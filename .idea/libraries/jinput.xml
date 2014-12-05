@@ -10,7 +10,9 @@
       <root url="jar://$PROJECT_DIR$/lib/lwjgl_util_applet.jar!/" />
       <root url="jar://$PROJECT_DIR$/lib/slick.jar!/" />
     </CLASSES>
-    <JAVADOC />
+    <JAVADOC>
+      <root url="file://$PROJECT_DIR$/lib/javadoc" />
+    </JAVADOC>
     <NATIVE>
       <root url="file://$PROJECT_DIR$/lib/native/linux" />
       <root url="file://$PROJECT_DIR$/lib/native/mac" />
