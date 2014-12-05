@@ -1,14 +1,17 @@
 package test;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+/*
 import org.newdawn.slick.AppGameContainer;
 import org.newdawn.slick.BasicGame;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.SlickException;
+*/
 
-public class Test extends BasicGame
+public class Test // extends BasicGame
 {
+        /*
         private static int counter = 0;
 
         public Test(String gamename)
@@ -48,4 +51,5 @@ public class Test extends BasicGame
                         Logger.getLogger(Test.class.getName()).log(Level.SEVERE, null, ex);
                 }
         }
+        */
 }
