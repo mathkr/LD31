@@ -5,6 +5,7 @@ package test;
  */
 public class MyTestClass {
     private double y = 1.0;
+    private String s = "Hallo::";
 
     public static void main(String[] args) {
         System.out.println("fasdfasdf");
