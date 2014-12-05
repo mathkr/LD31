@@ -10,4 +10,16 @@ public class MyTestClass {
         System.out.println("fasdfasdf");
     }
 
+        private class Code {
+                String[] lots_of_code;
+        }
+
+        private class ClubMate {
+                int[] tasty_mate;
+        }
+
+        Code work(ClubMate[] lots_of_mate) {
+                System.out.println("Wurst");
+                return new Code();
+        }
 }
