@@ -17,6 +17,7 @@ public abstract class Structure {
         public ResourceTable productionOutDelta;
         public ResourceTable productionInPerSec;
         public ResourceTable productionOutPerSec;
+        public ResourceTable capacityIncrease;
 
         public Structure(Vector2i pos) {
                 position = pos;
@@ -94,5 +95,11 @@ public abstract class Structure {
         public void actuallyPlace(){
                 Game.world.structures.add(this);
                 Game.world.resources.subtract(this.buildCost);
+                Game.world.resourceCapacity.add(this.capacityIncrease);
+        }
+
+        public void remove(){
+                Game.world.resourceCapacity.subtract(this.capacityIncrease);
+                Game.world.trimResourcesToCap();
         }
 }
