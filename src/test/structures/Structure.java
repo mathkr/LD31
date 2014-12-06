@@ -1,4 +1,7 @@
-package test;
+package test.structures;
+
+import test.ResourceTable;
+import test.Vector2i;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -6,9 +9,12 @@ import java.util.List;
 public abstract class Structure {
         public Vector2i position;
         public List<Vector2i> occupiedTiles;
+        public ResourceTable buildCost;
 
-        public Structure() {
+        public Structure(Vector2i pos) {
+                position = pos;
                 occupiedTiles = new ArrayList<Vector2i>();
+                buildCost = new ResourceTable();
         }
 
         public boolean collidesWith(Structure other){
@@ -21,6 +27,4 @@ public abstract class Structure {
         }
 
         public abstract void update();
-
-        public abstract ResourceTable getCost();
 }
