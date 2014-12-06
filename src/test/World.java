@@ -2,6 +2,7 @@ package test;
 
 import test.resources.Resource;
 import test.resources.ResourceTable;
+import test.structures.*;
 import test.structures.Structure;
 
 import java.util.ArrayList;
@@ -38,10 +39,8 @@ public class World {
 
                 createWorld(4L);
 
-                // For debugging
-                for (Resource resource : Resource.values()) {
-                        resources.put(resource, 1000.0f);
-                }
+                structures.add(new CopperMill(new Vector2i(10, 10)));
+                structures.add(new CopperMill(new Vector2i(50, 30)));
         }
 
         public void update(float delta) {
