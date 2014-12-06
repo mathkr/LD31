@@ -1,6 +1,9 @@
 package test;
 
+import java.util.Map;
 import java.util.Random;
+import java.util.TreeMap;
+
 import test.World.*;
 
 /**
@@ -15,18 +18,21 @@ public class WorldGenerator {
     public static Integer creationHintMapSizeDefaultX;
     public static Integer creationHintMapSizeDefaultY;
 
+
     static {
         //Legt nur die maximale anzahl fest
         creationHintLoadCount = 10;
         creationHintLoadSize = 5;
         creationHintMapSizeDefaultX = 160;
         creationHintMapSizeDefaultY = 80;
+
     }
 
     public static void createWorld(World world){
         Long seed = new Random().nextLong();
         createWorld(world, seed);
     }
+
 
     public static void createWorld(World world, Long seed){
         resetWorld(world);
@@ -42,7 +48,7 @@ public class WorldGenerator {
                     do {
                         ++cancel;
                         Integer sizeLoad = r.nextInt(creationHintLoadSize - 1) + 1;
-                        
+
                         Integer x = r.nextInt(world.bounds.x - (1 + sizeLoad )) + 1;
                         Integer y = r.nextInt(world.bounds.y - (1 + sizeLoad )) + 1;
 
@@ -80,5 +86,9 @@ public class WorldGenerator {
                 world.terrain[x][y] = TerrainType.DEFAULT;
             }
         }
+    }
+
+    private static Integer getCountOfLoads(){
+        return null;
     }
 }
