@@ -11,7 +11,7 @@ import test.resources.Resource;
  */
 public class GlassMine extends Structure{
 
-    private Float prodfactor = 0.05F;
+    private final Float prodfactor = 0.05F;
 
     public GlassMine(Vector2i pos) {
         super(pos);
@@ -21,12 +21,7 @@ public class GlassMine extends Structure{
         occupiedTiles.add(new Vector2i(0, 1));
         occupiedTiles.add(new Vector2i(1, 0));
         occupiedTiles.add(new Vector2i(1, 3));
+        productionOutPerSec.put(Resource.GLASS, getNearResources(World.TerrainType.GLASS, 1) * prodfactor);
     }
 
-    @Override
-    public void update(float d) {
-        Integer value = getNearResources(World.TerrainType.GLASS, 1);
-        productionOutPerSec.put(Resource.GLASS, value * prodfactor);
-        super.update(d);
-    }
 }

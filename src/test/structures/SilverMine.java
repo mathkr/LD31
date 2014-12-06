@@ -11,7 +11,7 @@ import test.resources.Resource;
  */
 public class SilverMine extends Structure {
 
-    private Float prodfactor = 0.1F;
+    private final Float prodfactor = 0.1F;
 
     public SilverMine(Vector2i pos) {
         super(pos);
@@ -21,12 +21,6 @@ public class SilverMine extends Structure {
         occupiedTiles.add(new Vector2i(0, 1));
         occupiedTiles.add(new Vector2i(1, 0));
         occupiedTiles.add(new Vector2i(1, 3));
-    }
-
-    @Override
-    public void update(float d) {
-        Integer value = getNearResources(World.TerrainType.SILVER, 1);
-        productionOutPerSec.put(Resource.SILVER, prodfactor * value);
-        super.update(d);
+        productionOutPerSec.put(Resource.SILVER, prodfactor * getNearResources(World.TerrainType.SILVER, 1));
     }
 }

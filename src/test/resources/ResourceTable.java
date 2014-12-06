@@ -30,6 +30,10 @@ public class ResourceTable {
         resources.put(r,f);
     }
 
+    public void putAll(ResourceTable other){
+        resources.putAll(other.resources);
+    }
+
     public void change(Resource r, Float f){
         resources.put(r, get(r) + f);
     }
