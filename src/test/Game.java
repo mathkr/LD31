@@ -9,6 +9,8 @@ public class Game extends BasicGame
         public static final int WIN_WIDTH = 800;
         public static final int WIN_HEIGHT = 600;
 
+        public static AppGameContainer appgc;
+
         public static World world;
         public static Renderer renderer;
         public static UserInterface gui;
@@ -28,6 +30,7 @@ public class Game extends BasicGame
         public void update(GameContainer gc, int i) throws SlickException {
                 float delta = i / 1000.0f;
                 world.update(delta);
+                gui.update(gc);
         }
 
         @Override
@@ -36,12 +39,22 @@ public class Game extends BasicGame
                 gui.render(gc, g);
         }
 
+        public static int getWorldMouseX() {
+                int stageX = appgc.getInput().getAbsoluteMouseX() - renderer.xOffset;
+                return stageX / renderer.tilePixelDimensions.x;
+        }
+
+        public static int getWorldMouseY() {
+                int stageY = appgc.getInput().getAbsoluteMouseY() - renderer.yOffset;
+                return stageY / renderer.tilePixelDimensions.y;
+        }
+
         public static void main(String[] args) {
                 try {
-                        AppGameContainer appgc;
                         appgc = new AppGameContainer(new Game("Simple Slick Game"));
                         appgc.setDisplayMode(WIN_WIDTH, WIN_HEIGHT, false);
                         appgc.setTargetFrameRate(60);
+                        appgc.setShowFPS(false);
                         appgc.start();
                 } catch (SlickException ex) {
                         Logger.getLogger(Game.class.getName()).log(Level.SEVERE, null, ex);

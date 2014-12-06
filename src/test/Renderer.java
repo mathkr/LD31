@@ -15,7 +15,15 @@ public class Renderer {
 
         public static boolean debugGrid = true;
 
+        public Vector2i tilePixelDimensions;
+
+        public int xOffset;
+        public int yOffset;
+
         public Renderer() {
+                xOffset = 0;
+                yOffset = 0;
+
                 try {
                         debugStructure = new Image("resources/debug_structure.png");
                 } catch (SlickException e) {
@@ -24,9 +32,9 @@ public class Renderer {
         }
 
         public void render(GameContainer gc, Graphics g) {
-                Vector2i tilePixelDimensions = new Vector2i(0, 0);
-                int xOffset = 0;
-                int yOffset = 0;
+                tilePixelDimensions = new Vector2i(0, 0);
+                xOffset = 0;
+                yOffset = 0;
 
                 float worldAspectRatio = (float)Game.world.bounds.x / (float)Game.world.bounds.y;
                 if (worldAspectRatio > 1.0f) {
@@ -100,6 +108,21 @@ public class Renderer {
                         for (int y = 0; y < Game.world.bounds.y; ++y) {
                                 int drawY = yOffset + y * tilePixelDimensions.y;
                                 g.drawLine(x0, drawY, x1, drawY);
+                        }
+                }
+
+                Structure placeStructure = Game.gui.structureToPlace;
+                if (placeStructure != null) {
+                        for (Vector2i occupiedTile : placeStructure.occupiedTiles) {
+                                int structureTileX = xOffset + (placeStructure.position.x + occupiedTile.x) * tilePixelDimensions.x;
+                                int structureTileY = yOffset + (placeStructure.position.y + occupiedTile.y) * tilePixelDimensions.y;
+                                if (placeStructure.canBePlaced()) {
+                                        System.out.println("can be placed");
+                                        g.drawImage(scaledDebugStructure, structureTileX, structureTileY);
+                                } else {
+                                        System.out.println("cant be placed");
+                                        g.drawImage(scaledDebugStructure, structureTileX, structureTileY, Color.red);
+                                }
                         }
                 }
         }

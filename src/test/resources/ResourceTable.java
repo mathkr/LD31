@@ -11,16 +11,9 @@ public class ResourceTable {
         resources = new HashMap<Resource,Float>();
     }
 
-    public static ResourceTable getZeroTable(){
-        ResourceTable res = new ResourceTable();
-        for(Resource r : Resource.values())
-            res.resources.put(r,0.0f);
-        return res;
-    }
-
     public boolean greaterOrEqual(ResourceTable other){
         for(Resource r : Resource.values())
-            if(this.resources.get(r) < other.resources.getOrDefault(r, 0.0f))
+            if(this.get(r) < other.get(r))
                 return false;
         return true;
     }
@@ -38,6 +31,13 @@ public class ResourceTable {
     }
 
     public boolean canSubstract(Resource r, Float f){
-        return resources.get(r) - f >= 0.0f;
+        return get(r) - f >= 0.0f;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        resources.forEach((res, val) -> sb.append(res + ": " + val + ", "));
+        return sb.toString();
     }
 }

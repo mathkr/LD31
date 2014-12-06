@@ -36,7 +36,6 @@ public class World {
                 for (Structure structure : structures) {
                         structure.update(delta);
                 }
-                resources.resources.forEach((r, f) -> System.out.println("res: " + r + ", value: " + f));
         }
 
         public void createWorld(Long seed){
