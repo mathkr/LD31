@@ -38,6 +38,6 @@ public class ResourceTable {
     }
 
     public boolean canSubstract(Resource r, Float f){
-        return resources.get(r) + f >= 0.0f;
+        return resources.get(r) - f >= 0.0f;
     }
 }
