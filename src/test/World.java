@@ -19,4 +19,8 @@ public class World {
                 structures = new ArrayList<Structure>();
                 terrain = new TerrainType[bounds.x][bounds.y];
         }
+
+        public void createWorld(Long seed){
+                WorldGenerator.createWorld(this,seed);
+        }
 }
