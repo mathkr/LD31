@@ -1,8 +1,7 @@
 package test;
 
 import test.resources.ResourceTable;
-import test.structures.CopperMill;
-import test.structures.Structure;
+import test.structures.*;
 
 import java.util.ArrayList;
 
@@ -26,8 +25,9 @@ public class World {
                 resources = new ResourceTable();
                 createWorld(4L);
 
-                structures.add(new CopperMill(new Vector2i(10, 10)));
-                structures.add(new CopperMill(new Vector2i(50, 30)));
+                structures.add(new CopperMine(new Vector2i(33, 33)));
+                structures.add(new SilverMine(new Vector2i(77, 43)));
+                structures.add(new GlasMine(new Vector2i(73, 37)));
         }
 
         public void update(float delta) {

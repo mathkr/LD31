@@ -1,7 +1,7 @@
 package test.structures;
 
 import test.Game;
-import test.resources.Resource;
+import test.World;
 import test.resources.ResourceTable;
 import test.Vector2i;
 
@@ -87,6 +87,35 @@ public abstract class Structure {
                 }
 
                 return true;
+        }
+
+        public Integer getNearResources(World.TerrainType searchType, Integer area){
+                Vector2i min = new Vector2i(occupiedTiles.get(0).x, occupiedTiles.get(0).y);
+                Vector2i max = new Vector2i(occupiedTiles.get(0).x, occupiedTiles.get(0).y);
+                for (Vector2i occupiedTile : occupiedTiles) {
+                        if(min.x > occupiedTile.x)
+                                min.x = occupiedTile.x;
+                        if(min.y > occupiedTile.y)
+                                min.y = occupiedTile.y;
+                        if(max.x < occupiedTile.x)
+                                max.x = occupiedTile.x;
+                        if(max.y < occupiedTile.y)
+                                max.y = occupiedTile.y;
+                }
+                min.x = this.position.x + min.x - area > 0 ? min.x - area : 0;
+                min.y = this.position.y + min.y - area > 0 ? min.y - area : 0;
+                max.x = this.position.x + max.x + area < Game.world.bounds.x   ? max.x + area : max.x;
+                max.y = this.position.y + max.y + area < Game.world.bounds.y  ? max.y + area : max.y;
+
+                Integer count = 0;
+                for (int i = min.x + this.position.x; i <= max.x + this.position.x; i++) {
+                        for (int j = min.y + this.position.y; j <= max.y + this.position.y; j++) {
+                                if(Game.world.terrain[i][j] == searchType){
+                                        ++count;
+                                }
+                        }
+                }
+                return count;
         }
 
 //        public void actuallyPlace(){
