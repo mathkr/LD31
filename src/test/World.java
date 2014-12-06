@@ -1,5 +1,6 @@
 package test;
 
+import test.resources.ResourceTable;
 import test.structures.Structure;
 
 import java.util.ArrayList;

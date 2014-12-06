@@ -1,7 +1,8 @@
 package test.structures;
 
 import test.Game;
-import test.ResourceTable;
+import test.resources.Resource;
+import test.resources.ResourceTable;
 import test.Vector2i;
 
 import java.util.ArrayList;
@@ -11,11 +12,17 @@ public abstract class Structure {
         public Vector2i position;
         public List<Vector2i> occupiedTiles;
         public ResourceTable buildCost;
+        public ResourceTable productionDelta;
+        public ResourceTable productionInPerSec;
+        public ResourceTable productionOutPerSec;
 
         public Structure(Vector2i pos) {
                 position = pos;
                 occupiedTiles = new ArrayList<Vector2i>();
                 buildCost = new ResourceTable();
+                productionDelta = new ResourceTable();
+                productionInPerSec = new ResourceTable();
+                productionOutPerSec = new ResourceTable();
         }
 
         public boolean collidesWith(Structure other){
@@ -27,9 +34,11 @@ public abstract class Structure {
                 return false;
         }
 
-        public abstract void update();
+        public void update(float d){
 
-        public boolean tryToPlaceAt(Vector2i pos){
+        }
+
+        public boolean tryToPlace(){
                 for(Structure other : Game.world.structures)
                         if(collidesWith(other)) {
                                 //kein Platz :(
