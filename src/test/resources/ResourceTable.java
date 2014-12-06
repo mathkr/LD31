@@ -20,7 +20,7 @@ public class ResourceTable {
 
     public boolean greaterOrEqual(ResourceTable other){
         for(Resource r : Resource.values())
-            if(this.resources.get(r) < other.resources.getOrDefault(r, 0.0f))
+            if(this.get(r) < other.get(r))
                 return false;
         return true;
     }
