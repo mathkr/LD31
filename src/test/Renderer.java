@@ -9,7 +9,7 @@ import java.util.Map;
 public class Renderer {
         public Vector2i windowDimensions = new Vector2i(Game.WIN_WIDTH, Game.WIN_HEIGHT);
 
-        public Color TERRAIN_DEFAULT_COLOR = new Color(0x3a, 0x8b, 0x27);
+        public Color TERRAIN_DEFAULT_COLOR = new Color(0x2e, 0x35, 0x52);
         public Color TERRAIN_COPPER_COLOR  = new Color(0xcd, 0x6d, 0x06);
         public Color TERRAIN_SILVER_COLOR  = new Color(0xcd, 0xcd, 0xcd);
         public Color TERRAIN_GLASS_COLOR   = new Color(0x83, 0xe3, 0xe4);
