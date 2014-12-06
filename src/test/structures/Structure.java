@@ -93,5 +93,6 @@ public abstract class Structure {
 
         public void actuallyPlace(){
                 Game.world.structures.add(this);
+                Game.world.resources.subtract(this.buildCost);
         }
 }
