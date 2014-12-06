@@ -1,5 +1,6 @@
 package test.structures;
 
+import test.Game;
 import test.Vector2i;
 import test.World;
 import test.resources.Resource;
@@ -14,12 +15,12 @@ public class SilverMine extends Structure {
 
     public SilverMine(Vector2i pos) {
         super(pos);
+        image = Game.renderer.getImage("resources/silver_mine.png");
+
         occupiedTiles.add(new Vector2i(0, 0));
         occupiedTiles.add(new Vector2i(0, 1));
         occupiedTiles.add(new Vector2i(1, 0));
-        occupiedTiles.add(new Vector2i(1, 1));
-        occupiedTiles.add(new Vector2i(2, 0));
-        occupiedTiles.add(new Vector2i(2, 1));
+        occupiedTiles.add(new Vector2i(1, 3));
     }
 
     @Override

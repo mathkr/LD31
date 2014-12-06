@@ -97,6 +97,54 @@ public class UserInterface {
                                                 ));
                                 }
                         );
+
+                        addButton(
+                                buttons,
+                                "Copper mine",
+                                gc,
+                                new Image("resources/debug_button.png"),
+                                currentButtonPosition,
+                                buttonSize,
+                                (comp) -> {
+                                        structureToPlace = new CopperMine(
+                                                new Vector2i(
+                                                        Game.getWorldMouseX(),
+                                                        Game.getWorldMouseY()
+                                                ));
+                                }
+                        );
+
+                        addButton(
+                                buttons,
+                                "Silver mine",
+                                gc,
+                                new Image("resources/debug_button.png"),
+                                currentButtonPosition,
+                                buttonSize,
+                                (comp) -> {
+                                        structureToPlace = new SilverMine(
+                                                new Vector2i(
+                                                        Game.getWorldMouseX(),
+                                                        Game.getWorldMouseY()
+                                                ));
+                                }
+                        );
+
+                        addButton(
+                                buttons,
+                                "Glass mine",
+                                gc,
+                                new Image("resources/debug_button.png"),
+                                currentButtonPosition,
+                                buttonSize,
+                                (comp) -> {
+                                        structureToPlace = new GlassMine(
+                                                new Vector2i(
+                                                        Game.getWorldMouseX(),
+                                                        Game.getWorldMouseY()
+                                                ));
+                                }
+                        );
                 } catch (SlickException e) {
                         e.printStackTrace();
                 }
