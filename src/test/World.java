@@ -21,15 +21,14 @@ public class World {
 
         public World() {
                 structures = new ArrayList<Structure>();
-                
+
                 terrain = new TerrainType[bounds.x][bounds.y];
-                // Initialize terrain array with default terrain
-                for (int x = 0; x < terrain.length; x++) {
-                        for (int y = 0; y < terrain[x].length; y++) {
-                                terrain[x][y] = TerrainType.DEFAULT;
-                        }
-                }
 
                 resources = new ResourceTable();
+                createWorld(2L);
+        }
+
+        public void createWorld(Long seed){
+                WorldGenerator.createWorld(this,seed);
         }
 }
