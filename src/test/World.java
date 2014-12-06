@@ -18,12 +18,24 @@ public class World {
         public ArrayList<Structure> structures;
         public TerrainType[][] terrain;
         public ResourceTable resources;
-
+        public ResourceTable resourceCapacity;
 
         public World() {
                 bounds = new Vector2i(80, 45);
                 structures = new ArrayList<Structure>();
                 resources = new ResourceTable();
+                resourceCapacity = new ResourceTable(){
+                        {
+                                put(Resource.COPPER, 500.0f);
+                                put(Resource.SILVER, 250.0f);
+                                put(Resource.GLASS, 100.0f);
+                                put(Resource.ENERGY, 750.0f);
+                                put(Resource.SILICON, 1000.0f);
+                                put(Resource.ELECTRON, 2000.0f);
+                                //TODO: balance numbers
+                        }
+                };
+
                 createWorld(4L);
 
                 // For debugging
@@ -40,5 +52,13 @@ public class World {
 
         public void createWorld(Long seed){
                 WorldGenerator.createWorld(this,seed);
+        }
+
+        public void trimResourcesToCap(){
+                resources.resources.forEach((r, v) ->{
+                        float rCap = resourceCapacity.get(r);
+                        if(v > rCap)
+                                resourceCapacity.put(r, rCap);
+                });
         }
 }
