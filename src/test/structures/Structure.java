@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public abstract class Structure {
+public class Structure {
         public Vector2i position;
         public List<Vector2i> occupiedTiles;
         public ResourceTable buildCost;

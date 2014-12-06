@@ -17,6 +17,6 @@ public class PSU_T1 extends Structure{
         occupiedTiles.add(new Vector2i(1,1));
 
         buildCost.put(Resource.SILICON, 80.0f);
-        productionOutPerSec.put(Resource.ENERGY, 0.333f);
+        productionOutPerSec.put(Resource.ENERGY, 0.4f);
     }
 }
