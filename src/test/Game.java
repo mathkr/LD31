@@ -65,6 +65,10 @@ public class Game extends BasicGame
                                 }
                         }
                 }
+
+                if (button == Input.MOUSE_RIGHT_BUTTON) {
+                        gui.structureToPlace = null;
+                }
         }
 
         public static void main(String[] args) {
