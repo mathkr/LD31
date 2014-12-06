@@ -26,6 +26,8 @@ public class Game extends BasicGame
 
         @Override
         public void update(GameContainer gc, int i) throws SlickException {
+                float delta = i / 1000.0f;
+                world.update(delta);
         }
 
         @Override
