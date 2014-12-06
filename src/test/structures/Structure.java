@@ -38,7 +38,7 @@ public abstract class Structure {
 
         public void update(float d){
                 ResourceTable resources = Game.world.resources;
-                //buffere aenderungen von maximal 1.0f
+                //buffere aenderungen, solange unter 1.0f
                 for(Resource r : Resource.values()) {
                         if (productionInDelta.get(r) < 1.0f)
                                 productionInDelta.change(r, productionInPerSec.get(r) * d);
@@ -55,18 +55,20 @@ public abstract class Structure {
                 }
                 //ziehe eingangsressourcen ab
                 for(Resource r : Resource.values()) {
-                        float rDelta = productionInDelta.get(r);
-                        float change = (int) rDelta;
-                        productionInDelta.change(r, -change);
-                        resources.change(r, -change);
+                        float rDelta = (int) productionInDelta.get(r);
+                        if (rDelta >= 1.0f) {
+                                productionInDelta.change(r, -rDelta);
+                                resources.change(r, -rDelta);
+                        }
                 }
                 //addiere ausgangsressourcen
                 //TODO: capacity-check
                 for(Resource r : Resource.values()) {
-                        float rDelta = productionOutDelta.get(r);
-                        float change = (int) rDelta;
-                        productionOutDelta.change(r, -change);
-                        resources.change(r, +change);
+                        float rDelta = (int) productionOutDelta.get(r);
+                        if(rDelta >= 1.0f) {
+                                productionOutDelta.change(r, -rDelta);
+                                resources.change(r, rDelta);
+                        }
                 }
         }
 
