@@ -18,6 +18,10 @@ public class ResourceTable {
         return true;
     }
 
+    public void subtract(ResourceTable other){
+        other.resources.forEach((res, val) -> this.change(res, -val));
+    }
+
     public void put(Resource r, Float f){
         resources.put(r,f);
     }
