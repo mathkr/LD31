@@ -13,6 +13,8 @@ public class Renderer {
 
         public Image debugStructure;
 
+        public static boolean debugGrid = true;
+
         public Renderer() {
                 try {
                         debugStructure = new Image("resources/debug_structure.png");
@@ -79,6 +81,25 @@ public class Renderer {
                                 int structureTileX = xOffset + (structure.position.x + occupiedTile.x) * tilePixelDimensions.x;
                                 int structureTileY = yOffset + (structure.position.y + occupiedTile.y) * tilePixelDimensions.y;
                                 g.drawImage(scaledDebugStructure, structureTileX, structureTileY);
+                        }
+                }
+
+                // Draw debug grid
+                if (debugGrid) {
+                        g.setColor(new Color(30, 30, 30, 100));
+
+                        int y0 = yOffset;
+                        int y1 = yOffset + tilePixelDimensions.y * Game.world.bounds.y;
+                        for (int x = 0; x < Game.world.bounds.x; ++x) {
+                                int drawX = xOffset + x * tilePixelDimensions.x;
+                                g.drawLine(drawX, y0, drawX, y1);
+                        }
+
+                        int x0 = xOffset;
+                        int x1 = xOffset + tilePixelDimensions.x * Game.world.bounds.x;
+                        for (int y = 0; y < Game.world.bounds.y; ++y) {
+                                int drawY = yOffset + y * tilePixelDimensions.y;
+                                g.drawLine(x0, drawY, x1, drawY);
                         }
                 }
         }
