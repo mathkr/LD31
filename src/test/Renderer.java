@@ -37,17 +37,19 @@ public class Renderer {
                 yOffset = 0;
 
                 float worldAspectRatio = (float)Game.world.bounds.x / (float)Game.world.bounds.y;
-                if (worldAspectRatio > 1.0f) {
+                float windowAspectRatio = (float)windowDimensions.x / (float)windowDimensions.y;
+                if (worldAspectRatio > windowAspectRatio) {
                         // World dimensions are wider than high (landscape)
                         tilePixelDimensions.x = windowDimensions.x / Game.world.bounds.x;
                         tilePixelDimensions.y = tilePixelDimensions.x;
-                        yOffset = (windowDimensions.y - (Game.world.bounds.y * tilePixelDimensions.y)) / 2;
                 } else {
                         // World dimensions are higher than wide (portrait)
                         tilePixelDimensions.y = windowDimensions.y / Game.world.bounds.y;
                         tilePixelDimensions.x = tilePixelDimensions.y;
-                        xOffset = (windowDimensions.x - (Game.world.bounds.x * tilePixelDimensions.x)) / 2;
                 }
+
+                xOffset = (windowDimensions.x - (Game.world.bounds.x * tilePixelDimensions.x)) / 2;
+                yOffset = (windowDimensions.y - (Game.world.bounds.y * tilePixelDimensions.y)) / 2;
 
                 // Render terrain
                 for (int x = 0; x < Game.world.bounds.x; ++x) {

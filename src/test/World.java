@@ -27,9 +27,10 @@ public class World {
                 resources = new ResourceTable();
                 createWorld(4L);
 
-                structures.add(new CopperMill(new Vector2i(10, 10)));
-                structures.add(new CopperMill(new Vector2i(50, 30)));
-                resources.put(Resource.SILICON, 100f);
+                // For debugging
+                for (Resource resource : Resource.values()) {
+                        resources.put(resource, 1000.0f);
+                }
         }
 
         public void update(float delta) {

@@ -6,8 +6,8 @@ import org.newdawn.slick.*;
 
 public class Game extends BasicGame
 {
-        public static final int WIN_WIDTH = 800;
-        public static final int WIN_HEIGHT = 600;
+        public static final int WIN_WIDTH = 1300;
+        public static final int WIN_HEIGHT = 700;
 
         public static AppGameContainer appgc;
 
@@ -47,24 +47,6 @@ public class Game extends BasicGame
         public static int getWorldMouseY() {
                 int stageY = appgc.getInput().getAbsoluteMouseY() - renderer.yOffset;
                 return stageY / renderer.tilePixelDimensions.y;
-        }
-
-        @Override
-        public void mouseClicked(int button, int x, int y, int clickCount) {
-                super.mouseClicked(button, x, y, clickCount);
-
-                if (button == Input.MOUSE_LEFT_BUTTON) {
-                        int worldX = (appgc.getInput().getAbsoluteMouseX() - renderer.xOffset) / renderer.tilePixelDimensions.x;
-                        int worldY = (appgc.getInput().getAbsoluteMouseY() - renderer.yOffset) / renderer.tilePixelDimensions.y;
-
-                        if (worldX >= 0 && worldX < world.bounds.x && worldY >= 0 && worldY < world.bounds.y) {
-                                // Hier haben wir auf ein gueltiges tile geclickt
-                                if (gui.structureToPlace != null && gui.structureToPlace.canBePlaced()) {
-                                        gui.structureToPlace.actuallyPlace();
-                                        gui.structureToPlace = null;
-                                }
-                        }
-                }
         }
 
         public static void main(String[] args) {
