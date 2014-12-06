@@ -31,7 +31,7 @@ public class ResourceTable {
     }
 
     public boolean canSubstract(Resource r, Float f){
-        return get(r) - f >= 0.0f;
+        return get(r) >= f;
     }
 
     @Override

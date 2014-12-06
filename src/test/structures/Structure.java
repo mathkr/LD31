@@ -7,6 +7,7 @@ import test.Vector2i;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public abstract class Structure {
         public Vector2i position;
@@ -48,15 +49,23 @@ public abstract class Structure {
                                 productionOutDelta.change(res, productionOutPerSec.get(res) * d);
                 });
                 //pruefe, ob eingangsressourcen vorhanden
-                productionInDelta.resources.forEach((res, val) -> {
-                        float expectedChange = (int) (float) val;
-                        if (expectedChange >= 1.0f && !resources.canSubstract(res, expectedChange)) ;
+                for(Map.Entry<Resource, Float> e : productionInDelta.resources.entrySet()){
+                        float rDelta = e.getValue().intValue();
+                        if (rDelta >= 1.0f && !resources.canSubstract(e.getKey(), rDelta)) {
                                 //kein saft :(
                                 return;
+                        }
+                }
+                productionInDelta.resources.forEach((res, val) -> {
+                        float rDelta = val.intValue();
+                        if (rDelta >= 1.0f && !resources.canSubstract(res, rDelta)) {
+                                //kein saft :(
+                                return;
+                        }
                 });
                 //ziehe eingangsressourcen ab
                 productionInDelta.resources.forEach((res, val) -> {
-                        float rDelta = (int) (float) val;
+                        float rDelta = val.intValue();
                         if (rDelta >= 1.0f) {
                                 productionInDelta.change(res, -rDelta);
                                 resources.change(res, -rDelta);
