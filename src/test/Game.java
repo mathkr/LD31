@@ -11,6 +11,7 @@ public class Game extends BasicGame
 
         public static World world;
         public static Renderer renderer;
+        public static UserInterface gui;
 
         public Game(String gamename) {
                 super(gamename);
@@ -20,6 +21,7 @@ public class Game extends BasicGame
         public void init(GameContainer gc) throws SlickException {
                 world = new World();
                 renderer = new Renderer();
+                gui = new UserInterface(gc);
         }
 
         @Override
@@ -29,6 +31,7 @@ public class Game extends BasicGame
         @Override
         public void render(GameContainer gc, Graphics g) throws SlickException {
                 renderer.render(gc, g);
+                gui.render(gc, g);
         }
 
         public static void main(String[] args) {
