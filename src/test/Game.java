@@ -6,7 +6,11 @@ import org.newdawn.slick.*;
 
 public class Game extends BasicGame
 {
+        public static final int WIN_WIDTH = 800;
+        public static final int WIN_HEIGHT = 600;
+
         public static World world;
+        public static Renderer renderer;
 
         public Game(String gamename) {
                 super(gamename);
@@ -15,6 +19,7 @@ public class Game extends BasicGame
         @Override
         public void init(GameContainer gc) throws SlickException {
                 world = new World();
+                renderer = new Renderer();
         }
 
         @Override
@@ -23,16 +28,14 @@ public class Game extends BasicGame
 
         @Override
         public void render(GameContainer gc, Graphics g) throws SlickException {
-                g.drawString("Howdy!", 40, 40);
-
-                g.drawRect(10, 10, 200, 150);
+                renderer.render(gc, g);
         }
 
         public static void main(String[] args) {
                 try {
                         AppGameContainer appgc;
                         appgc = new AppGameContainer(new Game("Simple Slick Game"));
-                        appgc.setDisplayMode(640, 480, false);
+                        appgc.setDisplayMode(WIN_WIDTH, WIN_HEIGHT, false);
                         appgc.setTargetFrameRate(60);
                         appgc.start();
                 } catch (SlickException ex) {

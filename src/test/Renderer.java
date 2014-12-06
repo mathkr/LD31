@@ -1,9 +1,10 @@
 package test;
 
 import org.newdawn.slick.*;
+import test.structures.Structure;
 
 public class Renderer {
-        public Vector2i windowDimensions = new Vector2i(800, 600);
+        public Vector2i windowDimensions = new Vector2i(Game.WIN_WIDTH, Game.WIN_HEIGHT);
 
         public Color TERRAIN_DEFAULT_COLOR = new Color(0x3a, 0x8b, 0x27);
         public Color TERRAIN_COPPER_COLOR = new Color(203, 122, 18);
@@ -39,9 +40,8 @@ public class Renderer {
                 }
 
                 // Render terrain
-                Vector2i currentDrawCoordinates = new Vector2i(xOffset, yOffset);
-                for (int x = 0; x < Game.world.terrain.length; ++x) {
-                        for (int y = 0; y < Game.world.terrain[0].length; ++y) {
+                for (int x = 0; x < Game.world.bounds.x; ++x) {
+                        for (int y = 0; y < Game.world.bounds.y; ++y) {
                                 // Set color depending on terrainType
                                 World.TerrainType terrainType = Game.world.terrain[x][y];
                                 Color tileColor = null;
@@ -65,13 +65,11 @@ public class Renderer {
 
                                 // Draw tile
                                 g.setColor(tileColor);
-                                g.fillRect(currentDrawCoordinates.x, currentDrawCoordinates.y, tilePixelDimensions.x, tilePixelDimensions.y);
-
-                                // Move the current draw coordinates one tile down
-                                currentDrawCoordinates.y += tilePixelDimensions.y;
+                                int drawX = xOffset + x * tilePixelDimensions.x;
+                                int drawY = yOffset + y * tilePixelDimensions.y;
+                                //System.out.println("currentDrawCoordinates = " + drawX + ", " + drawY);
+                                g.fillRect(drawX, drawY, tilePixelDimensions.x, tilePixelDimensions.y);
                         }
-                        // Move the current draw coordinates one tile to the right
-                        currentDrawCoordinates.x += tilePixelDimensions.x;
                 }
 
                 // Debug render structures
