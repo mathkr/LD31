@@ -26,6 +26,7 @@ public class WorldGenerator {
 
     public static void createWorld(World world, Long seed){
 
+        resetWorld(world);
 
         Random r = new Random(seed);
         for (TerrainType terrainType : TerrainType.values()) {
@@ -34,8 +35,9 @@ public class WorldGenerator {
                 Integer count = r.nextInt(creationHintLoadCount - 1 ) + 1;
                 for (int i = 0; i < count; i++) {
                     boolean vainSet = true;
+                    Integer cancel = 0;
                     do {
-
+                        ++cancel;
                         Integer sizeLoad = r.nextInt(creationHintLoadSize - 1) + 1;
 
                         Integer x = r.nextInt(world.bounds.x - (1 + sizeLoad )) + 1;
@@ -60,7 +62,7 @@ public class WorldGenerator {
                         }
 
                         //Suche solange eine Freie stelle biss der Arzt kommt
-                    }while(!vainSet);
+                    }while(!vainSet && cancel < 5);
                 }
 
             }

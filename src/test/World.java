@@ -21,9 +21,10 @@ public class World {
         public World() {
                 structures = new ArrayList<Structure>();
 
-                createWorld(1L);
+                terrain = new TerrainType[bounds.x][bounds.y];
 
                 resources = new ResourceTable();
+                createWorld(2L);
         }
 
         public void createWorld(Long seed){
