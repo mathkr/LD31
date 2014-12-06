@@ -1,5 +1,6 @@
 package test;
 
+import test.resources.Resource;
 import test.resources.ResourceTable;
 import test.structures.CopperMill;
 import test.structures.Structure;
@@ -28,6 +29,7 @@ public class World {
 
                 structures.add(new CopperMill(new Vector2i(10, 10)));
                 structures.add(new CopperMill(new Vector2i(50, 30)));
+                resources.put(Resource.SILICON, 100f);
         }
 
         public void update(float delta) {

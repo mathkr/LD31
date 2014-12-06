@@ -49,6 +49,24 @@ public class Game extends BasicGame
                 return stageY / renderer.tilePixelDimensions.y;
         }
 
+        @Override
+        public void mouseClicked(int button, int x, int y, int clickCount) {
+                super.mouseClicked(button, x, y, clickCount);
+
+                if (button == Input.MOUSE_LEFT_BUTTON) {
+                        int worldX = (appgc.getInput().getAbsoluteMouseX() - renderer.xOffset) / renderer.tilePixelDimensions.x;
+                        int worldY = (appgc.getInput().getAbsoluteMouseY() - renderer.yOffset) / renderer.tilePixelDimensions.y;
+
+                        if (worldX >= 0 && worldX < world.bounds.x && worldY >= 0 && worldY < world.bounds.y) {
+                                // Hier haben wir auf ein gueltiges tile geclickt
+                                if (gui.structureToPlace != null && gui.structureToPlace.canBePlaced()) {
+                                        gui.structureToPlace.actuallyPlace();
+                                        gui.structureToPlace = null;
+                                }
+                        }
+                }
+        }
+
         public static void main(String[] args) {
                 try {
                         appgc = new AppGameContainer(new Game("Simple Slick Game"));

@@ -117,11 +117,11 @@ public class Renderer {
                                 int structureTileX = xOffset + (placeStructure.position.x + occupiedTile.x) * tilePixelDimensions.x;
                                 int structureTileY = yOffset + (placeStructure.position.y + occupiedTile.y) * tilePixelDimensions.y;
                                 if (placeStructure.canBePlaced()) {
-                                        System.out.println("can be placed");
                                         g.drawImage(scaledDebugStructure, structureTileX, structureTileY);
                                 } else {
-                                        System.out.println("cant be placed");
-                                        g.drawImage(scaledDebugStructure, structureTileX, structureTileY, Color.red);
+                                        g.drawImage(scaledDebugStructure, structureTileX, structureTileY);
+                                        g.setColor(new Color(255, 0, 0, 40));
+                                        g.fillRect(structureTileX, structureTileY, scaledDebugStructure.getWidth(), scaledDebugStructure.getHeight());
                                 }
                         }
                 }

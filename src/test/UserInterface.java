@@ -90,8 +90,6 @@ public class UserInterface {
                 if (structureToPlace != null) {
                         structureToPlace.position.x = Game.getWorldMouseX();
                         structureToPlace.position.y = Game.getWorldMouseY();
-
-                        System.out.println("x: " + structureToPlace.position.x + ", y: " + structureToPlace.position.y);
                 }
         }
 

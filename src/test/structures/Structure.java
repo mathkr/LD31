@@ -89,8 +89,7 @@ public abstract class Structure {
                 return true;
         }
 
-//        public void actuallyPlace(){
-//                Game.world.structures.add(this);
-//                Game.world.resources.
-//        }
+        public void actuallyPlace(){
+                Game.world.structures.add(this);
+        }
 }
