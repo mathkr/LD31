@@ -45,8 +45,8 @@ public class UserInterface {
                                 (comp) -> {
                                         structureToPlace = new CopperMill(
                                                 new Vector2i(
-                                                        gc.getInput().getMouseX() - Game.renderer.xOffset,
-                                                        gc.getInput().getMouseY() - Game.renderer.yOffset
+                                                        Game.getWorldMouseX(),
+                                                        Game.getWorldMouseY()
                                                 ));
                                 }
                         );
@@ -88,11 +88,8 @@ public class UserInterface {
 
         public void update(GameContainer gc) {
                 if (structureToPlace != null) {
-                        int mouseX = gc.getInput().getMouseX() - Game.renderer.xOffset;
-                        int mouseY = gc.getInput().getMouseY() - Game.renderer.yOffset;
-
-                        structureToPlace.position.x = mouseX;
-                        structureToPlace.position.y = mouseY;
+                        structureToPlace.position.x = Game.getWorldMouseX();
+                        structureToPlace.position.y = Game.getWorldMouseY();
 
                         System.out.println("x: " + structureToPlace.position.x + ", y: " + structureToPlace.position.y);
                 }

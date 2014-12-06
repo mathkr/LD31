@@ -15,6 +15,8 @@ public class Renderer {
 
         public static boolean debugGrid = true;
 
+        public Vector2i tilePixelDimensions;
+
         public int xOffset;
         public int yOffset;
 
@@ -30,7 +32,7 @@ public class Renderer {
         }
 
         public void render(GameContainer gc, Graphics g) {
-                Vector2i tilePixelDimensions = new Vector2i(0, 0);
+                tilePixelDimensions = new Vector2i(0, 0);
                 xOffset = 0;
                 yOffset = 0;
 
