@@ -56,13 +56,6 @@ public abstract class Structure {
                                 return;
                         }
                 }
-                productionInDelta.resources.forEach((res, val) -> {
-                        float rDelta = val.intValue();
-                        if (rDelta >= 1.0f && !resources.canSubstract(res, rDelta)) {
-                                //kein saft :(
-                                return;
-                        }
-                });
                 //ziehe eingangsressourcen ab
                 productionInDelta.resources.forEach((res, val) -> {
                         float rDelta = val.intValue();
