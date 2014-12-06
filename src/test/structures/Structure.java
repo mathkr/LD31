@@ -12,7 +12,8 @@ public abstract class Structure {
         public Vector2i position;
         public List<Vector2i> occupiedTiles;
         public ResourceTable buildCost;
-        public ResourceTable productionDelta;
+        public ResourceTable productionInDelta;
+        public ResourceTable productionOutDelta;
         public ResourceTable productionInPerSec;
         public ResourceTable productionOutPerSec;
 
@@ -20,7 +21,8 @@ public abstract class Structure {
                 position = pos;
                 occupiedTiles = new ArrayList<Vector2i>();
                 buildCost = new ResourceTable();
-                productionDelta = new ResourceTable();
+                productionInDelta = new ResourceTable();
+                productionOutDelta = new ResourceTable();
                 productionInPerSec = new ResourceTable();
                 productionOutPerSec = new ResourceTable();
         }
@@ -35,7 +37,37 @@ public abstract class Structure {
         }
 
         public void update(float d){
-
+                ResourceTable resources = Game.world.resources;
+                //buffere aenderungen von maximal 1.0f
+                for(Resource r : Resource.values()) {
+                        if (productionInDelta.get(r) < 1.0f)
+                                productionInDelta.change(r, productionInPerSec.get(r) * d);
+                        if (productionOutDelta.get(r) < 1.0f)
+                                productionOutDelta.change(r, productionOutPerSec.get(r) * d);
+                }
+                //pruefe, ob eingangsressourcen vorhanden
+                for(Resource r : Resource.values()) {
+                        float expectedChange = (int)productionInDelta.get(r);
+                        if (expectedChange >= 1.0f && !resources.canSubstract(r, expectedChange)) {
+                                //kein saft :(
+                                return;
+                        }
+                }
+                //ziehe eingangsressourcen ab
+                for(Resource r : Resource.values()) {
+                        float rDelta = productionInDelta.get(r);
+                        float change = (int) rDelta;
+                        productionInDelta.change(r, -change);
+                        resources.change(r, -change);
+                }
+                //addiere ausgangsressourcen
+                //TODO: capacity-check
+                for(Resource r : Resource.values()) {
+                        float rDelta = productionOutDelta.get(r);
+                        float change = (int) rDelta;
+                        productionOutDelta.change(r, -change);
+                        resources.change(r, +change);
+                }
         }
 
         public boolean tryToPlace(){

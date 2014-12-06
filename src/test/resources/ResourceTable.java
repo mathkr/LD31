@@ -20,7 +20,7 @@ public class ResourceTable {
 
     public boolean greaterOrEqual(ResourceTable other){
         for(Resource r : Resource.values())
-            if(this.resources.getOrDefault(r, 0.0f) < other.resources.getOrDefault(r, 0.0f))
+            if(this.resources.get(r) < other.resources.getOrDefault(r, 0.0f))
                 return false;
         return true;
     }
@@ -30,6 +30,14 @@ public class ResourceTable {
     }
 
     public void change(Resource r, Float f){
-        resources.put(r, resources.get(r) + f);
+        resources.put(r, get(r) + f);
+    }
+
+    public float get(Resource r){
+        return resources.getOrDefault(r, 0.0f);
+    }
+
+    public boolean canSubstract(Resource r, Float f){
+        return resources.get(r) + f >= 0.0f;
     }
 }
