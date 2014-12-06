@@ -11,8 +11,6 @@ public abstract class Structure {
                 occupiedTiles = new ArrayList<Vector2i>();
         }
 
-        public abstract void update();
-
         public boolean collidesWith(Structure other){
                 for(Vector2i thisPos : this.occupiedTiles)
                         for(Vector2i otherPos : other.occupiedTiles)
@@ -21,6 +19,8 @@ public abstract class Structure {
                                         return true;
                 return false;
         }
+
+        public abstract void update();
 
         public abstract ResourceTable getCost();
 }
