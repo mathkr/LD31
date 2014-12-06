@@ -1,7 +1,9 @@
 package test;
 
+import test.resources.Resource;
 import test.resources.ResourceTable;
 import test.structures.*;
+import test.structures.Structure;
 
 import java.util.ArrayList;
 
@@ -17,27 +19,45 @@ public class World {
         public ArrayList<Structure> structures;
         public TerrainType[][] terrain;
         public ResourceTable resources;
-
+        public ResourceTable resourceCapacity;
 
         public World() {
                 bounds = new Vector2i(80, 45);
                 structures = new ArrayList<Structure>();
                 resources = new ResourceTable();
+                resourceCapacity = new ResourceTable(){
+                        {
+                                put(Resource.COPPER, 500.0f);
+                                put(Resource.SILVER, 250.0f);
+                                put(Resource.GLASS, 100.0f);
+                                put(Resource.ENERGY, 750.0f);
+                                put(Resource.SILICON, 1000.0f);
+                                put(Resource.ELECTRON, 2000.0f);
+                                //TODO: balance numbers
+                        }
+                };
+
                 createWorld(4L);
 
-                structures.add(new CopperMine(new Vector2i(33, 33)));
-                structures.add(new SilverMine(new Vector2i(77, 43)));
-                structures.add(new GlasMine(new Vector2i(73, 37)));
+                structures.add(new CopperMill(new Vector2i(10, 10)));
+                structures.add(new CopperMill(new Vector2i(50, 30)));
         }
 
         public void update(float delta) {
                 for (Structure structure : structures) {
                         structure.update(delta);
                 }
-                resources.resources.forEach((r, f) -> System.out.println("res: " + r + ", value: " + f));
         }
 
         public void createWorld(Long seed){
                 WorldGenerator.createWorld(this,seed);
+        }
+
+        public void trimResourcesToCap(){
+                resources.resources.forEach((r, v) ->{
+                        float rCap = resourceCapacity.get(r);
+                        if(v > rCap)
+                                resourceCapacity.put(r, rCap);
+                });
         }
 }
