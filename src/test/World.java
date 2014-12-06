@@ -12,19 +12,17 @@ public class World {
                 GLASS
         }
 
-        public Vector2i bounds = new Vector2i(160, 90);
+        public Vector2i bounds;
         public ArrayList<Structure> structures;
         public TerrainType[][] terrain;
         public ResourceTable resources;
 
 
         public World() {
+                bounds = new Vector2i(160, 90);
                 structures = new ArrayList<Structure>();
-
-                terrain = new TerrainType[bounds.x][bounds.y];
-
                 resources = new ResourceTable();
-                createWorld(2L);
+                createWorld(4L);
         }
 
         public void createWorld(Long seed){

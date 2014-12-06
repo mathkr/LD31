@@ -12,11 +12,15 @@ public class WorldGenerator {
 
     public static Integer creationHintLoadSize;
     public static Integer creationHintLoadCount;
+    public static Integer creationHintMapSizeDefaultX;
+    public static Integer creationHintMapSizeDefaultY;
 
     static {
         //Legt nur die maximale anzahl fest
         creationHintLoadCount = 10;
         creationHintLoadSize = 5;
+        creationHintMapSizeDefaultX = 160;
+        creationHintMapSizeDefaultY = 80;
     }
 
     public static void createWorld(World world){
@@ -25,7 +29,6 @@ public class WorldGenerator {
     }
 
     public static void createWorld(World world, Long seed){
-
         resetWorld(world);
 
         Random r = new Random(seed);
@@ -39,7 +42,7 @@ public class WorldGenerator {
                     do {
                         ++cancel;
                         Integer sizeLoad = r.nextInt(creationHintLoadSize - 1) + 1;
-
+                        
                         Integer x = r.nextInt(world.bounds.x - (1 + sizeLoad )) + 1;
                         Integer y = r.nextInt(world.bounds.y - (1 + sizeLoad )) + 1;
 
@@ -70,7 +73,7 @@ public class WorldGenerator {
     }
 
     public static void resetWorld( World world){
-
+        world.terrain = new TerrainType[world.bounds.x][world.bounds.y];
         //clear Terrain from changes
         for (int x = 0; x < world.bounds.x; x++) {
             for (int y = 0; y < world.bounds.y; y++) {
