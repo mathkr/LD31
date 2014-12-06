@@ -2,7 +2,6 @@ package test;
 
 import test.resources.Resource;
 import test.resources.ResourceTable;
-import test.structures.CopperMill;
 import test.structures.Structure;
 
 import java.util.ArrayList;

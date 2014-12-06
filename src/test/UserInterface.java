@@ -73,6 +73,10 @@ public class UserInterface {
                                                 }
                                         }
                                 }
+
+                                if (button == Input.MOUSE_RIGHT_BUTTON) {
+                                        Game.gui.structureToPlace = null;
+                                }
                         }
 
                         @Override
