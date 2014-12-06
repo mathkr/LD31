@@ -1,5 +1,6 @@
 package test.structures;
 
+import test.Game;
 import test.ResourceTable;
 import test.Vector2i;
 
@@ -27,4 +28,17 @@ public abstract class Structure {
         }
 
         public abstract void update();
+
+        public boolean tryToPlaceAt(Vector2i pos){
+                for(Structure other : Game.world.structures)
+                        if(collidesWith(other)) {
+                                //kein Platz :(
+                                return false;
+                        }
+                if(!Game.world.resources.greaterOrEqual(buildCost))
+                        //zu teuer :(
+                        return false;
+                Game.world.structures.add(this);
+                return true;
+        }
 }

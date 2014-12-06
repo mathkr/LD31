@@ -1,6 +1,7 @@
 package test.structures;
 
 import test.Game;
+import test.ResourceTable;
 import test.Vector2i;
 
 public class CopperMill extends Structure{
@@ -15,6 +16,10 @@ public class CopperMill extends Structure{
     }
 
     public void update(){
-        Game.world.resources.copper += 1;
+        ResourceTable res = Game.world.resources;
+        if(res.energy >= 1) {
+            Game.world.resources.energy -= 1;
+            Game.world.resources.copper += 10;
+        }
     }
 }
