@@ -3,6 +3,9 @@ package test;
 import org.newdawn.slick.*;
 import test.structures.Structure;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class Renderer {
         public Vector2i windowDimensions = new Vector2i(Game.WIN_WIDTH, Game.WIN_HEIGHT);
 
@@ -20,14 +23,51 @@ public class Renderer {
         public int xOffset;
         public int yOffset;
 
+        public Map<String, Image> loadedImages;
+
         public Renderer() {
                 xOffset = 0;
                 yOffset = 0;
+                loadedImages = new HashMap<>();
 
                 try {
-                        debugStructure = new Image("resources/debug_structure.png");
+                        Image debug = new Image("resources/debug_structure.png");
                 } catch (SlickException e) {
                         e.printStackTrace();
+                }
+        }
+
+        public Image getImage(String path) {
+                if (loadedImages.containsKey(path)) {
+                        // We already loaded and scaled the image
+                        return loadedImages.get(path);
+                } else {
+                        try {
+                                // We load and a scale the image, then put it into the map and return it
+                                Image image = new Image(path, false, Image.FILTER_NEAREST);
+                                Image scaled = image.getScaledCopy((float)tilePixelDimensions.x / 8.0f);
+                                loadedImages.put(path, scaled);
+                                return scaled;
+                        } catch (SlickException e) {
+                                e.printStackTrace();
+                        }
+                        return null;
+                }
+        }
+
+        public void renderStructure(Structure structure, Graphics g) {
+                Image image = structure.image;
+
+                if (image != null) {
+                        int structureTileX = xOffset + structure.position.x * tilePixelDimensions.x;
+                        int structureTileY = yOffset + structure.position.y * tilePixelDimensions.y;
+                        g.drawImage(image, structureTileX, structureTileY);
+                } else {
+                        for (Vector2i occupiedTile : structure.occupiedTiles) {
+                                int structureTileX = xOffset + (structure.position.x + occupiedTile.x) * tilePixelDimensions.x;
+                                int structureTileY = yOffset + (structure.position.y + occupiedTile.y) * tilePixelDimensions.y;
+                                g.drawImage(debugStructure, structureTileX, structureTileY);
+                        }
                 }
         }
 
@@ -50,6 +90,15 @@ public class Renderer {
 
                 xOffset = (windowDimensions.x - (Game.world.bounds.x * tilePixelDimensions.x)) / 2;
                 yOffset = (windowDimensions.y - (Game.world.bounds.y * tilePixelDimensions.y)) / 2;
+
+                if (debugStructure == null) {
+                        try {
+                                debugStructure = new Image("resources/debug_structure.png");
+                                debugStructure = debugStructure.getScaledCopy(tilePixelDimensions.x, tilePixelDimensions.y);
+                        } catch (SlickException e) {
+                                e.printStackTrace();
+                        }
+                }
 
                 // Render terrain
                 for (int x = 0; x < Game.world.bounds.x; ++x) {
@@ -79,19 +128,13 @@ public class Renderer {
                                 g.setColor(tileColor);
                                 int drawX = xOffset + x * tilePixelDimensions.x;
                                 int drawY = yOffset + y * tilePixelDimensions.y;
-                                //System.out.println("currentDrawCoordinates = " + drawX + ", " + drawY);
                                 g.fillRect(drawX, drawY, tilePixelDimensions.x, tilePixelDimensions.y);
                         }
                 }
 
                 // Debug render structures
-                Image scaledDebugStructure = debugStructure.getScaledCopy(tilePixelDimensions.x, tilePixelDimensions.y);
                 for (Structure structure : Game.world.structures) {
-                        for (Vector2i occupiedTile : structure.occupiedTiles) {
-                                int structureTileX = xOffset + (structure.position.x + occupiedTile.x) * tilePixelDimensions.x;
-                                int structureTileY = yOffset + (structure.position.y + occupiedTile.y) * tilePixelDimensions.y;
-                                g.drawImage(scaledDebugStructure, structureTileX, structureTileY);
-                        }
+                        renderStructure(structure, g);
                 }
 
                 // Draw debug grid
@@ -115,15 +158,14 @@ public class Renderer {
 
                 Structure placeStructure = Game.gui.structureToPlace;
                 if (placeStructure != null) {
+                        renderStructure(placeStructure, g);
                         for (Vector2i occupiedTile : placeStructure.occupiedTiles) {
                                 int structureTileX = xOffset + (placeStructure.position.x + occupiedTile.x) * tilePixelDimensions.x;
                                 int structureTileY = yOffset + (placeStructure.position.y + occupiedTile.y) * tilePixelDimensions.y;
-                                if (placeStructure.canBePlaced()) {
-                                        g.drawImage(scaledDebugStructure, structureTileX, structureTileY);
-                                } else {
-                                        g.drawImage(scaledDebugStructure, structureTileX, structureTileY);
+                                if (!placeStructure.canBePlaced()) {
+                                        g.drawImage(debugStructure, structureTileX, structureTileY);
                                         g.setColor(new Color(255, 0, 0, 40));
-                                        g.fillRect(structureTileX, structureTileY, scaledDebugStructure.getWidth(), scaledDebugStructure.getHeight());
+                                        g.fillRect(structureTileX, structureTileY, tilePixelDimensions.x, tilePixelDimensions.y);
                                 }
                         }
                 }

@@ -1,5 +1,6 @@
 package test.structures;
 
+import org.newdawn.slick.Image;
 import test.Game;
 import test.resources.Resource;
 import test.resources.ResourceTable;
@@ -18,6 +19,8 @@ public abstract class Structure {
         public ResourceTable productionInPerSec;
         public ResourceTable productionOutPerSec;
         public ResourceTable capacityIncrease;
+
+        public Image image;
 
         public Structure(Vector2i pos) {
                 position = pos;
