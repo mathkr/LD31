@@ -27,6 +27,7 @@ public abstract class Structure {
                 productionOutDelta = new ResourceTable();
                 productionInPerSec = new ResourceTable();
                 productionOutPerSec = new ResourceTable();
+                capacityIncrease = new ResourceTable();
         }
 
         public boolean collidesWith(Structure other){
