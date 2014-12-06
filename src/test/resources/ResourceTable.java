@@ -40,4 +40,11 @@ public class ResourceTable {
     public boolean canSubstract(Resource r, Float f){
         return resources.get(r) - f >= 0.0f;
     }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        resources.forEach((res, val) -> sb.append(res + ": " + val + ", "));
+        return sb.toString();
+    }
 }

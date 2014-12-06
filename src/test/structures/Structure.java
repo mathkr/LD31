@@ -70,16 +70,19 @@ public abstract class Structure {
                 }
         }
 
-        public boolean tryToPlace(){
-                for(Structure other : Game.world.structures)
-                        if(collidesWith(other)) {
+        public boolean canBePlaced(){
+                for(Structure other : Game.world.structures) {
+                        if (collidesWith(other)) {
                                 //kein Platz :(
                                 return false;
                         }
-                if(!Game.world.resources.greaterOrEqual(buildCost))
+                }
+
+                if(!Game.world.resources.greaterOrEqual(buildCost)) {
                         //zu teuer :(
                         return false;
-                Game.world.structures.add(this);
+                }
+
                 return true;
         }
 }

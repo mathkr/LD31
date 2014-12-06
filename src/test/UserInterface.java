@@ -8,6 +8,8 @@ import org.newdawn.slick.geom.Shape;
 import org.newdawn.slick.gui.ComponentListener;
 import org.newdawn.slick.gui.GUIContext;
 import org.newdawn.slick.gui.MouseOverArea;
+import test.structures.CopperMill;
+import test.structures.Structure;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,9 +19,84 @@ public class UserInterface {
         public List<MyButton> buttons;
         private static Stack<MyButton> overlayButtons;
 
+        Structure structureToPlace;
+
         public Vector2i guiTopLeft = new Vector2i(0, 0);
         public int buttonSize = 40;
         public int buttonMargins = 10;
+
+        public UserInterface(GameContainer gc) {
+                buttons = new ArrayList<>();
+                overlayButtons = new Stack<>();
+                structureToPlace = null;
+
+                // add Buttons
+                try {
+                        Vector2i currentButtonPosition = new Vector2i(guiTopLeft.x + buttonMargins,
+                                guiTopLeft.y + buttonMargins);
+
+                        addButton(
+                                buttons,
+                                "Place copper mill",
+                                gc,
+                                new Image("resources/debug_button.png"),
+                                currentButtonPosition,
+                                buttonSize,
+                                (comp) -> {
+                                        structureToPlace = new CopperMill(
+                                                new Vector2i(
+                                                        gc.getInput().getMouseX() - Game.renderer.xOffset,
+                                                        gc.getInput().getMouseY() - Game.renderer.yOffset
+                                                ));
+                                }
+                        );
+                } catch (SlickException e) {
+                        e.printStackTrace();
+                }
+        }
+
+        public void addButton(List<MyButton> buttonList, String description, GUIContext context,
+                              Image image, Vector2i position, int length, ComponentListener listener)
+        {
+                final MyButton button = new MyButton(
+                        description,
+                        context,
+                        image,
+                        position.x,
+                        position.y,
+                        length,
+                        length);
+                button.addListener(listener);
+                buttonList.add(button);
+                position.x += length + buttonMargins;
+        }
+
+        public void render(GameContainer gc, Graphics g) {
+                for (MyButton button : buttons) {
+                        button.render(gc, g);
+                }
+
+                g.setColor(Color.white);
+                g.drawString(Game.world.resources.toString(), 10, Game.WIN_HEIGHT - 40);
+
+                while (!overlayButtons.empty()) {
+                        MyButton button = overlayButtons.pop();
+                        g.setColor(Color.white);
+                        g.drawString(button.buttonDescription, button.getX() + 10, button.getY() + 45);
+                }
+        }
+
+        public void update(GameContainer gc) {
+                if (structureToPlace != null) {
+                        int mouseX = gc.getInput().getMouseX() - Game.renderer.xOffset;
+                        int mouseY = gc.getInput().getMouseY() - Game.renderer.yOffset;
+
+                        structureToPlace.position.x = mouseX;
+                        structureToPlace.position.y = mouseY;
+
+                        System.out.println("x: " + structureToPlace.position.x + ", y: " + structureToPlace.position.y);
+                }
+        }
 
         public static class MyButton extends MouseOverArea {
                 public String buttonDescription;
@@ -55,88 +132,6 @@ public class UserInterface {
                         if (isMouseOver()) {
                                 overlayButtons.push(this);
                         }
-                }
-        }
-
-        public void addButton(List<MyButton> buttonList, String description, GUIContext context,
-                              Image image, Vector2i position, int length, ComponentListener listener)
-        {
-                final MyButton button = new MyButton(
-                        description,
-                        context,
-                        image,
-                        position.x,
-                        position.y,
-                        length,
-                        length);
-                button.addListener(listener);
-                buttonList.add(button);
-                position.x += length + buttonMargins;
-        }
-
-        public UserInterface(GUIContext guiContext) {
-                buttons = new ArrayList<MyButton>();
-                overlayButtons = new Stack<>();
-
-                // add Buttons
-                try {
-                        Vector2i currentButtonPosition = new Vector2i(guiTopLeft.x + buttonMargins,
-                                guiTopLeft.y + buttonMargins);
-
-                        addButton(
-                                buttons,
-                                "Test button 1",
-                                guiContext,
-                                new Image("resources/debug_button.png"),
-                                currentButtonPosition,
-                                buttonSize,
-                                (comp) -> System.out.println("Test button 1")
-                        );
-
-                        addButton(
-                                buttons,
-                                "Test button 2",
-                                guiContext,
-                                new Image("resources/debug_button.png"),
-                                currentButtonPosition,
-                                buttonSize,
-                                (comp) -> System.out.println("Test button 2")
-                        );
-
-                        addButton(
-                                buttons,
-                                "Test button 3",
-                                guiContext,
-                                new Image("resources/debug_button.png"),
-                                currentButtonPosition,
-                                buttonSize,
-                                (comp) -> System.out.println("Test button 3")
-                        );
-
-                        addButton(
-                                buttons,
-                                "Test button 4",
-                                guiContext,
-                                new Image("resources/debug_button.png"),
-                                currentButtonPosition,
-                                buttonSize,
-                                (comp) -> System.out.println("Test button 4")
-                        );
-                } catch (SlickException e) {
-                        e.printStackTrace();
-                }
-
-        }
-
-        public void render(GameContainer gc, Graphics g) {
-                for (MyButton button : buttons) {
-                        button.render(gc, g);
-                }
-
-                while (!overlayButtons.empty()) {
-                        MyButton button = overlayButtons.pop();
-                        g.setColor(Color.white);
-                        g.drawString(button.buttonDescription, button.getX() + 10, button.getY() + 45);
                 }
         }
 }
