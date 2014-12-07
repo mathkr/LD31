@@ -56,8 +56,7 @@ public class UserInterface {
                         String desc = StructureLoader.getProperties(structureType).getProperty("desc", "no description");
                         String imgPath = StructureLoader.getProperties(structureType).getProperty("image");
 
-                        int size = Renderer.HEADER_HEIGHT - buttonMargins;
-                        Shape shape = new Rectangle(buttonPos.x, buttonPos.y, size, size);
+                        Shape shape = new Rectangle(buttonPos.x, buttonPos.y, buttonSize, buttonSize);
 
                         Image image = null;
 
@@ -87,15 +86,15 @@ public class UserInterface {
 
                         button.addListener((component) -> {
                                         structureToPlace = StructureLoader.getInstance(structureType,
-                                                Game.getWorldMouseX(),
-                                                Game.getWorldMouseY()
+                                                0,
+                                                0
                                         );
                                         menuState = SideMenuState.PLACING;
                                 });
 
                         buttons.add(button);
 
-                        buttonPos.x += size + buttonMargins;
+                        buttonPos.x += buttonSize + buttonMargins;
                 }
 
                 gc.getInput().addMouseListener(new MouseListener() {
@@ -104,6 +103,13 @@ public class UserInterface {
 
                         @Override
                         public void mouseClicked(int button, int x, int y, int clickCount) {
+                        }
+
+                        @Override
+                        public void mousePressed(int button, int x, int y) { }
+
+                        @Override
+                        public void mouseReleased(int button, int x, int y) {
                                 if (button == Input.MOUSE_LEFT_BUTTON) {
                                         int worldX = (Game.appgc.getInput().getAbsoluteMouseX() - Game.renderer.stagePosition.x) / Game.renderer.tileSize;
                                         int worldY = (Game.appgc.getInput().getAbsoluteMouseY() - Game.renderer.stagePosition.y) / Game.renderer.tileSize;
@@ -114,7 +120,7 @@ public class UserInterface {
 
                                                 if (structureToPlace != null) {
                                                         // can it be placed? roads get handled in mouse dragged callback
-                                                        if (structureToPlace.canBePlaced() && !structureToPlace.isRoad()) {
+                                                        if (structureToPlace.canBePlaced()) {
                                                                 structureToPlace.actuallyPlace();
 
                                                                 int particleX = x;
@@ -128,8 +134,13 @@ public class UserInterface {
                                                                         40, 1, 20,
                                                                         Game.renderer.TERRAIN_DEFAULT_COLOR.brighter(1.5f), 1f);
 
-                                                                structureToPlace = null;
-                                                                menuState = SideMenuState.OFF;
+                                                                if (!structureToPlace.isRoad()) { // Only stop placing if we arent placing a wire
+                                                                        structureToPlace = null;
+                                                                        menuState = SideMenuState.OFF;
+                                                                } else { // If we are, make a new wire piece to place
+                                                                        structureToPlace = StructureLoader.getInstance(structureToPlace.type, structureToPlace.position.x,
+                                                                                structureToPlace.position.y);
+                                                                }
                                                         }
                                                 } else {
                                                         // See if we clicked on a structure
@@ -178,34 +189,74 @@ public class UserInterface {
                         }
 
                         @Override
-                        public void mousePressed(int button, int x, int y) { }
-
-                        @Override
-                        public void mouseReleased(int button, int x, int y) { }
-
-                        @Override
                         public void mouseMoved(int oldx, int oldy, int newx, int newy) { }
 
                         @Override
                         public void mouseDragged(int oldx, int oldy, int newx, int newy) {
-                                if (structureToPlace != null) {
-                                        // Placing roads
-                                        if (structureToPlace.canBePlaced() && structureToPlace.isRoad()) {
-                                                structureToPlace.actuallyPlace();
+                                if (Game.appgc.getInput().isMouseButtonDown(Input.MOUSE_LEFT_BUTTON)) {
+                                        if (structureToPlace != null) {
+                                                if (structureToPlace.isRoad()) {
+                                                        // Placing roads
+                                                        int startx = Game.getWorldX(oldx);
+                                                        int starty = Game.getWorldY(oldy);
 
-                                                int particleX = newx;
-                                                int particleW = structureToPlace.dimensions.x * Game.PIXELS_PER_TILE * Game.PIXEL_SCALE;
-                                                int particleY = newy;
-                                                int particleH = structureToPlace.dimensions.y * Game.PIXELS_PER_TILE * Game.PIXEL_SCALE;
+                                                        int endx = Game.getWorldX(newx);
+                                                        int endy = Game.getWorldY(newy);
 
-                                                Game.renderer.spawnParticlesInArea(
-                                                        particleX, particleY,
-                                                        particleW, particleH,
-                                                        40, 1, 20,
-                                                        Game.renderer.TERRAIN_DEFAULT_COLOR.brighter(1.5f), 1f);
+                                                        int deltax = endx - startx;
+                                                        int deltay = endy - starty;
 
-                                                structureToPlace = StructureLoader.getInstance(structureToPlace.type, structureToPlace.position.x,
-                                                        structureToPlace.position.y);
+                                                        int signx = (int)Math.signum(deltax);
+                                                        int signy = (int)Math.signum(deltay);
+
+                                                        boolean stepX = Math.abs(deltax) > Math.abs(deltay);
+
+                                                        int currentx = startx;
+                                                        int currenty = starty;
+
+                                                        while (true) {
+                                                                structureToPlace.position.x = currentx;
+                                                                structureToPlace.position.y = currenty;
+
+                                                                if (structureToPlace.canBePlaced()) {
+                                                                        structureToPlace.actuallyPlace();
+
+                                                                        int particleX = newx;
+                                                                        int particleW = structureToPlace.dimensions.x * Game.PIXELS_PER_TILE * Game.PIXEL_SCALE;
+                                                                        int particleY = newy;
+                                                                        int particleH = structureToPlace.dimensions.y * Game.PIXELS_PER_TILE * Game.PIXEL_SCALE;
+
+                                                                        Game.renderer.spawnParticlesInArea(
+                                                                                particleX, particleY,
+                                                                                particleW, particleH,
+                                                                                40, 1, 20,
+                                                                                Game.renderer.TERRAIN_DEFAULT_COLOR.brighter(1.5f), 1f);
+
+                                                                        structureToPlace = StructureLoader.getInstance(structureToPlace.type, structureToPlace.position.x,
+                                                                                structureToPlace.position.y);
+                                                                }
+
+                                                                if (currentx == endx && currenty == endy) {
+                                                                        break;
+                                                                }
+
+                                                                if (currentx == endx) {
+                                                                        stepX = false;
+                                                                }
+
+                                                                if (currenty == endy) {
+                                                                        stepX = true;
+                                                                }
+
+                                                                if (stepX) {
+                                                                        currentx += signx;
+                                                                        stepX = !stepX;
+                                                                } else {
+                                                                        currenty += signy;
+                                                                        stepX = !stepX;
+                                                                }
+                                                        }
+                                                }
                                         }
                                 }
                         }
@@ -373,9 +424,26 @@ public class UserInterface {
                                 removeButton.addListener(
                                         (comp) -> {
                                                 if (menuState == SideMenuState.SELECTING) {
+                                                        int particleX = Game.renderer.stagePosition.x + selectedStructure.position.x * Game.PIXELS_PER_TILE * Game.PIXEL_SCALE;
+                                                        int particleW = selectedStructure.dimensions.x * Game.PIXELS_PER_TILE * Game.PIXEL_SCALE;
+                                                        int particleY = Game.renderer.stagePosition.y + selectedStructure.position.y * Game.PIXELS_PER_TILE * Game.PIXEL_SCALE;
+                                                        int particleH = selectedStructure.dimensions.y * Game.PIXELS_PER_TILE * Game.PIXEL_SCALE;
+
                                                         selectedStructure.remove();
                                                         selectedStructure = null;
                                                         menuState = SideMenuState.OFF;
+
+                                                        Game.renderer.spawnParticlesInArea(
+                                                                particleX, particleY,
+                                                                particleW, particleH,
+                                                                40, 1, 20,
+                                                                Color.black, 1f);
+
+                                                        Game.renderer.spawnParticlesInArea(
+                                                                particleX, particleY,
+                                                                particleW, particleH,
+                                                                40, 1, 20,
+                                                                Color.white, 1f);
                                                 }
                                         });
                         } catch (SlickException e) {

@@ -43,13 +43,39 @@ public class Game extends BasicGame {
         }
 
         public static int getWorldMouseX() {
-                int stageX = appgc.getInput().getAbsoluteMouseX() - renderer.stagePosition.x;
-                return stageX / renderer.tileSize;
+                int worldX = (appgc.getInput().getAbsoluteMouseX() - renderer.stagePosition.x) / renderer.tileSize;
+
+                worldX = worldX < 0 ? 0 : worldX;
+                worldX = worldX >= World.WORLD_DIMENSIONS.x ? World.WORLD_DIMENSIONS.x - 1 : worldX;
+
+                return worldX;
         }
 
         public static int getWorldMouseY() {
-                int stageY = appgc.getInput().getAbsoluteMouseY() - renderer.stagePosition.y;
-                return stageY / renderer.tileSize;
+                int worldY = (appgc.getInput().getAbsoluteMouseY() - renderer.stagePosition.y) / renderer.tileSize;
+
+                worldY = worldY < 0 ? 0 : worldY;
+                worldY = worldY >= World.WORLD_DIMENSIONS.y ? World.WORLD_DIMENSIONS.y - 1 : worldY;
+
+                return worldY;
+        }
+
+        public static int getWorldX(int windowX) {
+                int worldX =  (windowX - renderer.stagePosition.x) / renderer.tileSize;
+
+                worldX = worldX < 0 ? 0 : worldX;
+                worldX = worldX >= World.WORLD_DIMENSIONS.x ? World.WORLD_DIMENSIONS.x - 1 : worldX;
+
+                return worldX;
+        }
+
+        public static int getWorldY(int windowY) {
+                int worldY =  (windowY - renderer.stagePosition.y) / renderer.tileSize;
+
+                worldY = worldY < 0 ? 0 : worldY;
+                worldY = worldY >= World.WORLD_DIMENSIONS.y ? World.WORLD_DIMENSIONS.y - 1 : worldY;
+
+                return worldY;
         }
 
         public static void main(String[] args) {
