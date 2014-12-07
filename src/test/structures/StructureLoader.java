@@ -110,7 +110,12 @@ public class StructureLoader {
                         structure.capacityIncrease.put(resource, Float.parseFloat(properties.getProperty("capacityIncrease" + resource.name(), "0f")));
                 }
 
-                Image image = Game.renderer.getImage("resources/" + properties.getProperty("image"));
+                Image image;
+                if (properties.getProperty("image") != null) {
+                        image = Game.renderer.getImage("resources/" + properties.getProperty("image"));
+                } else {
+                        image = null;
+                }
 
 //                structure.productionFactor = Float.parseFloat(properties.getProperty("productionFactor", "1f"));
 
