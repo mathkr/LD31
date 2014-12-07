@@ -181,12 +181,12 @@ public class Structure {
                 return roadAccess;
         }
 
-        //sets road access
+        //tries to improve a structure's road access
         //returns true if a road's roadAccess improved
-        public boolean setRoadAccess(RoadAccess road){
+        public boolean improveRoadAccess(RoadAccess road){
                 switch(type){
                         case CopperRoad :
-                                if(roadAccess == RoadAccess.NONE){
+                                if(roadAccess.compareTo(road) < 0){
                                         roadAccess = RoadAccess.COPPER;
                                         return true;
                                 }
@@ -194,43 +194,30 @@ public class Structure {
                         case SilverRoad :
                                 switch(road){
                                         case COPPER :
-                                                if(roadAccess == RoadAccess.NONE){
+                                                if(roadAccess.compareTo(road) < 0){
                                                         roadAccess = RoadAccess.COPPER;
                                                         return true;
                                                 }
                                                 return false;
                                         case SILVER :
                                         case GLASS :
-                                                if(roadAccess == RoadAccess.NONE || roadAccess == RoadAccess.COPPER){
+                                                if(roadAccess.compareTo(road) < 0){
                                                         roadAccess = RoadAccess.SILVER;
                                                         return true;
                                                 }
                                                 return false;
                                 }
                         case GlassRoad :
-                                switch(road){
-                                        case COPPER :
-                                                if(roadAccess == RoadAccess.NONE){
-                                                        roadAccess = RoadAccess.COPPER;
-                                                        return true;
-                                                }
-                                                return false;
-                                        case SILVER :
-                                                if(roadAccess == RoadAccess.NONE || roadAccess == RoadAccess.COPPER){
-                                                        roadAccess = RoadAccess.SILVER;
-                                                        return true;
-                                                }
-                                                return false;
-                                        case GLASS :
-                                                if(roadAccess != RoadAccess.GLASS){
-                                                        roadAccess = RoadAccess.GLASS;
-                                                        return true;
-                                                }
-                                                return false;
+                                if(roadAccess.compareTo(road) < 0){
+                                        roadAccess = road;
+                                        return true;
                                 }
+                                return false;
                 }
-                System.out.println(type + "["+position.x+"]["+position.y+"]: road access changed from " + roadAccess + " to " + road);
-                roadAccess = road;
+                if(roadAccess.compareTo(road) < 0) {
+//                        System.out.println(type + "[" + position.x + "][" + position.y + "]: road access changed from " + roadAccess + " to " + road);
+                        roadAccess = road;
+                }
                 return false;
         }
 

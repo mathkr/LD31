@@ -162,6 +162,70 @@ public class UserInterface {
                                         menuState = SideMenuState.PLACING;
                                 }
                         );
+
+                        addButton(
+                                buttons,
+                                "CPU T1",
+                                gc,
+                                new Image("resources/debug_button.png"),
+                                currentButtonPosition,
+                                buttonSize,
+                                (comp) -> {
+                                        structureToPlace = StructureLoader.getInstance(StructureType.CPU_T1,
+                                                Game.getWorldMouseX(),
+                                                Game.getWorldMouseY()
+                                        );
+                                        menuState = SideMenuState.PLACING;
+                                }
+                        );
+
+                        addButton(
+                                buttons,
+                                "Copper road",
+                                gc,
+                                new Image("resources/debug_button.png"),
+                                currentButtonPosition,
+                                buttonSize,
+                                (comp) -> {
+                                        structureToPlace = StructureLoader.getInstance(StructureType.CopperRoad,
+                                                Game.getWorldMouseX(),
+                                                Game.getWorldMouseY()
+                                        );
+                                        menuState = SideMenuState.PLACING;
+                                }
+                        );
+
+                        addButton(
+                                buttons,
+                                "Silver road",
+                                gc,
+                                new Image("resources/debug_button.png"),
+                                currentButtonPosition,
+                                buttonSize,
+                                (comp) -> {
+                                        structureToPlace = StructureLoader.getInstance(StructureType.SilverRoad,
+                                                Game.getWorldMouseX(),
+                                                Game.getWorldMouseY()
+                                        );
+                                        menuState = SideMenuState.PLACING;
+                                }
+                        );
+
+                        addButton(
+                                buttons,
+                                "Glass road",
+                                gc,
+                                new Image("resources/debug_button.png"),
+                                currentButtonPosition,
+                                buttonSize,
+                                (comp) -> {
+                                        structureToPlace = StructureLoader.getInstance(StructureType.GlassRoad,
+                                                Game.getWorldMouseX(),
+                                                Game.getWorldMouseY()
+                                        );
+                                        menuState = SideMenuState.PLACING;
+                                }
+                        );
                 } catch (SlickException e) {
                         e.printStackTrace();
                 }
@@ -446,6 +510,7 @@ public class UserInterface {
                                 g.setColor(selectionColor);
                                 int selectedX = Game.renderer.stagePosition.x + selectedStructure.position.x * Game.renderer.tileSize;
                                 int selectedY = Game.renderer.stagePosition.y + selectedStructure.position.y * Game.renderer.tileSize;
+                                if(selectedStructure.image != null)
                                 g.drawRect(selectedX - 5, selectedY - 5,
                                         selectedStructure.image.getWidth() + 10, selectedStructure.image.getHeight() + 10);
 
