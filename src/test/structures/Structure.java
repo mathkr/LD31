@@ -64,7 +64,7 @@ public class Structure {
                 //pruefe, ob eingangsressourcen vorhanden
                 for(Map.Entry<Resource, Float> e : productionInDelta.resources.entrySet()){
                         float rDelta = e.getValue().intValue();
-                        if (rDelta >= 1.0f && !resources.canSubstract(e.getKey(), rDelta)) {
+                        if (rDelta >= 1.0f && !resources.canSubtract(e.getKey(), rDelta)) {
                                 //kein saft :(
                                 return;
                         }

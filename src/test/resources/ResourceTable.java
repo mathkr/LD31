@@ -44,7 +44,7 @@ public class ResourceTable {
         return resources.getOrDefault(r, 0.0f);
     }
 
-    public boolean canSubstract(Resource r, float f){
+    public boolean canSubtract(Resource r, float f){
         return get(r) >= f;
     }
 
