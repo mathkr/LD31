@@ -26,7 +26,7 @@ public class ResourceTable {
         other.resources.forEach((res, val) -> this.change(res, -val));
     }
 
-    public void put(Resource r, Float f){
+    public void put(Resource r, float f){
         resources.put(r,f);
     }
 
@@ -34,7 +34,9 @@ public class ResourceTable {
         resources.putAll(other.resources);
     }
 
-    public void change(Resource r, Float f){
+    public void multiply(Resource r, float f) { resources.put(r, get(r)*f); }
+
+    public void change(Resource r, float f){
         resources.put(r, get(r) + f);
     }
 
@@ -42,7 +44,7 @@ public class ResourceTable {
         return resources.getOrDefault(r, 0.0f);
     }
 
-    public boolean canSubstract(Resource r, Float f){
+    public boolean canSubtract(Resource r, float f){
         return get(r) >= f;
     }
 

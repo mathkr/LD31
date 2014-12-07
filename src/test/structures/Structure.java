@@ -20,8 +20,8 @@ public class Structure {
         public ResourceTable productionInPerSec;
         public ResourceTable productionOutPerSec;
         public ResourceTable capacityIncrease;
-        public float productionFactor;
         public StructureLoader.Updater updater;
+        public StructureType type;
 
         public Image image;
 
@@ -64,7 +64,7 @@ public class Structure {
                 //pruefe, ob eingangsressourcen vorhanden
                 for(Map.Entry<Resource, Float> e : productionInDelta.resources.entrySet()){
                         float rDelta = e.getValue().intValue();
-                        if (rDelta >= 1.0f && !resources.canSubstract(e.getKey(), rDelta)) {
+                        if (rDelta >= 1.0f && !resources.canSubtract(e.getKey(), rDelta)) {
                                 //kein saft :(
                                 return;
                         }
@@ -147,6 +147,12 @@ public class Structure {
         }
 
         public void actuallyPlace(){
+                switch(type){
+                        //TODO: silicon
+                        case SilverMine : productionOutPerSec.multiply(Resource.SILVER, getNearResources(World.TerrainType.SILVER, 1)); break;
+                        case CopperMine : productionOutPerSec.multiply(Resource.COPPER, getNearResources(World.TerrainType.COPPER, 1)); break;
+                        case GlassMine : productionOutPerSec.multiply(Resource.GLASS, getNearResources(World.TerrainType.GLASS, 1)); break;
+                }
                 Game.world.structures.add(this);
                 Game.world.resources.subtract(this.buildCost);
                 Game.world.resourceCapacity.add(this.capacityIncrease);
