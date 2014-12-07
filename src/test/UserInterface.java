@@ -53,6 +53,58 @@ public class UserInterface {
                 } catch (SlickException e) {
                         e.printStackTrace();
                 }
+
+                gc.getInput().addMouseListener(new MouseListener() {
+                        @Override
+                        public void mouseWheelMoved(int change) { }
+
+                        @Override
+                        public void mouseClicked(int button, int x, int y, int clickCount) {
+                                if (button == Input.MOUSE_LEFT_BUTTON) {
+                                        int worldX = (Game.appgc.getInput().getAbsoluteMouseX() - Game.renderer.xOffset) / Game.renderer.tilePixelDimensions.x;
+                                        int worldY = (Game.appgc.getInput().getAbsoluteMouseY() - Game.renderer.yOffset) / Game.renderer.tilePixelDimensions.y;
+
+                                        if (worldX >= 0 && worldX < Game.world.bounds.x && worldY >= 0 && worldY < Game.world.bounds.y) {
+                                                // Hier haben wir auf ein gueltiges tile geclickt
+
+                                                if (Game.gui.structureToPlace != null && Game.gui.structureToPlace.canBePlaced()) {
+                                                        Game.gui.structureToPlace.actuallyPlace();
+                                                        Game.gui.structureToPlace = null;
+                                                }
+                                        }
+                                }
+
+                                if (button == Input.MOUSE_RIGHT_BUTTON) {
+                                        Game.gui.structureToPlace = null;
+                                }
+                        }
+
+                        @Override
+                        public void mousePressed(int button, int x, int y) { }
+
+                        @Override
+                        public void mouseReleased(int button, int x, int y) { }
+
+                        @Override
+                        public void mouseMoved(int oldx, int oldy, int newx, int newy) { }
+
+                        @Override
+                        public void mouseDragged(int oldx, int oldy, int newx, int newy) { }
+
+                        @Override
+                        public void setInput(Input input) { }
+
+                        @Override
+                        public boolean isAcceptingInput() {
+                                return true;
+                        }
+
+                        @Override
+                        public void inputEnded() { }
+
+                        @Override
+                        public void inputStarted() { }
+                });
         }
 
         public void addButton(List<MyButton> buttonList, String description, GUIContext context,
@@ -90,8 +142,6 @@ public class UserInterface {
                 if (structureToPlace != null) {
                         structureToPlace.position.x = Game.getWorldMouseX();
                         structureToPlace.position.y = Game.getWorldMouseY();
-
-                        System.out.println("x: " + structureToPlace.position.x + ", y: " + structureToPlace.position.y);
                 }
         }
 
@@ -121,6 +171,18 @@ public class UserInterface {
                 public MyButton(String desc, GUIContext container, Image image, Shape shape) {
                         super(container, image, shape);
                         buttonDescription = desc;
+                }
+
+                @Override
+                public void mouseClicked(int button, int x, int y, int clickCount) {
+                        super.mouseClicked(button, x, y, clickCount);
+
+                        if (    x > getX() && x < getX() + getWidth()
+                             && y > getY() && y < getY() + getHeight())
+                        {
+                                // We have been clicked?
+                                consumeEvent();
+                        }
                 }
 
                 @Override

@@ -18,6 +18,14 @@ public class ResourceTable {
         return true;
     }
 
+    public void add(ResourceTable other){
+        other.resources.forEach(this::change);
+    }
+
+    public void subtract(ResourceTable other){
+        other.resources.forEach((res, val) -> this.change(res, -val));
+    }
+
     public void put(Resource r, Float f){
         resources.put(r,f);
     }
@@ -31,7 +39,7 @@ public class ResourceTable {
     }
 
     public boolean canSubstract(Resource r, Float f){
-        return get(r) - f >= 0.0f;
+        return get(r) >= f;
     }
 
     @Override

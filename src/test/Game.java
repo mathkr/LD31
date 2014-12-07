@@ -6,8 +6,8 @@ import org.newdawn.slick.*;
 
 public class Game extends BasicGame
 {
-        public static final int WIN_WIDTH = 800;
-        public static final int WIN_HEIGHT = 600;
+        public static final int WIN_WIDTH = 1300;
+        public static final int WIN_HEIGHT = 700;
 
         public static AppGameContainer appgc;
 
