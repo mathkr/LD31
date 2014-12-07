@@ -4,10 +4,12 @@ import java.util.logging.Logger;
 
 import org.newdawn.slick.*;
 
-public class Game extends BasicGame
-{
-        public static final int WIN_WIDTH = 1300;
-        public static final int WIN_HEIGHT = 700;
+public class Game extends BasicGame {
+
+        public static final int PIXELS_PER_TILE = 8;
+        public static final int PIXEL_SCALE = 2;
+        public static int WIN_WIDTH;
+        public static int WIN_HEIGHT;
 
         public static AppGameContainer appgc;
 
@@ -40,17 +42,21 @@ public class Game extends BasicGame
         }
 
         public static int getWorldMouseX() {
-                int stageX = appgc.getInput().getAbsoluteMouseX() - renderer.xOffset;
-                return stageX / renderer.tilePixelDimensions.x;
+                int stageX = appgc.getInput().getAbsoluteMouseX() - renderer.stagePosition.x;
+                return stageX / renderer.tileSize;
         }
 
         public static int getWorldMouseY() {
-                int stageY = appgc.getInput().getAbsoluteMouseY() - renderer.yOffset;
-                return stageY / renderer.tilePixelDimensions.y;
+                int stageY = appgc.getInput().getAbsoluteMouseY() - renderer.stagePosition.y;
+                return stageY / renderer.tileSize;
         }
 
         public static void main(String[] args) {
                 try {
+                        WIN_WIDTH = (World.WORLD_DIMENSIONS.x * PIXELS_PER_TILE * PIXEL_SCALE) + Renderer.MENU_WIDTH;
+                        WIN_HEIGHT = (World.WORLD_DIMENSIONS.y * PIXELS_PER_TILE * PIXEL_SCALE)
+                                + Renderer.HEADER_HEIGHT + Renderer.FOOTER_HEIGHT;
+
                         appgc = new AppGameContainer(new Game("Simple Slick Game"));
                         appgc.setDisplayMode(WIN_WIDTH, WIN_HEIGHT, false);
                         appgc.setTargetFrameRate(60);

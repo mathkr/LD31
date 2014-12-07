@@ -1,8 +1,6 @@
 package test;
 
-import java.util.Map;
 import java.util.Random;
-import java.util.TreeMap;
 
 import test.World.*;
 
@@ -49,8 +47,8 @@ public class WorldGenerator {
                         ++cancel;
                         Integer sizeLoad = r.nextInt(creationHintLoadSize - 1) + 1;
 
-                        Integer x = r.nextInt(world.bounds.x - (1 + sizeLoad )) + 1;
-                        Integer y = r.nextInt(world.bounds.y - (1 + sizeLoad )) + 1;
+                        Integer x = r.nextInt(world.WORLD_DIMENSIONS.x - (1 + sizeLoad )) + 1;
+                        Integer y = r.nextInt(world.WORLD_DIMENSIONS.y - (1 + sizeLoad )) + 1;
 
                         // suche nach störenden Feldern
                         for (int xi = 0; xi < sizeLoad; xi++) {
@@ -79,10 +77,10 @@ public class WorldGenerator {
     }
 
     public static void resetWorld( World world){
-        world.terrain = new TerrainType[world.bounds.x][world.bounds.y];
+        world.terrain = new TerrainType[world.WORLD_DIMENSIONS.x][world.WORLD_DIMENSIONS.y];
         //clear Terrain from changes
-        for (int x = 0; x < world.bounds.x; x++) {
-            for (int y = 0; y < world.bounds.y; y++) {
+        for (int x = 0; x < world.WORLD_DIMENSIONS.x; x++) {
+            for (int y = 0; y < world.WORLD_DIMENSIONS.y; y++) {
                 world.terrain[x][y] = TerrainType.DEFAULT;
             }
         }

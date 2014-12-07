@@ -2,7 +2,6 @@ package test;
 
 import test.resources.Resource;
 import test.resources.ResourceTable;
-import test.structures.*;
 import test.structures.Structure;
 
 import java.util.ArrayList;
@@ -15,15 +14,15 @@ public class World {
                 GLASS
         }
 
-        public Vector2i bounds;
+        public static final Vector2i WORLD_DIMENSIONS = new Vector2i(80, 45);
+
         public ArrayList<Structure> structures;
         public TerrainType[][] terrain;
         public ResourceTable resources;
         public ResourceTable resourceCapacity;
 
         public World() {
-                bounds = new Vector2i(80, 45);
-                structures = new ArrayList<Structure>();
+                structures = new ArrayList<>();
                 resources = new ResourceTable(){{
                         put(Resource.COPPER, 100.0f);
                         put(Resource.ENERGY, 250.0f);

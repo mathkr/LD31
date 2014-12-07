@@ -132,8 +132,8 @@ public class Structure {
                 }
                 min.x = this.position.x + min.x - area > 0 ? min.x - area : 0;
                 min.y = this.position.y + min.y - area > 0 ? min.y - area : 0;
-                max.x = this.position.x + max.x + area < Game.world.bounds.x   ? max.x + area : max.x;
-                max.y = this.position.y + max.y + area < Game.world.bounds.y  ? max.y + area : max.y;
+                max.x = this.position.x + max.x + area < Game.world.WORLD_DIMENSIONS.x   ? max.x + area : max.x;
+                max.y = this.position.y + max.y + area < Game.world.WORLD_DIMENSIONS.y  ? max.y + area : max.y;
 
                 Integer count = 0;
                 for (int i = min.x + this.position.x; i <= max.x + this.position.x; i++) {
