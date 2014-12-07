@@ -4,6 +4,8 @@ import org.newdawn.slick.*;
 import org.newdawn.slick.Color;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
+import org.newdawn.slick.geom.Rectangle;
+import org.newdawn.slick.geom.RoundedRectangle;
 import org.newdawn.slick.geom.Shape;
 import org.newdawn.slick.gui.ComponentListener;
 import org.newdawn.slick.gui.GUIContext;
@@ -47,187 +49,53 @@ public class UserInterface {
                 menuState = SideMenuState.OFF;
                 selectedStructure = null;
 
-                // add Buttons
-                try {
-                        Vector2i currentButtonPosition = new Vector2i(buttonMargins / 2, buttonMargins / 2);
+                // Add a button per StructureType
+                Vector2i buttonPos = new Vector2i(buttonMargins / 2, buttonMargins / 2);
+                for (StructureType structureType : StructureType.values()) {
+                        String name = StructureLoader.getProperties(structureType).getProperty("name", "no name");
+                        String desc = StructureLoader.getProperties(structureType).getProperty("desc", "no description");
+                        String imgPath = StructureLoader.getProperties(structureType).getProperty("image");
 
-                        addButton(
-                                buttons,
-                                "Copper mine",
-                                gc,
-                                new Image("resources/debug_button.png"),
-                                currentButtonPosition,
-                                buttonSize,
-                                (comp) -> {
-                                        structureToPlace = StructureLoader.getInstance(StructureType.CopperMine,
+                        int size = Renderer.HEADER_HEIGHT - buttonMargins;
+                        Shape shape = new Rectangle(buttonPos.x, buttonPos.y, size, size);
+
+                        Image image = null;
+
+                        if (imgPath != null) {
+                                image = Game.renderer.getImage("resources/" + imgPath).copy();
+
+                                Color filterColor;
+                                switch (structureType) {
+                                        case CopperRoad:
+                                                filterColor = Game.renderer.TERRAIN_COPPER_COLOR;
+                                                break;
+                                        case SilverRoad:
+                                                filterColor = Game.renderer.TERRAIN_SILVER_COLOR;
+                                                break;
+                                        case GlassRoad:
+                                                filterColor = Game.renderer.TERRAIN_GLASS_COLOR;
+                                                break;
+                                        default:
+                                                filterColor = Color.white;
+                                                break;
+                                }
+
+                                image.setImageColor(filterColor.r, filterColor.g, filterColor.b, filterColor.a);
+                        }
+
+                        MyButton button = new MyButton(name + ": " + desc, gc, image, shape);
+
+                        button.addListener((component) -> {
+                                        structureToPlace = StructureLoader.getInstance(structureType,
                                                 Game.getWorldMouseX(),
                                                 Game.getWorldMouseY()
                                         );
                                         menuState = SideMenuState.PLACING;
-                                }
-                        );
+                                });
 
-                        addButton(
-                                buttons,
-                                "Glass mine",
-                                gc,
-                                new Image("resources/debug_button.png"),
-                                currentButtonPosition,
-                                buttonSize,
-                                (comp) -> {
-                                        structureToPlace = StructureLoader.getInstance(StructureType.GlassMine,
-                                                Game.getWorldMouseX(),
-                                                Game.getWorldMouseY()
-                                        );
-                                        menuState = SideMenuState.PLACING;
-                                }
-                        );
+                        buttons.add(button);
 
-                        addButton(
-                                buttons,
-                                "Silver mine",
-                                gc,
-                                new Image("resources/debug_button.png"),
-                                currentButtonPosition,
-                                buttonSize,
-                                (comp) -> {
-                                        structureToPlace = StructureLoader.getInstance(StructureType.SilverMine,
-                                                Game.getWorldMouseX(),
-                                                Game.getWorldMouseY()
-                                        );
-                                        menuState = SideMenuState.PLACING;
-                                }
-                        );
-
-                        addButton(
-                                buttons,
-                                "Silicon mine",
-                                gc,
-                                new Image("resources/debug_button.png"),
-                                currentButtonPosition,
-                                buttonSize,
-                                (comp) -> {
-                                        structureToPlace = StructureLoader.getInstance(StructureType.SiliconMine,
-                                                Game.getWorldMouseX(),
-                                                Game.getWorldMouseY()
-                                        );
-                                        menuState = SideMenuState.PLACING;
-                                }
-                        );
-
-                        addButton(
-                                buttons,
-                                "PSU T1",
-                                gc,
-                                new Image("resources/debug_button.png"),
-                                currentButtonPosition,
-                                buttonSize,
-                                (comp) -> {
-                                        structureToPlace = StructureLoader.getInstance(StructureType.PSU_T1,
-                                                Game.getWorldMouseX(),
-                                                Game.getWorldMouseY()
-                                        );
-                                        menuState = SideMenuState.PLACING;
-                                }
-                        );
-
-                        addButton(
-                                buttons,
-                                "RAM T1",
-                                gc,
-                                new Image("resources/debug_button.png"),
-                                currentButtonPosition,
-                                buttonSize,
-                                (comp) -> {
-                                        structureToPlace = StructureLoader.getInstance(StructureType.RAM_T1,
-                                                Game.getWorldMouseX(),
-                                                Game.getWorldMouseY()
-                                        );
-                                        menuState = SideMenuState.PLACING;
-                                }
-                        );
-
-                        addButton(
-                                buttons,
-                                "Memory T1",
-                                gc,
-                                new Image("resources/debug_button.png"),
-                                currentButtonPosition,
-                                buttonSize,
-                                (comp) -> {
-                                        structureToPlace = StructureLoader.getInstance(StructureType.MEMORY_T1,
-                                                Game.getWorldMouseX(),
-                                                Game.getWorldMouseY()
-                                        );
-                                        menuState = SideMenuState.PLACING;
-                                }
-                        );
-
-                        addButton(
-                                buttons,
-                                "CPU T1",
-                                gc,
-                                new Image("resources/debug_button.png"),
-                                currentButtonPosition,
-                                buttonSize,
-                                (comp) -> {
-                                        structureToPlace = StructureLoader.getInstance(StructureType.CPU_T1,
-                                                Game.getWorldMouseX(),
-                                                Game.getWorldMouseY()
-                                        );
-                                        menuState = SideMenuState.PLACING;
-                                }
-                        );
-
-                        addButton(
-                                buttons,
-                                "Copper road",
-                                gc,
-                                new Image("resources/debug_button.png"),
-                                currentButtonPosition,
-                                buttonSize,
-                                (comp) -> {
-                                        structureToPlace = StructureLoader.getInstance(StructureType.CopperRoad,
-                                                Game.getWorldMouseX(),
-                                                Game.getWorldMouseY()
-                                        );
-                                        menuState = SideMenuState.PLACING;
-                                }
-                        );
-
-                        addButton(
-                                buttons,
-                                "Silver road",
-                                gc,
-                                new Image("resources/debug_button.png"),
-                                currentButtonPosition,
-                                buttonSize,
-                                (comp) -> {
-                                        structureToPlace = StructureLoader.getInstance(StructureType.SilverRoad,
-                                                Game.getWorldMouseX(),
-                                                Game.getWorldMouseY()
-                                        );
-                                        menuState = SideMenuState.PLACING;
-                                }
-                        );
-
-                        addButton(
-                                buttons,
-                                "Glass road",
-                                gc,
-                                new Image("resources/debug_button.png"),
-                                currentButtonPosition,
-                                buttonSize,
-                                (comp) -> {
-                                        structureToPlace = StructureLoader.getInstance(StructureType.GlassRoad,
-                                                Game.getWorldMouseX(),
-                                                Game.getWorldMouseY()
-                                        );
-                                        menuState = SideMenuState.PLACING;
-                                }
-                        );
-                } catch (SlickException e) {
-                        e.printStackTrace();
+                        buttonPos.x += size + buttonMargins;
                 }
 
                 gc.getInput().addMouseListener(new MouseListener() {
@@ -245,7 +113,8 @@ public class UserInterface {
                                                 // Hier haben wir auf ein gueltiges tile geclickt
 
                                                 if (structureToPlace != null) {
-                                                        if (structureToPlace.canBePlaced()) {
+                                                        // can it be placed? roads get handled in mouse dragged callback
+                                                        if (structureToPlace.canBePlaced() && !structureToPlace.isRoad()) {
                                                                 structureToPlace.actuallyPlace();
 
                                                                 int particleX = x;
@@ -318,7 +187,28 @@ public class UserInterface {
                         public void mouseMoved(int oldx, int oldy, int newx, int newy) { }
 
                         @Override
-                        public void mouseDragged(int oldx, int oldy, int newx, int newy) { }
+                        public void mouseDragged(int oldx, int oldy, int newx, int newy) {
+                                if (structureToPlace != null) {
+                                        // Placing roads
+                                        if (structureToPlace.canBePlaced() && structureToPlace.isRoad()) {
+                                                structureToPlace.actuallyPlace();
+
+                                                int particleX = newx;
+                                                int particleW = structureToPlace.dimensions.x * Game.PIXELS_PER_TILE * Game.PIXEL_SCALE;
+                                                int particleY = newy;
+                                                int particleH = structureToPlace.dimensions.y * Game.PIXELS_PER_TILE * Game.PIXEL_SCALE;
+
+                                                Game.renderer.spawnParticlesInArea(
+                                                        particleX, particleY,
+                                                        particleW, particleH,
+                                                        40, 1, 20,
+                                                        Game.renderer.TERRAIN_DEFAULT_COLOR.brighter(1.5f), 1f);
+
+                                                structureToPlace = StructureLoader.getInstance(structureToPlace.type, structureToPlace.position.x,
+                                                        structureToPlace.position.y);
+                                        }
+                                }
+                        }
 
                         @Override
                         public void setInput(Input input) { }
@@ -406,21 +296,7 @@ public class UserInterface {
 
         public static class MyButton extends MouseOverArea {
                 public String buttonDescription;
-
-                public MyButton(String desc, GUIContext container, Image image, int x, int y, ComponentListener listener) {
-                        super(container, image, x, y, listener);
-                        buttonDescription = desc;
-                }
-
-                public MyButton(String desc, GUIContext container, Image image, int x, int y) {
-                        super(container, image, x, y);
-                        buttonDescription = desc;
-                }
-
-                public MyButton(String desc, GUIContext container, Image image, int x, int y, int width, int height, ComponentListener listener) {
-                        super(container, image, x, y, width, height, listener);
-                        buttonDescription = desc;
-                }
+                public Shape shape;
 
                 public MyButton(String desc, GUIContext container, Image image, int x, int y, int width, int height) {
                         super(container, image, x, y, width, height);
@@ -429,6 +305,7 @@ public class UserInterface {
 
                 public MyButton(String desc, GUIContext container, Image image, Shape shape) {
                         super(container, image, shape);
+                        this.shape = shape;
                         buttonDescription = desc;
                 }
 
@@ -446,10 +323,31 @@ public class UserInterface {
 
                 @Override
                 public void render(GUIContext container, Graphics g) {
-                        super.render(container, g);
+                        Rectangle clip = g.getClip();
+                        g.setClip(getX() - 1, getY(), getWidth() + 2, getHeight() + 1);
+
+                        g.setColor(Game.renderer.TERRAIN_DEFAULT_COLOR);
+                        if (shape != null) {
+                                g.fill(shape);
+                        }
+
                         if (isMouseOver()) {
                                 overlayButtons.push(this);
                         }
+
+                        super.render(container, g);
+
+                        if (isMouseOver()) {
+                                g.setColor(Game.renderer.TERRAIN_GLASS_COLOR);
+                        } else {
+                                g.setColor(Game.renderer.TERRAIN_SILVER_COLOR);
+                        }
+
+                        if (shape != null) {
+                                g.draw(shape);
+                        }
+
+                        g.setClip(clip);
                 }
         }
 

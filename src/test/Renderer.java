@@ -3,7 +3,6 @@ package test;
 import org.newdawn.slick.*;
 import org.newdawn.slick.geom.Vector2f;
 import test.structures.Structure;
-import test.structures.StructureType;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -43,6 +42,8 @@ public class Renderer {
                 stageDimensions = new Vector2i(Game.WIN_WIDTH - MENU_WIDTH, (Game.WIN_HEIGHT - HEADER_HEIGHT) - FOOTER_HEIGHT);
                 stagePosition = new Vector2i(0, HEADER_HEIGHT);
                 tileSize = Game.PIXELS_PER_TILE * Game.PIXEL_SCALE;
+
+                Game.appgc.getGraphics().setBackground(Color.darkGray);
         }
 
         public Image getImage(String path) {
@@ -64,7 +65,13 @@ public class Renderer {
         }
 
         public void renderStructureShadow(Structure structure, Graphics g) {
-                Image image = structure.image;
+                Image image;
+
+                if (structure.isRoad()) {
+                        image = getWireImage(structure);
+                } else {
+                        image = structure.image;
+                }
 
                 if (image != null) {
                         int structureTileX = stagePosition.x + structure.position.x * tileSize;
@@ -73,6 +80,58 @@ public class Renderer {
                         Color shadowFilterColor = new Color(0, 0, 0, 100);
                         image.draw(structureTileX + 2, structureTileY + 2, shadowFilterColor);
                 }
+        }
+
+        public Image getWireImage(Structure structure) {
+                int x = structure.position.x;
+                int y = structure.position.y;
+
+                boolean w = false;
+                boolean n = false;
+                boolean e = false;
+                boolean s = false;
+
+                if (x > 0)
+                        w = Game.world.structureGrid[x - 1][y] != null && Game.world.structureGrid[x - 1][y].isRoad();
+                if (x < Game.world.WORLD_DIMENSIONS.x - 1)
+                        e = Game.world.structureGrid[x + 1][y] != null && Game.world.structureGrid[x + 1][y].isRoad();
+                if (y > 0)
+                        n = Game.world.structureGrid[x][y - 1] != null && Game.world.structureGrid[x][y - 1].isRoad();
+                if (y < Game.world.WORLD_DIMENSIONS.y - 1)
+                        s = Game.world.structureGrid[x][y + 1] != null && Game.world.structureGrid[x][y + 1].isRoad();
+
+                // 4 way
+                if (w && n && e && s)
+                        return wireImages.intersection4;
+
+                // 3 way
+                if (w && n && e)
+                        return wireImages.intersection3N;
+                if (n && e && s)
+                        return wireImages.intersection3E;
+                if (e && s && w)
+                        return wireImages.intersection3S;
+                if (s && w && n)
+                        return wireImages.intersection3W;
+
+                // corner
+                if (w && n)
+                        return wireImages.cornerWN;
+                if (n && e)
+                        return wireImages.cornerNE;
+                if (e && s)
+                        return wireImages.cornerES;
+                if (s && w)
+                        return wireImages.cornerSW;
+
+                // straight
+                if (w || e)
+                        return wireImages.straightHoriz;
+                if (n || s)
+                        return wireImages.straightVerti;
+
+                // alone or between buildings
+                return wireImages.intersection4;
         }
 
         public void renderStructure(Structure structure, Graphics g) {
@@ -96,94 +155,12 @@ public class Renderer {
                                         System.exit(-1);
                         }
 
-                        int x = structure.position.x;
-                        int y = structure.position.y;
-
-                        boolean w = false;
-                        boolean n = false;
-                        boolean e = false;
-                        boolean s = false;
-
-                        if (x > 0)
-                                w = Game.world.structureGrid[x - 1][y] != null && Game.world.structureGrid[x - 1][y].isRoad();
-
-                        if (x < Game.world.WORLD_DIMENSIONS.x - 1)
-                                e = Game.world.structureGrid[x + 1][y] != null && Game.world.structureGrid[x + 1][y].isRoad();
-
-                        if (y > 0)
-                                n = Game.world.structureGrid[x][y - 1] != null && Game.world.structureGrid[x][y - 1].isRoad();
-
-                        if (y < Game.world.WORLD_DIMENSIONS.y - 1)
-                                s = Game.world.structureGrid[x][y + 1] != null && Game.world.structureGrid[x][y + 1].isRoad();
-
                         int windowX = stagePosition.x + structure.position.x * tileSize;
                         int windowY = stagePosition.y + structure.position.y * tileSize;
 
-                        // 4 way
-                        if (w && n && e && s) {
-                                wireImages.intersection4.draw(windowX, windowY, filterColor);
-                                return;
-                        }
-
-                        // 3 way
-                        if (w && n && e) {
-                                wireImages.intersection3N.draw(windowX, windowY, filterColor);
-                                return;
-                        }
-
-                        if (n && e && s) {
-                                wireImages.intersection3E.draw(windowX, windowY, filterColor);
-                                return;
-                        }
-
-                        if (e && s && w) {
-                                wireImages.intersection3S.draw(windowX, windowY, filterColor);
-                                return;
-                        }
-
-                        if (s && w && n) {
-                                wireImages.intersection3W.draw(windowX, windowY, filterColor);
-                                return;
-                        }
-
-                        // corner
-                        if (w && n) {
-                                wireImages.cornerWN.draw(windowX, windowY, filterColor);
-                                return;
-                        }
-
-                        if (n && e) {
-                                wireImages.cornerNE.draw(windowX, windowY, filterColor);
-                                return;
-                        }
-
-                        if (e && s) {
-                                wireImages.cornerES.draw(windowX, windowY, filterColor);
-                                return;
-                        }
-
-                        if (s && w) {
-                                wireImages.cornerSW.draw(windowX, windowY, filterColor);
-                                return;
-                        }
-
-                        // straight
-                        if (w || e) {
-                                wireImages.straightHoriz.draw(windowX, windowY, filterColor);
-                                return;
-                        }
-
-                        if (n || s) {
-                                wireImages.straightVerti.draw(windowX, windowY, filterColor);
-                                return;
-                        }
-
-                        // alone or between buildings
-                        wireImages.intersection4.draw(windowX, windowY, filterColor);
-                        return;
-                }
-
-                if (image != null) {
+                        Image wireImage = getWireImage(structure);
+                        wireImage.draw(windowX, windowY, filterColor);
+                } else if (image != null) {
                         int structureTileX = stagePosition.x + structure.position.x * tileSize;
                         int structureTileY = stagePosition.y + structure.position.y * tileSize;
 
