@@ -1,5 +1,6 @@
 package test.structures;
 
+import org.newdawn.slick.Image;
 import test.Game;
 import test.World;
 import test.resources.Resource;
@@ -10,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public abstract class Structure {
+public class Structure {
         public Vector2i position;
         public List<Vector2i> occupiedTiles;
         public ResourceTable buildCost;
@@ -19,6 +20,8 @@ public abstract class Structure {
         public ResourceTable productionInPerSec;
         public ResourceTable productionOutPerSec;
         public ResourceTable capacityIncrease;
+
+        public Image image;
 
         public Structure(Vector2i pos) {
                 position = pos;
@@ -42,6 +45,7 @@ public abstract class Structure {
 
         public void update(float d){
                 ResourceTable resources = Game.world.resources;
+                ResourceTable cap = Game.world.resourceCapacity;
                 //buffere aenderungen, solange unter 1.0f
                 productionInPerSec.resources.forEach((res, val) -> {
                         if (productionInDelta.get(res) < 1.0f)
@@ -59,6 +63,17 @@ public abstract class Structure {
                                 return;
                         }
                 }
+                //pruefe, ob fuer mindestens eine der produzierten ressourcen kapazitaet vorhanden ist
+                boolean hasCapacity = false;
+                for(Map.Entry<Resource, Float> e : productionOutPerSec.resources.entrySet()){
+                        if(resources.get(e.getKey()) < cap.get(e.getKey())) {
+                                hasCapacity = true;
+                                break;
+                        }
+                }
+                if(!hasCapacity)
+                        //lager voll :(
+                        return;
                 //ziehe eingangsressourcen ab
                 productionInDelta.resources.forEach((res, val) -> {
                         float rDelta = val.intValue();
@@ -68,10 +83,12 @@ public abstract class Structure {
                         }
                 });
                 //addiere ausgangsressourcen
-                //TODO: capacity-check
                 productionOutDelta.resources.forEach((res, val) -> {
-                        float rDelta = (int)(float)val;
+                        float rDelta = val.intValue();
                         if(rDelta >= 1.0f){
+                                float currentRes = resources.get(res);
+                                float resourceCap = cap.get(res);
+                                rDelta = rDelta + currentRes <= resourceCap ? rDelta : resourceCap - currentRes;
                                 productionOutDelta.change(res, -rDelta);
                                 resources.change(res, rDelta);
                         }

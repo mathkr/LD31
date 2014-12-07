@@ -8,8 +8,7 @@ import org.newdawn.slick.geom.Shape;
 import org.newdawn.slick.gui.ComponentListener;
 import org.newdawn.slick.gui.GUIContext;
 import org.newdawn.slick.gui.MouseOverArea;
-import test.structures.CopperMill;
-import test.structures.Structure;
+import test.structures.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,6 +43,102 @@ public class UserInterface {
                                 buttonSize,
                                 (comp) -> {
                                         structureToPlace = new CopperMill(
+                                                new Vector2i(
+                                                        Game.getWorldMouseX(),
+                                                        Game.getWorldMouseY()
+                                                ));
+                                }
+                        );
+
+                        addButton(
+                                buttons,
+                                "PSU T1",
+                                gc,
+                                new Image("resources/debug_button.png"),
+                                currentButtonPosition,
+                                buttonSize,
+                                (comp) -> {
+                                        structureToPlace = new PSU_T1(
+                                                new Vector2i(
+                                                        Game.getWorldMouseX(),
+                                                        Game.getWorldMouseY()
+                                                ));
+                                }
+                        );
+
+                        addButton(
+                                buttons,
+                                "S_RAM",
+                                gc,
+                                new Image("resources/debug_button.png"),
+                                currentButtonPosition,
+                                buttonSize,
+                                (comp) -> {
+                                        structureToPlace = new S_RAM(
+                                                new Vector2i(
+                                                        Game.getWorldMouseX(),
+                                                        Game.getWorldMouseY()
+                                                ));
+                                }
+                        );
+
+                        addButton(
+                                buttons,
+                                "Silicon Mine",
+                                gc,
+                                new Image("resources/debug_button.png"),
+                                currentButtonPosition,
+                                buttonSize,
+                                (comp) -> {
+                                        structureToPlace = new SiliconMine(
+                                                new Vector2i(
+                                                        Game.getWorldMouseX(),
+                                                        Game.getWorldMouseY()
+                                                ));
+                                }
+                        );
+
+                        addButton(
+                                buttons,
+                                "Copper mine",
+                                gc,
+                                new Image("resources/debug_button.png"),
+                                currentButtonPosition,
+                                buttonSize,
+                                (comp) -> {
+                                        structureToPlace = new CopperMine(
+                                                new Vector2i(
+                                                        Game.getWorldMouseX(),
+                                                        Game.getWorldMouseY()
+                                                ));
+                                }
+                        );
+
+                        addButton(
+                                buttons,
+                                "Silver mine",
+                                gc,
+                                new Image("resources/debug_button.png"),
+                                currentButtonPosition,
+                                buttonSize,
+                                (comp) -> {
+                                        structureToPlace = new SilverMine(
+                                                new Vector2i(
+                                                        Game.getWorldMouseX(),
+                                                        Game.getWorldMouseY()
+                                                ));
+                                }
+                        );
+
+                        addButton(
+                                buttons,
+                                "Glass mine",
+                                gc,
+                                new Image("resources/debug_button.png"),
+                                currentButtonPosition,
+                                buttonSize,
+                                (comp) -> {
+                                        structureToPlace = new GlassMine(
                                                 new Vector2i(
                                                         Game.getWorldMouseX(),
                                                         Game.getWorldMouseY()

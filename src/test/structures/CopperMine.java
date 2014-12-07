@@ -1,5 +1,6 @@
 package test.structures;
 
+import test.Game;
 import test.Vector2i;
 import test.World;
 import test.resources.Resource;
@@ -11,17 +12,17 @@ import test.resources.Resource;
  */
 public class CopperMine extends Structure {
 
-    private Float prodfactor = 0.2F;
+    private final Float prodfactor = 0.2F;
 
     public CopperMine(Vector2i pos) {
         super(pos);
-        occupiedTiles.add(new Vector2i(-1, 0));
-        occupiedTiles.add(new Vector2i(0, -1));
+        image = Game.renderer.getImage("resources/copper_mine.png");
+
         occupiedTiles.add(new Vector2i(0, 0));
         occupiedTiles.add(new Vector2i(0, 1));
         occupiedTiles.add(new Vector2i(1, 0));
-        buildCost.put(Resource.SILICON, 0F);
-
+        occupiedTiles.add(new Vector2i(1, 3));
+        productionOutPerSec.put(Resource.COPPER, prodfactor * getNearResources(World.TerrainType.COPPER, 1));
     }
 
     @Override

@@ -7,20 +7,21 @@ import test.resources.Resource;
 
 /**
  * Created by msk on 06.12.14.
- * Einfache Silber Mine
+ * Einfache Glas Mine
  */
-public class SilverMine extends Structure {
+public class GlassMine extends Structure{
 
-    private final Float prodfactor = 0.1F;
+    private final Float prodfactor = 0.05F;
 
-    public SilverMine(Vector2i pos) {
+    public GlassMine(Vector2i pos) {
         super(pos);
-        image = Game.renderer.getImage("resources/silver_mine.png");
+        image = Game.renderer.getImage("resources/glass_mine.png");
 
         occupiedTiles.add(new Vector2i(0, 0));
         occupiedTiles.add(new Vector2i(0, 1));
         occupiedTiles.add(new Vector2i(1, 0));
         occupiedTiles.add(new Vector2i(1, 3));
-        productionOutPerSec.put(Resource.SILVER, prodfactor * getNearResources(World.TerrainType.SILVER, 1));
+        productionOutPerSec.put(Resource.GLASS, getNearResources(World.TerrainType.GLASS, 1) * prodfactor);
     }
+
 }
