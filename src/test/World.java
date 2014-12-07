@@ -6,6 +6,8 @@ import test.structures.*;
 import test.structures.Structure;
 
 import java.util.ArrayList;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class World {
         public static enum TerrainType {
@@ -18,11 +20,13 @@ public class World {
         public Vector2i bounds;
         public ArrayList<Structure> structures;
         public TerrainType[][] terrain;
+        public Structure[][] structureGrid;
         public ResourceTable resources;
         public ResourceTable resourceCapacity;
 
         public World() {
                 bounds = new Vector2i(80, 45);
+                structureGrid = new Structure[bounds.x][bounds.y];
                 structures = new ArrayList<Structure>();
                 resources = new ResourceTable(){{
                         put(Resource.COPPER, 100.0f);
@@ -62,5 +66,20 @@ public class World {
                         if(v > rCap)
                                 resourceCapacity.put(r, rCap);
                 });
+        }
+
+        public Structure getCPU(){
+                //TODO: implement
+                return null;
+        }
+
+        //sollte bei der CPU starten
+        //die CPU hat immer maximalen (GLASS) road access zu sich selbst
+        public void revalidateRoadAccess(){
+                for(Structure structure : structures)
+                        structure.roadAccess = RoadAccess.NONE;
+                getCPU().setRoadAccess(RoadAccess.GLASS);
+                //CPU.adjacentRoads.setRoadAccess
+                //forAll roads r : r.adjacentRoads.setRoadAccess...
         }
 }
