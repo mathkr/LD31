@@ -183,6 +183,18 @@ public class UserInterface {
                                                 if (structureToPlace != null) {
                                                         if (structureToPlace.canBePlaced()) {
                                                                 structureToPlace.actuallyPlace();
+
+                                                                int particleX = x;
+                                                                int particleW = structureToPlace.image.getWidth();
+                                                                int particleY = y;
+                                                                int particleH = structureToPlace.image.getHeight();
+
+                                                                Game.renderer.spawnParticlesInArea(
+                                                                        particleX, particleY,
+                                                                        particleW, particleH,
+                                                                        40, 1, 20,
+                                                                        Game.renderer.TERRAIN_DEFAULT_COLOR.brighter(1.5f), 1f);
+
                                                                 structureToPlace = null;
                                                                 menuState = SideMenuState.OFF;
                                                         }

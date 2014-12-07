@@ -1,9 +1,12 @@
 package test;
 
 import org.newdawn.slick.*;
+import org.newdawn.slick.geom.Vector2f;
 import test.structures.Structure;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class Renderer {
@@ -27,8 +30,11 @@ public class Renderer {
 
         public Map<String, Image> loadedImages;
 
+        public List<Particle> particles;
+
         public Renderer() {
                 loadedImages = new HashMap<>();
+                particles = new ArrayList<>();
 
                 stageDimensions = new Vector2i(Game.WIN_WIDTH - MENU_WIDTH, (Game.WIN_HEIGHT - HEADER_HEIGHT) - FOOTER_HEIGHT);
                 stagePosition = new Vector2i(0, HEADER_HEIGHT);
@@ -143,6 +149,11 @@ public class Renderer {
                         }
                 }
 
+                // render particles
+                for (Particle particle : particles) {
+                        particle.render(g);
+                }
+
                 // render structure shadows
                 // In einem extra loop, damit niemals schatten ueber anderen structures gerendert werden
                 // High Performance Code(C)! \s
@@ -168,6 +179,70 @@ public class Renderer {
                                         g.fillRect(structureTileX, structureTileY, tileSize, tileSize);
                                 }
                         }
+                }
+        }
+
+        public void update(float delta) {
+                for (Particle particle : particles) {
+                        particle.update(delta);
+                }
+                particles.removeIf((p) -> p.dead);
+        }
+
+        public void spawnParticlesAtPosition(int x, int y, float velocity, float variance, int num, Color color, float lifeTime) {
+                for (int i = 0; i < num; ++i) {
+                        float vel = (velocity + (velocity * variance)) - ((float)Math.random() * 2 * (velocity * variance));
+                        float life = (lifeTime + (lifeTime * variance)) - ((float)Math.random() * 2 * (lifeTime * variance));
+                        double theta = Math.random() * 360.0;
+
+                        Particle particle = new Particle(x, y, life, color);
+                        particle.velocity.scale(vel);
+                        particle.velocity.setTheta(theta);
+                        particles.add(particle);
+                }
+        }
+
+        public void spawnParticlesInArea(int x, int y, int width, int height, float velocity, float variance, int num, Color color, float lifeTime) {
+                for (int i = 0; i < num; ++i) {
+                        int posx = x + (int)(Math.random() * width);
+                        int posy = y + (int)(Math.random() * height);
+                        float vel = (velocity + (velocity * variance)) - ((float)Math.random() * 2 * (velocity * variance));
+                        float life = (lifeTime + (lifeTime * variance)) - ((float)Math.random() * 2 * (lifeTime * variance));
+                        double theta = Math.random() * 360.0;
+
+                        Particle particle = new Particle(posx, posy, life, color);
+                        particle.velocity.scale(vel);
+                        particle.velocity.setTheta(theta);
+                        particles.add(particle);
+                }
+        }
+
+        class Particle {
+                Vector2f position;
+                Vector2f velocity;
+                float maxLifeTime;
+                float lifeTime = 0;
+                boolean dead;
+                Color color;
+
+                public Particle(int x, int y, float maxLifeTime, Color color) {
+                        position = new Vector2f(x, y);
+                        velocity = new Vector2f(1, 0);
+                        dead = false;
+                        this.maxLifeTime = maxLifeTime;
+                        this.color = color;
+                }
+
+                public void update(float delta) {
+                        lifeTime += delta;
+                        dead = lifeTime >= maxLifeTime;
+
+                        position = position.add(velocity.copy().scale(delta));
+                }
+
+                public void render(Graphics g) {
+                        g.setColor(color);
+                        g.fillRect(position.x, position.y, Game.PIXEL_SCALE, Game.PIXEL_SCALE);
                 }
         }
 }
