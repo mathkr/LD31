@@ -1,5 +1,6 @@
 package test.structures;
 
+import org.newdawn.slick.Color;
 import org.newdawn.slick.Image;
 import test.Game;
 import test.Vector2i;
