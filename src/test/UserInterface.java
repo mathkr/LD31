@@ -8,14 +8,17 @@ import org.newdawn.slick.geom.Shape;
 import org.newdawn.slick.gui.ComponentListener;
 import org.newdawn.slick.gui.GUIContext;
 import org.newdawn.slick.gui.MouseOverArea;
+import test.resources.Resource;
 import test.structures.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Stack;
 
 public class UserInterface {
         public List<MyButton> buttons;
+        public SideMenu menu;
         private static Stack<MyButton> overlayButtons;
 
         Structure structureToPlace;
@@ -25,6 +28,7 @@ public class UserInterface {
         public int buttonMargins = 10;
 
         public UserInterface(GameContainer gc) {
+                menu = new SideMenu();
                 buttons = new ArrayList<>();
                 overlayButtons = new Stack<>();
                 structureToPlace = null;
@@ -209,6 +213,7 @@ public class UserInterface {
                         g.setColor(Color.white);
                         g.drawString(button.buttonDescription, button.getX() + 10, button.getY() + 45);
                 }
+                menu.render(g);
         }
 
         public void update(GameContainer gc) {
@@ -265,5 +270,54 @@ public class UserInterface {
                                 overlayButtons.push(this);
                         }
                 }
+        }
+
+        class SideMenu {
+                private Image background;
+
+                public SideMenu(){
+                        try {
+                                background = new Image("resources/debug_menu.png");
+                        } catch (SlickException e) {
+                                e.printStackTrace();
+                        }
+                }
+
+                public void render(Graphics g){
+                        // Game.renderer.xOffset
+                        Integer x = Game.renderer.windowDimensions.x ;
+                        Integer y = Game.renderer.yOffset;
+                        Integer xi = Game.WIN_WIDTH - Game.renderer.xOffset;
+                        Integer yi = Game.renderer.windowDimensions.y -Game.renderer.yOffset;
+                        g.drawImage(background,x,y,xi,yi,0,0, background.getWidth(),background.getHeight());
+
+                        if(structureToPlace != null){
+                                Image image = structureToPlace.image;
+                                if(image!= null){
+                                        g.setColor(Color.white);
+                                        int width = image.getWidth();
+                                        int height = image.getHeight();
+                                        g.fillRect(xi - (width + 20), y, (width + 20), height + 20);
+                                        g.drawImage(image, xi - (width + 10), y + 10 );
+                                }
+
+                                int h = y + 30 + (image != null ? image.getHeight() : 0);
+                                g.setColor(Color.white);
+                                g.drawLine(x,h, xi, h);
+
+                                h += 10;
+                                for (Map.Entry<Resource,Float> resource : structureToPlace.buildCost.resources.entrySet()) {
+                                        g.drawString(resource.getKey() + " : " + resource.getValue(),x + 10, h  );
+                                        h+= 20;
+                                }
+
+
+
+                        }
+
+
+
+                }
+
         }
 }

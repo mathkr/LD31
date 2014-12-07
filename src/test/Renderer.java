@@ -7,7 +7,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Renderer {
-        public Vector2i windowDimensions = new Vector2i(Game.WIN_WIDTH, Game.WIN_HEIGHT);
+        public Integer menuSize = 200;
+        public Vector2i windowDimensions = new Vector2i(Game.WIN_WIDTH - menuSize, Game.WIN_HEIGHT);
 
         public Color TERRAIN_DEFAULT_COLOR = new Color(0x2e, 0x35, 0x52);
         public Color TERRAIN_COPPER_COLOR  = new Color(0xcd, 0x6d, 0x06);
