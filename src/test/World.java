@@ -106,20 +106,20 @@ public class World {
                 Queue<Structure> roads = new ConcurrentLinkedQueue<Structure>();
                 Structure s;
                 if(cpu.position.y-1 >= 0)
-                        for(int i=0; i<5; ++i)
+                        for(int i=0; i<cpu.dimensions.x; ++i)
                                 if((s = structureGrid[cpu.position.x+i][cpu.position.y-1]) != null && s.isRoad() && s.improveRoadAccess(RoadAccess.GLASS))
                                         roads.add(s);
-                if(cpu.position.y+5 < WORLD_DIMENSIONS.y)
-                        for(int i=0; i<5; ++i)
-                                if((s = structureGrid[cpu.position.x+i][cpu.position.y+5]) != null && s.isRoad() && s.improveRoadAccess(RoadAccess.GLASS))
+                if(cpu.position.y+cpu.dimensions.y < WORLD_DIMENSIONS.y)
+                        for(int i=0; i<cpu.dimensions.x; ++i)
+                                if((s = structureGrid[cpu.position.x+i][cpu.position.y+cpu.dimensions.y]) != null && s.isRoad() && s.improveRoadAccess(RoadAccess.GLASS))
                                         roads.add(s);
                 if(cpu.position.x-1 >= 0)
-                        for(int i=0; i<5; ++i)
+                        for(int i=0; i<cpu.dimensions.y; ++i)
                                 if((s = structureGrid[cpu.position.x-1][cpu.position.y+i]) != null && s.isRoad() && s.improveRoadAccess(RoadAccess.GLASS))
                                         roads.add(s);
-                if(cpu.position.x+5 < WORLD_DIMENSIONS.x)
-                        for(int i=0; i<5; ++i)
-                                if((s = structureGrid[cpu.position.x+5][cpu.position.y+i]) != null && s.isRoad() && s.improveRoadAccess(RoadAccess.GLASS))
+                if(cpu.position.x+cpu.dimensions.x < WORLD_DIMENSIONS.x)
+                        for(int i=0; i<cpu.dimensions.y; ++i)
+                                if((s = structureGrid[cpu.position.x+cpu.dimensions.x][cpu.position.y+i]) != null && s.isRoad() && s.improveRoadAccess(RoadAccess.GLASS))
                                         roads.add(s);
                 while(!roads.isEmpty()){
                         Structure other;
