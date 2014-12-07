@@ -327,7 +327,9 @@ public class UserInterface {
                         g.setClip(getX() - 1, getY(), getWidth() + 2, getHeight() + 1);
 
                         g.setColor(Game.renderer.TERRAIN_DEFAULT_COLOR);
-                        g.fill(shape);
+                        if (shape != null) {
+                                g.fill(shape);
+                        }
 
                         if (isMouseOver()) {
                                 overlayButtons.push(this);
@@ -341,7 +343,10 @@ public class UserInterface {
                                 g.setColor(Game.renderer.TERRAIN_SILVER_COLOR);
                         }
 
-                        g.draw(shape);
+                        if (shape != null) {
+                                g.draw(shape);
+                        }
+
                         g.setClip(clip);
                 }
         }
