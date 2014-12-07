@@ -23,7 +23,7 @@ public class Population {
         costPhoton = new ResourceTable();
         costQuantum = new ResourceTable();
 
-        costElectron.put(Resource.COPPER,0.01F);
+        costElectron.put(Resource.COPPER,0.1F);
         costPhoton.put(Resource.SILVER, 0.25F);
         costQuantum.put(Resource.GLASS, 0.66F);
 
@@ -37,19 +37,22 @@ public class Population {
         ResourceTable globalResources = Game.world.resources;
         // Deltas Berrechnen
 
-
-
-        float cost = globalResources.get(Resource.ELECTRON) * time;
-        costElectron.resources.forEach((res, val) -> {
-            if(globalResources.get(res) - (int)costElectron.get(res) + 1 > 0){
-                deltaElectron.change(res, deltaElectron.get(res) * cost );
+        float cost = (globalResources.get(Resource.ELECTRON) + 1) * time;
+        Resource res = Resource.COPPER;
+        if(deltaElectron.get(res) > -1 && deltaElectron.get(res) < 1){
+            if(globalResources.get(res) - costElectron.get(res).intValue() + 1 > 0){
+                deltaElectron.change(res, costElectron.get(res) * cost );
             } else {
-                deltaElectron.change(res, -deltaElectron.get(res) * cost);
+                deltaElectron.change(res, -costElectron.get(res) * cost);
             }
+        }
 
-
-
-        });
+        if(deltaElectron.get(res) > 1){
+            globalResources.change(res, -deltaElectron.get(res).intValue());
+            deltaElectron.change(res, -deltaElectron.get(res).intValue());
+        } else if(deltaElectron.get(res) < -1) {
+            deltaElectron.change(res, -deltaElectron.get(res).intValue());
+        }
 
 
 
