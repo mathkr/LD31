@@ -7,7 +7,7 @@ import org.newdawn.slick.*;
 public class Game extends BasicGame {
 
         public static final int PIXELS_PER_TILE = 8;
-        public static final int PIXEL_SCALE = 2;
+        public static final int PIXEL_SCALE = 1;
         public static int WIN_WIDTH;
         public static int WIN_HEIGHT;
 
