@@ -8,6 +8,10 @@ public enum StructureType {
         RAM_T1,
         SiliconMine,
         MEMORY_T1,
+        CopperRoad,
+        SilverRoad,
+        GlassRoad,
+        CPU_T1
 }
 
 
