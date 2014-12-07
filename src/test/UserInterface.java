@@ -17,11 +17,19 @@ import java.util.Map;
 import java.util.Stack;
 
 public class UserInterface {
+        enum SideMenuState {
+                OFF,
+                PLACING,
+                SELECTING,
+        }
+
         public List<MyButton> buttons;
-        public SideMenu menu;
         private static Stack<MyButton> overlayButtons;
 
-        Structure structureToPlace;
+        public SideMenu menu;
+        public SideMenuState menuState;
+        public Structure structureToPlace;
+        public Structure selectedStructure;
 
         public Vector2i guiTopLeft = new Vector2i(0, 0);
         public int buttonSize = 40;
@@ -31,7 +39,10 @@ public class UserInterface {
                 menu = new SideMenu();
                 buttons = new ArrayList<>();
                 overlayButtons = new Stack<>();
+
                 structureToPlace = null;
+                menuState = SideMenuState.OFF;
+                selectedStructure = null;
 
                 // add Buttons
                 try {
@@ -50,6 +61,7 @@ public class UserInterface {
                                                 Game.getWorldMouseX(),
                                                 Game.getWorldMouseY()
                                         );
+                                        menuState = SideMenuState.PLACING;
                                 }
                         );
 
@@ -65,6 +77,7 @@ public class UserInterface {
                                                 Game.getWorldMouseX(),
                                                 Game.getWorldMouseY()
                                         );
+                                        menuState = SideMenuState.PLACING;
                                 }
                         );
 
@@ -80,6 +93,7 @@ public class UserInterface {
                                                 Game.getWorldMouseX(),
                                                 Game.getWorldMouseY()
                                         );
+                                        menuState = SideMenuState.PLACING;
                                 }
                         );
 
@@ -95,6 +109,7 @@ public class UserInterface {
                                                 Game.getWorldMouseX(),
                                                 Game.getWorldMouseY()
                                         );
+                                        menuState = SideMenuState.PLACING;
                                 }
                         );
 
@@ -110,6 +125,7 @@ public class UserInterface {
                                                 Game.getWorldMouseX(),
                                                 Game.getWorldMouseY()
                                         );
+                                        menuState = SideMenuState.PLACING;
                                 }
                         );
 
@@ -125,6 +141,7 @@ public class UserInterface {
                                                 Game.getWorldMouseX(),
                                                 Game.getWorldMouseY()
                                         );
+                                        menuState = SideMenuState.PLACING;
                                 }
                         );
 
@@ -140,6 +157,7 @@ public class UserInterface {
                                                 Game.getWorldMouseX(),
                                                 Game.getWorldMouseY()
                                         );
+                                        menuState = SideMenuState.PLACING;
                                 }
                         );
                 } catch (SlickException e) {
@@ -155,19 +173,57 @@ public class UserInterface {
                                 if (button == Input.MOUSE_LEFT_BUTTON) {
                                         int worldX = (Game.appgc.getInput().getAbsoluteMouseX() - Game.renderer.xOffset) / Game.renderer.tilePixelDimensions.x;
                                         int worldY = (Game.appgc.getInput().getAbsoluteMouseY() - Game.renderer.yOffset) / Game.renderer.tilePixelDimensions.y;
+                                        Vector2i clickedPosition = new Vector2i(worldX, worldY);
 
                                         if (worldX >= 0 && worldX < Game.world.bounds.x && worldY >= 0 && worldY < Game.world.bounds.y) {
                                                 // Hier haben wir auf ein gueltiges tile geclickt
 
-                                                if (Game.gui.structureToPlace != null && Game.gui.structureToPlace.canBePlaced()) {
-                                                        Game.gui.structureToPlace.actuallyPlace();
-                                                        Game.gui.structureToPlace = null;
+                                                if (structureToPlace != null && structureToPlace.canBePlaced()) {
+                                                        structureToPlace.actuallyPlace();
+                                                        structureToPlace = null;
+                                                        menuState = SideMenuState.OFF;
+                                                } else {
+                                                        // See if we clicked on a structure
+                                                        Structure clickedStructure = null;
+                                                        int structureIndex = 0;
+                                                        while (clickedStructure == null && structureIndex < Game.world.structures.size()) {
+                                                                Structure current = Game.world.structures.get(structureIndex);
+
+                                                                for (Vector2i occupiedTile : current.occupiedTiles) {
+                                                                        if (Vector2i.add(current.position, occupiedTile).equals(clickedPosition)) {
+                                                                                clickedStructure = current;
+                                                                                break;
+                                                                        }
+                                                                }
+
+                                                                ++structureIndex;
+                                                        }
+
+                                                        System.out.println("clicked: " + clickedPosition);
+
+                                                        if (clickedStructure != null) {
+                                                                // We clicked on a structure
+                                                                selectedStructure = clickedStructure;
+                                                                menuState = SideMenuState.SELECTING;
+                                                        } else {
+                                                                // We clicked on nothing
+                                                                selectedStructure = null;
+                                                                menuState = SideMenuState.OFF;
+                                                        }
                                                 }
                                         }
                                 }
 
                                 if (button == Input.MOUSE_RIGHT_BUTTON) {
-                                        Game.gui.structureToPlace = null;
+                                        if (menuState == SideMenuState.PLACING) {
+                                                // Abbrechen
+                                                structureToPlace = null;
+                                                menuState = SideMenuState.OFF;
+                                        } else if (menuState == SideMenuState.SELECTING) {
+                                                // Abbrechen
+                                                selectedStructure = null;
+                                                menuState = SideMenuState.OFF;
+                                        }
                                 }
                         }
 
@@ -298,41 +354,58 @@ public class UserInterface {
                         }
                 }
 
-                public void render(Graphics g){
+                public void render(Graphics g) {
+                        Structure structure = null;
+
+                        switch (menuState) {
+                                case OFF:
+                                        return;
+                                case PLACING:
+                                        structure = structureToPlace;
+                                        break;
+                                case SELECTING:
+                                        structure = selectedStructure;
+                                        break;
+                                default:
+                                        System.err.println("Unknown menu state in side menu renderer.");
+                                        System.exit(-1);
+                        }
+
                         // Game.renderer.xOffset
                         Integer x = Game.renderer.windowDimensions.x ;
                         Integer y = Game.renderer.yOffset;
                         Integer xi = Game.WIN_WIDTH - Game.renderer.xOffset;
-                        Integer yi = Game.renderer.windowDimensions.y -Game.renderer.yOffset;
+                        Integer yi = Game.renderer.windowDimensions.y - Game.renderer.yOffset;
+
+                        // falsche draw parameter?
                         g.drawImage(background,x,y,xi,yi,0,0, background.getWidth(),background.getHeight());
 
-                        if(structureToPlace != null){
-                                Image image = structureToPlace.image;
-                                if(image!= null){
-                                        g.setColor(Color.white);
-                                        int width = image.getWidth();
-                                        int height = image.getHeight();
-                                        g.fillRect(xi - (width + 20), y, (width + 20), height + 20);
-                                        g.drawImage(image, xi - (width + 10), y + 10 );
-                                }
-
-                                int h = y + 30 + (image != null ? image.getHeight() : 0);
+                        Image image = structure.image;
+                        if(image != null){
                                 g.setColor(Color.white);
-                                g.drawLine(x,h, xi, h);
-
-                                h += 10;
-                                for (Map.Entry<Resource,Float> resource : structureToPlace.buildCost.resources.entrySet()) {
-                                        g.drawString(resource.getKey() + " : " + resource.getValue(),x + 10, h  );
-                                        h+= 20;
-                                }
-
-
-
+                                int width = image.getWidth();
+                                int height = image.getHeight();
+                                g.fillRect(xi - (width + 20), y, (width + 20), height + 20);
+                                g.drawImage(image, xi - (width + 10), y + 10 );
                         }
 
+                        int h = y + 30 + (image != null ? image.getHeight() : 0);
+                        g.setColor(Color.white);
+                        g.drawLine(x,h, xi, h);
 
+                        h += 10;
+                        for (Map.Entry<Resource,Float> resource : structure.buildCost.resources.entrySet()) {
+                                g.drawString(resource.getKey() + " : " + resource.getValue(),x + 10, h  );
+                                h+= 20;
+                        }
 
+                        if (menuState == SideMenuState.SELECTING) {
+                                g.setColor(new Color(0xFF, 0xFF, 0xFF, 150));
+                                int selectedX = Game.renderer.xOffset + selectedStructure.position.x * Game.renderer.tilePixelDimensions.x;
+                                int selectedY = Game.renderer.yOffset + selectedStructure.position.y * Game.renderer.tilePixelDimensions.y;
+                                g.drawRect(selectedX - 5, selectedY - 5,
+                                        selectedStructure.image.getWidth() + 10, selectedStructure.image.getHeight() + 10);
+                        }
                 }
-
         }
 }

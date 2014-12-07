@@ -35,7 +35,6 @@ public class StructureLoader {
                 updaterMap.put(StructureType.GlassMine, (structure) -> {
                         Integer value = structure.getNearResources(World.TerrainType.GLASS, 1);
                         structure.productionOutPerSec.put(Resource.GLASS, structure.productionFactor * value);
-                        System.out.println("value: " + value);
                 });
         }
 
