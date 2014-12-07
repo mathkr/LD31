@@ -27,16 +27,16 @@ public class StructureLoader {
         public static HashMap<StructureType, ArrayList<Vector2i>> occupiedTilesMap = new HashMap<>();
 
         static {
-                updaterMap.put(StructureType.CopperMine, (structure) -> {
-                        Integer value = structure.getNearResources(World.TerrainType.COPPER, 1);
-                        structure.productionOutPerSec.put(Resource.COPPER, structure.productionFactor * value);
-                });
-
-                updaterMap.put(StructureType.GlassMine, (structure) -> {
-                        Integer value = structure.getNearResources(World.TerrainType.GLASS, 1);
-                        structure.productionOutPerSec.put(Resource.GLASS, structure.productionFactor * value);
-                        System.out.println("value: " + value);
-                });
+//                updaterMap.put(StructureType.CopperMine, (structure) -> {
+//                        Integer value = structure.getNearResources(World.TerrainType.COPPER, 1);
+//                        structure.productionOutPerSec.put(Resource.COPPER, structure.productionFactor * value);
+//                });
+//
+//                updaterMap.put(StructureType.GlassMine, (structure) -> {
+//                        Integer value = structure.getNearResources(World.TerrainType.GLASS, 1);
+//                        structure.productionOutPerSec.put(Resource.GLASS, structure.productionFactor * value);
+//                        System.out.println("value: " + value);
+//                });
         }
 
         public static ArrayList<Vector2i> getOccupiedTiles(StructureType type) {
@@ -89,6 +89,7 @@ public class StructureLoader {
         public static Structure getInstance(StructureType type, int x, int y) {
                 Vector2i pos = new Vector2i(x, y);
                 Structure structure = new Structure(pos);
+                structure.type = type;
 
                 Properties properties = getProperties(type);
 
@@ -111,7 +112,7 @@ public class StructureLoader {
 
                 Image image = Game.renderer.getImage("resources/" + properties.getProperty("image"));
 
-                structure.productionFactor = Float.parseFloat(properties.getProperty("productionFactor", "1f"));
+//                structure.productionFactor = Float.parseFloat(properties.getProperty("productionFactor", "1f"));
 
                 ArrayList<Vector2i> occupiedTiles = getOccupiedTiles(type);
                 structure.occupiedTiles = occupiedTiles;
