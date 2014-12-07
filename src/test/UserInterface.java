@@ -8,6 +8,7 @@ import org.newdawn.slick.geom.Shape;
 import org.newdawn.slick.gui.ComponentListener;
 import org.newdawn.slick.gui.GUIContext;
 import org.newdawn.slick.gui.MouseOverArea;
+import org.newdawn.slick.util.FastTrig;
 import test.resources.Resource;
 import test.structures.*;
 
@@ -30,6 +31,9 @@ public class UserInterface {
         public SideMenuState menuState;
         public Structure structureToPlace;
         public Structure selectedStructure;
+
+        Color selectionColor = new Color(0xFF, 0xFF, 0xFF);
+        float selectionColorTime = 0f;
 
         public Vector2i guiTopLeft = new Vector2i(0, 0);
         public int buttonSize = 40;
@@ -290,11 +294,15 @@ public class UserInterface {
                 }
         }
 
-        public void update(GameContainer gc) {
+        public void update(GameContainer gc, float delta) {
                 if (structureToPlace != null) {
                         structureToPlace.position.x = Game.getWorldMouseX();
                         structureToPlace.position.y = Game.getWorldMouseY();
                 }
+
+                selectionColorTime += 5 * delta;
+                float alpha = Math.abs((float)FastTrig.cos(selectionColorTime));
+                selectionColor = new Color(0xFF, 0xFF, 0xFF, alpha);
         }
 
         public static class MyButton extends MouseOverArea {
@@ -424,7 +432,7 @@ public class UserInterface {
                         }
 
                         if (menuState == SideMenuState.SELECTING) {
-                                g.setColor(new Color(0xFF, 0xFF, 0xFF, 150));
+                                g.setColor(selectionColor);
                                 int selectedX = Game.renderer.xOffset + selectedStructure.position.x * Game.renderer.tilePixelDimensions.x;
                                 int selectedY = Game.renderer.yOffset + selectedStructure.position.y * Game.renderer.tilePixelDimensions.y;
                                 g.drawRect(selectedX - 5, selectedY - 5,
