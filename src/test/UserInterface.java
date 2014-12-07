@@ -35,8 +35,9 @@ public class UserInterface {
         Color selectionColor = new Color(0xFF, 0xFF, 0xFF);
         float selectionColorTime = 0f;
 
+        public Vector2i guiTopLeft = new Vector2i(0, 0);
+        public int buttonSize = 40;
         public int buttonMargins = 10;
-        public int buttonSize = Renderer.HEADER_HEIGHT - buttonMargins;
 
         public UserInterface(GameContainer gc) {
                 menu = new SideMenu();
@@ -49,7 +50,8 @@ public class UserInterface {
 
                 // add Buttons
                 try {
-                        Vector2i currentButtonPosition = new Vector2i(buttonMargins / 2, buttonMargins / 2);
+                        Vector2i currentButtonPosition = new Vector2i(guiTopLeft.x + buttonMargins,
+                                guiTopLeft.y + buttonMargins);
 
                         addButton(
                                 buttons,
@@ -162,6 +164,22 @@ public class UserInterface {
                                         menuState = SideMenuState.PLACING;
                                 }
                         );
+
+                        addButton(
+                                buttons,
+                                "CPU T1",
+                                gc,
+                                new Image("resources/debug_button.png"),
+                                currentButtonPosition,
+                                buttonSize,
+                                (comp) -> {
+                                        structureToPlace = StructureLoader.getInstance(StructureType.CPU_T1,
+                                                Game.getWorldMouseX(),
+                                                Game.getWorldMouseY()
+                                        );
+                                        menuState = SideMenuState.PLACING;
+                                }
+                        );
                 } catch (SlickException e) {
                         e.printStackTrace();
                 }
@@ -173,19 +191,17 @@ public class UserInterface {
                         @Override
                         public void mouseClicked(int button, int x, int y, int clickCount) {
                                 if (button == Input.MOUSE_LEFT_BUTTON) {
-                                        int worldX = (Game.appgc.getInput().getAbsoluteMouseX() - Game.renderer.stagePosition.x) / Game.renderer.tileSize;
-                                        int worldY = (Game.appgc.getInput().getAbsoluteMouseY() - Game.renderer.stagePosition.y) / Game.renderer.tileSize;
+                                        int worldX = (Game.appgc.getInput().getAbsoluteMouseX() - Game.renderer.xOffset) / Game.renderer.tilePixelDimensions.x;
+                                        int worldY = (Game.appgc.getInput().getAbsoluteMouseY() - Game.renderer.yOffset) / Game.renderer.tilePixelDimensions.y;
                                         Vector2i clickedPosition = new Vector2i(worldX, worldY);
 
-                                        if (worldX >= 0 && worldX < Game.world.WORLD_DIMENSIONS.x && worldY >= 0 && worldY < Game.world.WORLD_DIMENSIONS.y) {
+                                        if (worldX >= 0 && worldX < Game.world.bounds.x && worldY >= 0 && worldY < Game.world.bounds.y) {
                                                 // Hier haben wir auf ein gueltiges tile geclickt
 
-                                                if (structureToPlace != null) {
-                                                        if (structureToPlace.canBePlaced()) {
-                                                                structureToPlace.actuallyPlace();
-                                                                structureToPlace = null;
-                                                                menuState = SideMenuState.OFF;
-                                                        }
+                                                if (structureToPlace != null && structureToPlace.canBePlaced()) {
+                                                        structureToPlace.actuallyPlace();
+                                                        structureToPlace = null;
+                                                        menuState = SideMenuState.OFF;
                                                 } else {
                                                         // See if we clicked on a structure
                                                         Structure clickedStructure = null;
@@ -209,7 +225,6 @@ public class UserInterface {
                                                                 // We clicked on a structure
                                                                 selectedStructure = clickedStructure;
                                                                 menuState = SideMenuState.SELECTING;
-                                                                selectionColorTime = 0f;
                                                         } else {
                                                                 // We clicked on nothing
                                                                 selectedStructure = null;
@@ -284,18 +299,7 @@ public class UserInterface {
                 }
 
                 g.setColor(Color.white);
-
-                String resources = String.format("Copper: %.0f/%.0f | Silver: %.0f/%.0f | Glass: %.0f/%.0f | Silicon: %.0f/%.0f | Energy: %.0f/%.0f ||| Electrons: %.0f/%.0f | Photons: %.0f/%.0f | Quants: %.0f/%.0f",
-                        Game.world.resources.get(Resource.COPPER), Game.world.resourceCapacity.get(Resource.COPPER),
-                        Game.world.resources.get(Resource.SILVER), Game.world.resourceCapacity.get(Resource.SILVER),
-                        Game.world.resources.get(Resource.GLASS), Game.world.resourceCapacity.get(Resource.GLASS),
-                        Game.world.resources.get(Resource.SILICON), Game.world.resourceCapacity.get(Resource.SILICON),
-                        Game.world.resources.get(Resource.ENERGY), Game.world.resourceCapacity.get(Resource.ENERGY),
-                        Game.world.resources.get(Resource.ELECTRON), Game.world.resourceCapacity.get(Resource.ELECTRON),
-                        Game.world.resources.get(Resource.PHOTON), Game.world.resourceCapacity.get(Resource.PHOTON),
-                        Game.world.resources.get(Resource.QUANTUM), Game.world.resourceCapacity.get(Resource.QUANTUM));
-
-                g.drawString(resources, buttonMargins / 2, Game.renderer.stagePosition.y + Game.renderer.stageDimensions.y + 5);
+                g.drawString(Game.world.resources.toString(), 10, Game.WIN_HEIGHT - 40);
 
                 menu.render(g);
 
@@ -313,7 +317,7 @@ public class UserInterface {
                 }
 
                 selectionColorTime += 5 * delta;
-                float alpha = Math.abs((float) FastTrig.sin(selectionColorTime));
+                float alpha = Math.abs((float)FastTrig.cos(selectionColorTime));
                 selectionColor = new Color(0xFF, 0xFF, 0xFF, alpha);
         }
 
@@ -380,7 +384,7 @@ public class UserInterface {
                                         "Remove selected structure",
                                         Game.appgc,
                                         removeButtonImage,
-                                        Game.renderer.stageDimensions.x + 10,
+                                        Game.renderer.windowDimensions.x + 10,
                                         Game.WIN_HEIGHT - 90,
                                         80,
                                         20);
@@ -416,11 +420,12 @@ public class UserInterface {
                         }
 
                         // Game.renderer.xOffset
-                        Integer x = Game.renderer.stageDimensions.x;
-                        Integer y = Renderer.HEADER_HEIGHT;
-                        Integer xi = Game.WIN_WIDTH;
-                        Integer yi = Game.WIN_HEIGHT - Renderer.FOOTER_HEIGHT;
+                        Integer x = Game.renderer.windowDimensions.x;
+                        Integer y = Game.renderer.yOffset;
+                        Integer xi = Game.WIN_WIDTH - Game.renderer.xOffset;
+                        Integer yi = Game.renderer.windowDimensions.y - Game.renderer.yOffset;
 
+                        // falsche draw parameter?
                         g.drawImage(background,x,y,xi,yi,0,0, background.getWidth(),background.getHeight());
 
                         Image image = structure.image;
@@ -444,8 +449,9 @@ public class UserInterface {
 
                         if (menuState == SideMenuState.SELECTING) {
                                 g.setColor(selectionColor);
-                                int selectedX = Game.renderer.stagePosition.x + selectedStructure.position.x * Game.renderer.tileSize;
-                                int selectedY = Game.renderer.stagePosition.y + selectedStructure.position.y * Game.renderer.tileSize;
+                                int selectedX = Game.renderer.xOffset + selectedStructure.position.x * Game.renderer.tilePixelDimensions.x;
+                                int selectedY = Game.renderer.yOffset + selectedStructure.position.y * Game.renderer.tilePixelDimensions.y;
+                                if(selectedStructure.image != null)
                                 g.drawRect(selectedX - 5, selectedY - 5,
                                         selectedStructure.image.getWidth() + 10, selectedStructure.image.getHeight() + 10);
 

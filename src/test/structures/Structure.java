@@ -10,8 +10,6 @@ import test.resources.ResourceTable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Queue;
-import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class Structure {
         public Vector2i position;
@@ -231,6 +229,7 @@ public class Structure {
                                                 return false;
                                 }
                 }
+                System.out.println(type + "["+position.x+"]["+position.y+"]: road access changed from " + roadAccess + " to " + road);
                 roadAccess = road;
                 return false;
         }
