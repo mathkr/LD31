@@ -39,7 +39,7 @@ public class World {
                         //TODO: balance numbers
                 }};
 
-                createWorld(4L);
+                createWorld(null);
         }
 
         public void update(float delta) {
@@ -49,7 +49,11 @@ public class World {
         }
 
         public void createWorld(Long seed){
-                WorldGenerator.createWorld(this,seed);
+                if(seed != null){
+                        WorldGenerator.createWorld(this,seed);
+                } else{
+                        WorldGenerator.createWorld(this);
+                }
         }
 
         public void trimResourcesToCap(){
