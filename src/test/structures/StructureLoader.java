@@ -111,6 +111,8 @@ public class StructureLoader {
 
                 Image image = Game.renderer.getImage("resources/" + properties.getProperty("image"));
 
+                structure.productionFactor = Float.parseFloat(properties.getProperty("productionFactor", "1f"));
+
                 ArrayList<Vector2i> occupiedTiles = getOccupiedTiles(type);
                 structure.occupiedTiles = occupiedTiles;
                 structure.image = image;
