@@ -2,16 +2,16 @@ package test.structures;
 
 import org.newdawn.slick.Image;
 import test.Game;
+import test.Vector2i;
 import test.World;
 import test.resources.Resource;
 import test.resources.ResourceTable;
-import test.Vector2i;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public abstract class Structure {
+public class Structure {
         public Vector2i position;
         public List<Vector2i> occupiedTiles;
         public ResourceTable buildCost;
@@ -20,12 +20,14 @@ public abstract class Structure {
         public ResourceTable productionInPerSec;
         public ResourceTable productionOutPerSec;
         public ResourceTable capacityIncrease;
+        public float productionFactor;
+        public StructureLoader.Updater updater;
 
         public Image image;
 
         public Structure(Vector2i pos) {
                 position = pos;
-                occupiedTiles = new ArrayList<Vector2i>();
+                occupiedTiles = new ArrayList<>();
                 buildCost = new ResourceTable();
                 productionInDelta = new ResourceTable();
                 productionOutDelta = new ResourceTable();
@@ -44,6 +46,10 @@ public abstract class Structure {
         }
 
         public void update(float d){
+                if (updater != null) {
+                        updater.update(this);
+                }
+
                 ResourceTable resources = Game.world.resources;
                 ResourceTable cap = Game.world.resourceCapacity;
                 //buffere aenderungen, solange unter 1.0f
