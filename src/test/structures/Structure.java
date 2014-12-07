@@ -220,6 +220,7 @@ public class Structure {
                         case CopperRoad :
                                 if(roadAccess.compareTo(road) < 0){
                                         roadAccess = RoadAccess.COPPER;
+                                        setActive(true);
                                         return true;
                                 }
                                 return false;
@@ -228,6 +229,7 @@ public class Structure {
                                         case COPPER :
                                                 if(roadAccess.compareTo(road) < 0){
                                                         roadAccess = RoadAccess.COPPER;
+                                                        setActive(true);
                                                         return true;
                                                 }
                                                 return false;
@@ -235,6 +237,7 @@ public class Structure {
                                         case GLASS :
                                                 if(roadAccess.compareTo(road) < 0){
                                                         roadAccess = RoadAccess.SILVER;
+                                                        setActive(true);
                                                         return true;
                                                 }
                                                 return false;
@@ -242,6 +245,7 @@ public class Structure {
                         case GlassRoad :
                                 if(roadAccess.compareTo(road) < 0){
                                         roadAccess = road;
+                                        setActive(true);
                                         return true;
                                 }
                                 return false;
