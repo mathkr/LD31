@@ -266,8 +266,10 @@ public class UserInterface {
                         position.y,
                         length,
                         length);
+                if (buttonList != null) {
+                        buttonList.add(button);
+                }
                 button.addListener(listener);
-                buttonList.add(button);
                 position.x += length + buttonMargins;
         }
 
@@ -279,12 +281,13 @@ public class UserInterface {
                 g.setColor(Color.white);
                 g.drawString(Game.world.resources.toString(), 10, Game.WIN_HEIGHT - 40);
 
+                menu.render(g);
+
                 while (!overlayButtons.empty()) {
                         MyButton button = overlayButtons.pop();
                         g.setColor(Color.white);
                         g.drawString(button.buttonDescription, button.getX() + 10, button.getY() + 45);
                 }
-                menu.render(g);
         }
 
         public void update(GameContainer gc) {
@@ -345,10 +348,31 @@ public class UserInterface {
 
         class SideMenu {
                 private Image background;
+                public MyButton removeButton;
 
                 public SideMenu(){
                         try {
                                 background = new Image("resources/debug_menu.png");
+
+                                Image removeButtonImage = new Image("resources/debug_button_invert.png").getScaledCopy(80, 20);
+
+                                removeButton = new MyButton(
+                                        "Remove selected structure",
+                                        Game.appgc,
+                                        removeButtonImage,
+                                        Game.renderer.windowDimensions.x + 10,
+                                        Game.WIN_HEIGHT - 90,
+                                        80,
+                                        20);
+
+                                removeButton.addListener(
+                                        (comp) -> {
+                                                if (menuState == SideMenuState.SELECTING) {
+                                                        selectedStructure.remove();
+                                                        selectedStructure = null;
+                                                        menuState = SideMenuState.OFF;
+                                                }
+                                        });
                         } catch (SlickException e) {
                                 e.printStackTrace();
                         }
@@ -372,7 +396,7 @@ public class UserInterface {
                         }
 
                         // Game.renderer.xOffset
-                        Integer x = Game.renderer.windowDimensions.x ;
+                        Integer x = Game.renderer.windowDimensions.x;
                         Integer y = Game.renderer.yOffset;
                         Integer xi = Game.WIN_WIDTH - Game.renderer.xOffset;
                         Integer yi = Game.renderer.windowDimensions.y - Game.renderer.yOffset;
@@ -405,6 +429,8 @@ public class UserInterface {
                                 int selectedY = Game.renderer.yOffset + selectedStructure.position.y * Game.renderer.tilePixelDimensions.y;
                                 g.drawRect(selectedX - 5, selectedY - 5,
                                         selectedStructure.image.getWidth() + 10, selectedStructure.image.getHeight() + 10);
+
+                                removeButton.render(Game.appgc, g);
                         }
                 }
         }
