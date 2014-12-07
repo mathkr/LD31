@@ -105,6 +105,9 @@ public class Structure {
         }
 
         public boolean canBePlaced(){
+                if(type == StructureType.CPU_T1 && Game.world.cpu != null)
+                        //schon eine CPU vorhanden - mehr geht nicht
+                        return false;
                 for(Structure other : Game.world.structures) {
                         if (collidesWith(other)) {
                                 //kein Platz :(
@@ -154,20 +157,26 @@ public class Structure {
                         case SilverMine : productionOutPerSec.multiply(Resource.SILVER, getNearResources(World.TerrainType.SILVER, 1)); break;
                         case CopperMine : productionOutPerSec.multiply(Resource.COPPER, getNearResources(World.TerrainType.COPPER, 1)); break;
                         case GlassMine : productionOutPerSec.multiply(Resource.GLASS, getNearResources(World.TerrainType.GLASS, 1)); break;
+                        case CPU_T1 : Game.world.cpu = this;
                 }
                 for(Vector2i v : occupiedTiles)
                         Game.world.structureGrid[position.x+v.x][position.y+v.y] = this;
                 Game.world.structures.add(this);
                 Game.world.resources.subtract(this.buildCost);
                 Game.world.resourceCapacity.add(this.capacityIncrease);
+                Game.world.revalidateRoadAccess();
         }
 
         public void remove(){
+                if(type == StructureType.CPU_T1)
+                        Game.world.cpu = null;
                 Game.world.structures.remove(this);
                 for(Vector2i v : occupiedTiles)
                         Game.world.structureGrid[position.x+v.x][position.y+v.y] = null;
                 Game.world.resourceCapacity.subtract(this.capacityIncrease);
                 Game.world.trimResourcesToCap();
+                if(isRoad())
+                        Game.world.revalidateRoadAccess();
         }
 
         public RoadAccess getRoadAccess(){
@@ -224,5 +233,14 @@ public class Structure {
                 }
                 roadAccess = road;
                 return false;
+        }
+
+        public boolean isRoad(){
+                switch(type){
+                        case CopperRoad :
+                        case SilverRoad :
+                        case GlassRoad : return true;
+                        default : return false;
+                }
         }
 }

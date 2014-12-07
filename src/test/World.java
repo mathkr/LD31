@@ -18,9 +18,10 @@ public class World {
         }
 
         public Vector2i bounds;
-        public ArrayList<Structure> structures;
         public TerrainType[][] terrain;
         public Structure[][] structureGrid;
+        public ArrayList<Structure> structures;
+        public Structure cpu;
         public ResourceTable resources;
         public ResourceTable resourceCapacity;
 
@@ -68,18 +69,44 @@ public class World {
                 });
         }
 
-        public Structure getCPU(){
-                //TODO: implement
-                return null;
-        }
-
-        //sollte bei der CPU starten
+        //startet bei der CPU
         //die CPU hat immer maximalen (GLASS) road access zu sich selbst
         public void revalidateRoadAccess(){
                 for(Structure structure : structures)
                         structure.roadAccess = RoadAccess.NONE;
-                getCPU().setRoadAccess(RoadAccess.GLASS);
-                //CPU.adjacentRoads.setRoadAccess
-                //forAll roads r : r.adjacentRoads.setRoadAccess...
+                if(cpu == null)
+                        //keine CPU - kein Strassenzugang!
+                        return;
+                cpu.setRoadAccess(RoadAccess.GLASS);
+                Queue<Structure> roads = new ConcurrentLinkedQueue<Structure>();
+                Structure s;
+                if(cpu.position.y-1 >= 0)
+                        for(int i=0; i<5; ++i)
+                                if((s = structureGrid[cpu.position.x+i][cpu.position.y-1]) != null && s.isRoad() && s.setRoadAccess(RoadAccess.GLASS))
+                                        roads.add(s);
+                if(cpu.position.y+5 < bounds.y)
+                        for(int i=0; i<5; ++i)
+                                if((s = structureGrid[cpu.position.x+i][cpu.position.y+5]) != null && s.isRoad() && s.setRoadAccess(RoadAccess.GLASS))
+                                        roads.add(s);
+                if(cpu.position.x-1 >= 0)
+                        for(int i=0; i<5; ++i)
+                                if((s = structureGrid[cpu.position.x-1][cpu.position.y+i]) != null && s.isRoad() && s.setRoadAccess(RoadAccess.GLASS))
+                                        roads.add(s);
+                if(cpu.position.x+5 < bounds.x)
+                        for(int i=0; i<5; ++i)
+                                if((s = structureGrid[cpu.position.x+5][cpu.position.y+i]) != null && s.isRoad() && s.setRoadAccess(RoadAccess.GLASS))
+                                        roads.add(s);
+                while(!roads.isEmpty()){
+                        Structure other;
+                        s = roads.poll();
+                        if(s.position.y-1 >= 0 && (other = structureGrid[s.position.x][s.position.y-1]) != null && other.setRoadAccess(s.getRoadAccess()))
+                                roads.add(other);
+                        if(s.position.y+1 < bounds.y && (other = structureGrid[s.position.x][s.position.y+1]) != null && other.setRoadAccess(s.getRoadAccess()))
+                                roads.add(other);
+                        if(s.position.x-1 >= 0 && (other = structureGrid[s.position.x-1][s.position.y]) != null && other.setRoadAccess(s.getRoadAccess()))
+                                roads.add(other);
+                        if(s.position.x+1 < bounds.x && (other = structureGrid[s.position.x+1][s.position.y]) != null && other.setRoadAccess(s.getRoadAccess()))
+                                roads.add(other);
+                }
         }
 }
