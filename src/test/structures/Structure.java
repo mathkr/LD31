@@ -46,6 +46,7 @@ public class Structure {
                         case SilverRoad :
                         case GlassRoad :
                         case CPU_T1 :
+                        case RAM_T1 :
                         case MEMORY_T1 : isProducer = false; break;
                         default : isProducer = true;
                 }
