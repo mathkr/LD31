@@ -23,6 +23,7 @@ public class Structure {
         public StructureLoader.Updater updater;
         public StructureType type;
         public RoadAccess roadAccess;
+        public boolean isActive;
 
         public Image image;
 
@@ -35,6 +36,8 @@ public class Structure {
                 productionInPerSec = new ResourceTable();
                 productionOutPerSec = new ResourceTable();
                 capacityIncrease = new ResourceTable();
+                roadAccess = RoadAccess.NONE;
+                isActive = false;
         }
 
         public boolean collidesWith(Structure other){
@@ -51,6 +54,11 @@ public class Structure {
                         updater.update(this);
                 }
 
+                if(roadAccess == RoadAccess.NONE){
+                        //keine strasse :(
+                        isActive = false;
+                        return;
+                }
                 ResourceTable resources = Game.world.resources;
                 ResourceTable cap = Game.world.resourceCapacity;
                 //buffere aenderungen, solange unter 1.0f
@@ -67,6 +75,7 @@ public class Structure {
                         float rDelta = e.getValue().intValue();
                         if (rDelta >= 1.0f && !resources.canSubtract(e.getKey(), rDelta)) {
                                 //kein saft :(
+                                isActive = false;
                                 return;
                         }
                 }
@@ -78,9 +87,12 @@ public class Structure {
                                 break;
                         }
                 }
-                if(!hasCapacity)
+                if(!hasCapacity) {
                         //lager voll :(
+                        isActive = false;
                         return;
+                }
+                isActive = true;
                 //ziehe eingangsressourcen ab
                 productionInDelta.resources.forEach((res, val) -> {
                         float rDelta = val.intValue();
