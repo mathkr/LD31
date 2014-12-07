@@ -62,7 +62,9 @@ public class Renderer {
                 if (image != null) {
                         int structureTileX = xOffset + structure.position.x * tilePixelDimensions.x;
                         int structureTileY = yOffset + structure.position.y * tilePixelDimensions.y;
-                        g.drawImage(image, structureTileX, structureTileY);
+
+                        image.draw(structureTileX + 3, structureTileY + 3, new Color(0, 0, 0, 80));
+                        image.draw(structureTileX, structureTileY);
                 } else {
                         for (Vector2i occupiedTile : structure.occupiedTiles) {
                                 int structureTileX = xOffset + (structure.position.x + occupiedTile.x) * tilePixelDimensions.x;
@@ -133,14 +135,9 @@ public class Renderer {
                         }
                 }
 
-                // Debug render structures
-                for (Structure structure : Game.world.structures) {
-                        renderStructure(structure, g);
-                }
-
-                // Draw debug grid
+                // Draw grid
                 if (debugGrid) {
-                        g.setColor(new Color(30, 30, 30, 100));
+                        g.setColor(new Color(30, 30, 30, 30));
 
                         int y0 = yOffset;
                         int y1 = yOffset + tilePixelDimensions.y * Game.world.bounds.y;
@@ -155,6 +152,11 @@ public class Renderer {
                                 int drawY = yOffset + y * tilePixelDimensions.y;
                                 g.drawLine(x0, drawY, x1, drawY);
                         }
+                }
+
+                // render structures
+                for (Structure structure : Game.world.structures) {
+                        renderStructure(structure, g);
                 }
 
                 Structure placeStructure = Game.gui.structureToPlace;

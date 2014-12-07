@@ -159,6 +159,7 @@ public class Structure {
         }
 
         public void remove(){
+                Game.world.structures.remove(this);
                 Game.world.resourceCapacity.subtract(this.capacityIncrease);
                 Game.world.trimResourcesToCap();
         }

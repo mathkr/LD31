@@ -1,6 +1,4 @@
 package test;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -32,7 +30,7 @@ public class Game extends BasicGame
         public void update(GameContainer gc, int i) throws SlickException {
                 float delta = i / 1000.0f;
                 world.update(delta);
-                gui.update(gc);
+                gui.update(gc, delta);
         }
 
         @Override
