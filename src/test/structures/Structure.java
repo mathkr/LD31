@@ -197,7 +197,6 @@ public class Structure {
                         Game.world.structureGrid[position.x+v.x][position.y+v.y] = this;
                 Game.world.structures.add(this);
                 Game.world.resources.subtract(this.buildCost);
-//                Game.world.resourceCapacity.add(this.capacityIncrease);
                 Game.world.revalidateRoadAccess();
         }
 
@@ -208,8 +207,6 @@ public class Structure {
                 for(Vector2i v : occupiedTiles)
                         Game.world.structureGrid[position.x+v.x][position.y+v.y] = null;
                 setActive(false);
-//                Game.world.resourceCapacity.subtract(this.capacityIncrease);
-//                Game.world.trimResourcesToCap();
                 if(isRoad() || type == StructureType.CPU_T1)
                         Game.world.revalidateRoadAccess();
         }
@@ -251,10 +248,8 @@ public class Structure {
                                 }
                                 return false;
                 }
-                if(roadAccess.compareTo(road) < 0) {
-//                        System.out.println(type + "[" + position.x + "][" + position.y + "]: road access changed from " + roadAccess + " to " + road);
+                if(roadAccess.compareTo(road) < 0)
                         roadAccess = road;
-                }
                 return false;
         }
 
