@@ -46,7 +46,8 @@ public class Structure {
                         case SilverRoad :
                         case GlassRoad :
                         case CPU_T1 :
-                        case MEMORY_T1 : isProducer = false;
+                        case MEMORY_T1 : isProducer = false; break;
+                        default : isProducer = true;
                 }
         }
 
@@ -59,6 +60,14 @@ public class Structure {
                 return false;
         }
 
+        public void setActive(boolean setActive){
+                if(isActive && !setActive)
+                        Game.world.resourceCapacity.subtract(capacityIncrease);
+                else if(!isActive && setActive)
+                        Game.world.resourceCapacity.add(capacityIncrease);
+                isActive = setActive;
+        }
+
         public void update(float d){
                 if (updater != null) {
                         updater.update(this);
@@ -66,9 +75,12 @@ public class Structure {
 
                 if(roadAccess == RoadAccess.NONE){
                         //keine strasse :(
-                        isActive = false;
+                        setActive(false);
                         return;
                 }
+                if(isRoad())
+                        return;
+
                 ResourceTable resources = Game.world.resources;
                 ResourceTable cap = Game.world.resourceCapacity;
                 //buffere aenderungen, solange unter 1.0f
@@ -85,7 +97,7 @@ public class Structure {
                         float rDelta = e.getValue().intValue();
                         if (rDelta >= 1.0f && !resources.canSubtract(e.getKey(), rDelta)) {
                                 //kein saft :(
-                                isActive = false;
+                                setActive(false);
                                 return;
                         }
                 }
@@ -93,18 +105,18 @@ public class Structure {
                 if(isProducer) {
                         boolean hasCapacity = false;
                         for (Map.Entry<Resource, Float> e : productionOutPerSec.resources.entrySet()) {
-                                if (resources.get(e.getKey()) < cap.get(e.getKey())) {
+                                if (e.getValue() > 0.0f && resources.get(e.getKey()) < cap.get(e.getKey())) {
                                         hasCapacity = true;
                                         break;
                                 }
                         }
                         if (!hasCapacity) {
                                 //lager voll :(
-                                isActive = false;
+                                setActive(false);
                                 return;
                         }
                 }
-                isActive = true;
+                setActive(true);
                 //ziehe eingangsressourcen ab
                 productionInDelta.resources.forEach((res, val) -> {
                         float rDelta = val.intValue();
@@ -185,7 +197,7 @@ public class Structure {
                         Game.world.structureGrid[position.x+v.x][position.y+v.y] = this;
                 Game.world.structures.add(this);
                 Game.world.resources.subtract(this.buildCost);
-                Game.world.resourceCapacity.add(this.capacityIncrease);
+//                Game.world.resourceCapacity.add(this.capacityIncrease);
                 Game.world.revalidateRoadAccess();
         }
 
@@ -195,9 +207,10 @@ public class Structure {
                 Game.world.structures.remove(this);
                 for(Vector2i v : occupiedTiles)
                         Game.world.structureGrid[position.x+v.x][position.y+v.y] = null;
-                Game.world.resourceCapacity.subtract(this.capacityIncrease);
-                Game.world.trimResourcesToCap();
-                if(isRoad())
+                setActive(false);
+//                Game.world.resourceCapacity.subtract(this.capacityIncrease);
+//                Game.world.trimResourcesToCap();
+                if(isRoad() || type == StructureType.CPU_T1)
                         Game.world.revalidateRoadAccess();
         }
 

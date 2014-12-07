@@ -40,7 +40,7 @@ public class ResourceTable {
         resources.put(r, get(r) + f);
     }
 
-    public float get(Resource r){
+    public Float get(Resource r){
         return resources.getOrDefault(r, 0.0f);
     }
 

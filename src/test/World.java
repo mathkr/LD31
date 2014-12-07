@@ -26,6 +26,7 @@ public class World {
         public Structure cpu;
         public ResourceTable resources;
         public ResourceTable resourceCapacity;
+        public ResourceTable decayDelta;
 
         public World() {
                 structures = new ArrayList<>();
@@ -45,6 +46,7 @@ public class World {
                         put(Resource.ELECTRON, 2000.0f);
                         //TODO: balance numbers
                 }};
+                decayDelta = new ResourceTable();
 
                 createWorld(null);
         }
@@ -53,6 +55,7 @@ public class World {
                 for (Structure structure : structures) {
                         structure.update(delta);
                 }
+                resourceDecay(delta);
         }
 
         public void createWorld(Long seed){
@@ -63,12 +66,29 @@ public class World {
                 }
         }
 
+        //deprecated
         public void trimResourcesToCap(){
                 resources.resources.forEach((r, v) ->{
                         float rCap = resourceCapacity.get(r);
                         if(v > rCap)
                                 resourceCapacity.put(r, rCap);
                 });
+        }
+
+        public void resourceDecay(float delta){
+                for(Resource resource : Resource.values()){
+                        float top = resources.get(resource) - resourceCapacity.get(resource);
+                        if(top > 0.0f){
+                                decayDelta.change(resource, top*0.5f*delta/10.0f);
+                                float rDelta = decayDelta.get(resource).intValue();
+                                if(rDelta >= 1.0f){
+                                        decayDelta.change(resource, -rDelta);
+                                        resources.change(resource, -rDelta);
+                                }
+                        }else{
+                                decayDelta.put(resource, 0.0f);
+                        }
+                }
         }
 
         //startet bei der CPU
