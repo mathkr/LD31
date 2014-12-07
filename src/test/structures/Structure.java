@@ -41,14 +41,6 @@ public class Structure {
                 capacityIncrease = new ResourceTable();
                 roadAccess = RoadAccess.NONE;
                 isActive = false;
-                switch(type){
-                        case CopperRoad :
-                        case SilverRoad :
-                        case GlassRoad :
-                        case CPU_T1 :
-                        case MEMORY_T1 : isProducer = false; break;
-                        default : isProducer = true;
-                }
         }
 
         public boolean collidesWith(Structure other){
@@ -193,6 +185,12 @@ public class Structure {
                         case GlassMine : productionOutPerSec.multiply(Resource.GLASS, getNearResources(World.TerrainType.GLASS, 1)); break;
                         case CPU_T1 : Game.world.cpu = this;
                 }
+                isProducer = false;
+                for(Resource resource : Resource.values())
+                        if(productionOutPerSec.get(resource) > 0.0f) {
+                                isProducer = true;
+                                break;
+                        }
                 for(Vector2i v : occupiedTiles)
                         Game.world.structureGrid[position.x+v.x][position.y+v.y] = this;
                 Game.world.structures.add(this);
