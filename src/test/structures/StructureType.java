@@ -7,6 +7,7 @@ public enum StructureType {
         PSU_T1,
         RAM_T1,
         SiliconMine,
+        MEMORY_T1,
 }
 
 

@@ -127,6 +127,21 @@ public class UserInterface {
                                         );
                                 }
                         );
+
+                        addButton(
+                                buttons,
+                                "Memory T1",
+                                gc,
+                                new Image("resources/debug_button.png"),
+                                currentButtonPosition,
+                                buttonSize,
+                                (comp) -> {
+                                        structureToPlace = StructureLoader.getInstance(StructureType.MEMORY_T1,
+                                                Game.getWorldMouseX(),
+                                                Game.getWorldMouseY()
+                                        );
+                                }
+                        );
                 } catch (SlickException e) {
                         e.printStackTrace();
                 }
