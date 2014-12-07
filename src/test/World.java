@@ -45,7 +45,6 @@ public class World {
                         put(Resource.GLASS, 100.0f);
                         put(Resource.ENERGY, 750.0f);
                         put(Resource.SILICON, 1000.0f);
-                        put(Resource.ELECTRON, 2000.0f);
                         //TODO: balance numbers
                 }};
                 decayDelta = new ResourceTable();

@@ -29,7 +29,8 @@ public class Population {
         costPhoton = new ResourceTable();
         costQuantum = new ResourceTable();
 
-        costElectron.put(Resource.COPPER, 2.5F);
+        costElectron.put(Resource.COPPER, 0.01F);
+        costElectron.put(Resource.COPPER, 0.01F);
         costPhoton.put(Resource.SILVER, 0.5F);
         costQuantum.put(Resource.GLASS, 1.00F);
 
@@ -49,19 +50,23 @@ public class Population {
         ResourceTable globalResources = Game.world.resources;
         // Deltas Berrechnen
 
-        float cost = (globalResources.get(Resource.ELECTRON) + 1) * time;
+        float cost = (globalResources.get(Resource.ELECTRON)) * time;
         Resource res = Resource.COPPER;
         if(deltaElectron.get(res) > -1 && deltaElectron.get(res) < 1){
-            if(globalResources.get(res) - costElectron.get(res).intValue() + 1 > 0){
-                deltaElectron.change(res, costElectron.get(res) * cost );
-                deltaElectronProdPerSec += time;
+            if(globalResources.get(res) - costElectron.get(res).intValue() > 0){
+                deltaElectron.change(res, costElectron.get(res) * cost);
+                if(deltaElectronProdPerSec < electronProdPerSec){
+                    deltaElectronProdPerSec += time;
+                }
             } else {
                 deltaElectron.change(res, -costElectron.get(res) * cost);
-                deltaElectronDecayPerSec += time;
+                if(deltaElectronDecayPerSec < electronDecayPerSec){
+                    deltaElectronDecayPerSec += time;
+                }
             }
         }
 
-        if(deltaElectron.get(res) > 1){
+        if(deltaElectron.get(res) >= 1){
             globalResources.change(res, -deltaElectron.get(res).intValue());
             deltaElectron.change(res, -deltaElectron.get(res).intValue());
         } else if(deltaElectron.get(res) < -1) {
@@ -69,13 +74,13 @@ public class Population {
         }
 
         if(Game.world.resourceCapacity.get(Resource.ELECTRON) > globalResources.get(Resource.ELECTRON)){
-            while(deltaElectronProdPerSec > electronProdPerSec){
+            while(deltaElectronProdPerSec >= electronProdPerSec){
                 deltaElectronProdPerSec -= electronProdPerSec;
                 globalResources.change(Resource.ELECTRON, 1);
             }
         }
         if(globalResources.get(Resource.ELECTRON) > 0) {
-            while (deltaElectronDecayPerSec > electronDecayPerSec) {
+            while (deltaElectronDecayPerSec >= electronDecayPerSec) {
                 deltaElectronDecayPerSec -= electronDecayPerSec;
                 globalResources.change(Resource.ELECTRON, -1);
             }
