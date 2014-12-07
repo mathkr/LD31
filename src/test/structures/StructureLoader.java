@@ -13,10 +13,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 
 public class StructureLoader {
         public static interface Updater {
@@ -27,7 +24,28 @@ public class StructureLoader {
         public static HashMap<StructureType, Updater> updaterMap = new HashMap<>();
         public static HashMap<StructureType, ArrayList<Vector2i>> occupiedTilesMap = new HashMap<>();
 
+        public static Map<String, String> validPropertyKeys;
+
         static {
+                try {
+                        List<String> propertyLines = Files.readAllLines(Paths.get("resources/data/properties_list.txt"));
+                        validPropertyKeys = new HashMap<>();
+
+                        for (String propertyLine : propertyLines) {
+                                if (propertyLine.contains("RESOURCE")) {
+                                        for (Resource resource : Resource.values()) {
+                                                String value = propertyLine.replace("RESOURCE", resource.name());
+                                                validPropertyKeys.put(value, value);
+                                        }
+                                } else {
+                                        validPropertyKeys.put(propertyLine, propertyLine);
+                                }
+                        }
+                } catch (IOException e) {
+                        e.printStackTrace();
+                }
+
+                // Updaters:
 //                updaterMap.put(StructureType.CopperMine, (structure) -> {
 //                        Integer value = structure.getNearResources(World.TerrainType.COPPER, 1);
 //                        structure.productionOutPerSec.put(Resource.COPPER, structure.productionFactor * value);
@@ -81,6 +99,20 @@ public class StructureLoader {
                 try {
                         InputStream is = new FileInputStream(file);
                         res.load(is);
+
+                        boolean isValid = true;
+                        // Check if properties are valid
+                        for (String key : res.stringPropertyNames()) {
+                                if (!validPropertyKeys.containsKey(key)) {
+                                        isValid = false;
+                                        System.err.println("Unknown property key: '" + key + "', in file: " + file);
+                                }
+                        }
+
+                        if (!isValid) {
+                                System.exit(-1);
+                        }
+
                 } catch (Exception e) {
                         e.printStackTrace();
                 }

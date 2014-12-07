@@ -1,6 +1,8 @@
 package test;
 
 import org.newdawn.slick.*;
+import org.newdawn.slick.geom.Polygon;
+import org.newdawn.slick.geom.Shape;
 import org.newdawn.slick.geom.Vector2f;
 import org.newdawn.slick.util.FastTrig;
 import test.structures.Structure;
@@ -40,6 +42,8 @@ public class Renderer {
 
         public List<Particle> particles;
 
+        public Vector2f[][] terrainIntersections;
+
         public Renderer() {
                 loadedImages = new HashMap<>();
                 particles = new ArrayList<>();
@@ -53,6 +57,30 @@ public class Renderer {
                 tileSize = Game.PIXELS_PER_TILE * Game.PIXEL_SCALE;
 
                 Game.appgc.getGraphics().setBackground(Color.darkGray);
+
+                // TODO(matthis): code rausnehmen den du garnicht erst haettest hinzufuegen sollen
+                float variance = 0.2f * Game.PIXELS_PER_TILE * Game.PIXEL_SCALE;
+                terrainIntersections = new Vector2f[World.WORLD_DIMENSIONS.x + 1][World.WORLD_DIMENSIONS.y + 1];
+                for (int x = 1; x < World.WORLD_DIMENSIONS.x; ++x) {
+                        for (int y = 1; y < World.WORLD_DIMENSIONS.y; ++y) {
+                                float intersectionX = stagePosition.x + ((x * Game.PIXELS_PER_TILE * Game.PIXEL_SCALE + variance) - (float)(2 * Math.random() * variance));
+                                float intersectionY = stagePosition.y + ((y * Game.PIXELS_PER_TILE * Game.PIXEL_SCALE + variance) - (float)(2 * Math.random() * variance));
+                                terrainIntersections[x][y] = new Vector2f(intersectionX, intersectionY);
+                        }
+                }
+                // initialize the points on the edges straight
+                for (int x = 0; x < terrainIntersections.length; ++x) {
+                        terrainIntersections[x][0] = new Vector2f(stagePosition.x + x * Game.PIXELS_PER_TILE * Game.PIXEL_SCALE, stagePosition.y);
+                        terrainIntersections[x][terrainIntersections[0].length - 1] = new Vector2f(
+                                stagePosition.x + x * Game.PIXELS_PER_TILE * Game.PIXEL_SCALE,
+                                stagePosition.y + (terrainIntersections[0].length - 1) * Game.PIXELS_PER_TILE * Game.PIXEL_SCALE);
+                }
+                for (int y = 0; y < terrainIntersections[0].length; ++y) {
+                        terrainIntersections[0][y] = new Vector2f(stagePosition.x, stagePosition.y + y * Game.PIXELS_PER_TILE * Game.PIXEL_SCALE);
+                        terrainIntersections[terrainIntersections.length - 1][y] = new Vector2f(
+                                stagePosition.x + (terrainIntersections.length - 1) * Game.PIXELS_PER_TILE * Game.PIXEL_SCALE,
+                                stagePosition.y + y * Game.PIXELS_PER_TILE * Game.PIXEL_SCALE);
+                }
         }
 
         public Image getImage(String path) {
@@ -229,7 +257,17 @@ public class Renderer {
                                 g.setColor(tileColor);
                                 int drawX = stagePosition.x + x * tileSize;
                                 int drawY = stagePosition.y + y * tileSize;
-                                g.fillRect(drawX, drawY, tileSize, tileSize);
+
+                                float[] points = {
+                                        terrainIntersections[x][y].x, terrainIntersections[x][y].y,
+                                        terrainIntersections[x + 1][y].x, terrainIntersections[x + 1][y].y,
+                                        terrainIntersections[x + 1][y + 1].x, terrainIntersections[x + 1][y + 1].y,
+                                        terrainIntersections[x][y + 1].x, terrainIntersections[x][y + 1].y,
+                                };
+                                Shape shape = new Polygon(points);
+
+                                g.fill(shape);
+                                //g.fillRect(drawX, drawY, tileSize, tileSize);
                         }
                 }
 

@@ -1,0 +1,7 @@
+name
+desc
+image
+buildCostRESOURCE
+productionInPerSecRESOURCE
+productionOutPerSecRESOURCE
+capacityIncreaseRESOURCE

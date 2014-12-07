@@ -19,8 +19,8 @@ public class WorldGenerator {
 
     static {
         //Legt nur die maximale anzahl fest
-        creationHintLoadCount = 10;
-        creationHintLoadSize = 5;
+        creationHintLoadCount = 30;
+        creationHintLoadSize = 6;
         creationHintMapSizeDefaultX = 160;
         creationHintMapSizeDefaultY = 80;
 
