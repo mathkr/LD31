@@ -321,8 +321,6 @@ public class UserInterface {
                         @Override
                         public void mouseDragged(int oldx, int oldy, int newx, int newy) {
                                 if (structureToPlace != null) {
-                                        System.out.println(newx + " : " + newy);
-
                                         // Placing roads
                                         if (structureToPlace.canBePlaced() && structureToPlace.isRoad()) {
                                                 structureToPlace.actuallyPlace();
