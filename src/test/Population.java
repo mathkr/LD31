@@ -47,7 +47,10 @@ public class Population {
                 deltaElectron.change(res, -deltaElectron.get(res) * cost);
             }
 
+
+
         });
+
 
 
 

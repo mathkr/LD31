@@ -17,7 +17,7 @@ public class World {
                 GLASS
         }
 
-        public static final Vector2i WORLD_DIMENSIONS = new Vector2i(70, 45);
+        public static final Vector2i WORLD_DIMENSIONS = new Vector2i(70, 40);
 
         public TerrainType[][] terrain;
         public Structure[][] structureGrid;
