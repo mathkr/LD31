@@ -2,6 +2,7 @@ package test;
 
 import test.resources.Resource;
 import test.resources.ResourceTable;
+import test.structures.*;
 import test.structures.Structure;
 
 import java.util.ArrayList;
@@ -22,19 +23,21 @@ public class World {
 
         public World() {
                 bounds = new Vector2i(80, 45);
-                structures = new ArrayList<>();
-                resources = new ResourceTable();
-                resourceCapacity = new ResourceTable(){
-                        {
-                                put(Resource.COPPER, 500.0f);
-                                put(Resource.SILVER, 250.0f);
-                                put(Resource.GLASS, 100.0f);
-                                put(Resource.ENERGY, 750.0f);
-                                put(Resource.SILICON, 1000.0f);
-                                put(Resource.ELECTRON, 2000.0f);
-                                //TODO: balance numbers
-                        }
-                };
+                structures = new ArrayList<Structure>();
+                resources = new ResourceTable(){{
+                        put(Resource.COPPER, 100.0f);
+                        put(Resource.ENERGY, 250.0f);
+                        put(Resource.SILICON, 500.0f);
+                }};
+                resourceCapacity = new ResourceTable(){{
+                        put(Resource.COPPER, 500.0f);
+                        put(Resource.SILVER, 250.0f);
+                        put(Resource.GLASS, 100.0f);
+                        put(Resource.ENERGY, 750.0f);
+                        put(Resource.SILICON, 1000.0f);
+                        put(Resource.ELECTRON, 2000.0f);
+                        //TODO: balance numbers
+                }};
 
                 createWorld(4L);
         }
