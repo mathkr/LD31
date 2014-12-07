@@ -24,7 +24,7 @@ public class Structure {
         public StructureLoader.Updater updater;
         public StructureType type;
         public RoadAccess roadAccess;
-        public boolean isActive;
+        public StructureState state;
         public boolean isProducer;
 
         public Image image;
@@ -40,7 +40,6 @@ public class Structure {
                 productionOutPerSec = new ResourceTable();
                 capacityIncrease = new ResourceTable();
                 roadAccess = RoadAccess.NONE;
-                isActive = false;
         }
 
         public boolean collidesWith(Structure other){
@@ -52,12 +51,12 @@ public class Structure {
                 return false;
         }
 
-        public void setActive(boolean setActive){
-                if(isActive && !setActive)
+        public void setState(StructureState setState){
+                if(state == StructureState.Active && setState != StructureState.Active)
                         Game.world.resourceCapacity.subtract(capacityIncrease);
-                else if(!isActive && setActive)
+                else if(state != StructureState.Active && setState == StructureState.Active)
                         Game.world.resourceCapacity.add(capacityIncrease);
-                isActive = setActive;
+                state = setState;
         }
 
         public void update(float d){
@@ -67,7 +66,7 @@ public class Structure {
 
                 if(roadAccess == RoadAccess.NONE){
                         //keine strasse :(
-                        setActive(false);
+                        setState(StructureState.NoRoadAccess);
                         return;
                 }
                 if(isRoad())
@@ -89,7 +88,7 @@ public class Structure {
                         float rDelta = e.getValue().intValue();
                         if (rDelta >= 1.0f && !resources.canSubtract(e.getKey(), rDelta)) {
                                 //kein saft :(
-                                setActive(false);
+                                setState(StructureState.NoInputResources);
                                 return;
                         }
                 }
@@ -104,11 +103,12 @@ public class Structure {
                         }
                         if (!hasCapacity) {
                                 //lager voll :(
-                                setActive(false);
+                                //vielleicht hier was anderes machen
+                                setState(StructureState.NoSpareCapacity);
                                 return;
                         }
                 }
-                setActive(true);
+                setState(StructureState.Active);
                 //ziehe eingangsressourcen ab
                 productionInDelta.resources.forEach((res, val) -> {
                         float rDelta = val.intValue();
@@ -204,7 +204,7 @@ public class Structure {
                 Game.world.structures.remove(this);
                 for(Vector2i v : occupiedTiles)
                         Game.world.structureGrid[position.x+v.x][position.y+v.y] = null;
-                setActive(false);
+                setState(StructureState.NoRoadAccess);
                 if(isRoad() || type == StructureType.CPU_T1)
                         Game.world.revalidateRoadAccess();
         }
@@ -220,7 +220,7 @@ public class Structure {
                         case CopperRoad :
                                 if(roadAccess.compareTo(road) < 0){
                                         roadAccess = RoadAccess.COPPER;
-                                        setActive(true);
+                                        setState(StructureState.Active);
                                         return true;
                                 }
                                 return false;
@@ -229,7 +229,7 @@ public class Structure {
                                         case COPPER :
                                                 if(roadAccess.compareTo(road) < 0){
                                                         roadAccess = RoadAccess.COPPER;
-                                                        setActive(true);
+                                                        setState(StructureState.Active);
                                                         return true;
                                                 }
                                                 return false;
@@ -237,7 +237,7 @@ public class Structure {
                                         case GLASS :
                                                 if(roadAccess.compareTo(road) < 0){
                                                         roadAccess = RoadAccess.SILVER;
-                                                        setActive(true);
+                                                        setState(StructureState.Active);
                                                         return true;
                                                 }
                                                 return false;
@@ -245,7 +245,7 @@ public class Structure {
                         case GlassRoad :
                                 if(roadAccess.compareTo(road) < 0){
                                         roadAccess = road;
-                                        setActive(true);
+                                        setState(StructureState.Active);
                                         return true;
                                 }
                                 return false;
