@@ -2,6 +2,7 @@ package test;
 
 import org.newdawn.slick.*;
 import org.newdawn.slick.geom.Vector2f;
+import org.newdawn.slick.util.FastTrig;
 import test.structures.Structure;
 
 import java.util.ArrayList;
@@ -29,6 +30,12 @@ public class Renderer {
 
         public static boolean debugGrid = true;
 
+        public float inactiveAlpha = 0f;
+        public float inactiveUpdateTime = 0f;
+        public final float INACTIVE_BASE = 0.5f;
+        public final float INACTIVE_DIFF = 1f - INACTIVE_BASE;
+        public Color inactiveColor;
+
         public Map<String, Image> loadedImages;
 
         public List<Particle> particles;
@@ -38,6 +45,8 @@ public class Renderer {
                 particles = new ArrayList<>();
 
                 wireImages = new WireImages();
+
+                inactiveColor = new Color(0, 0, 0);
 
                 stageDimensions = new Vector2i(Game.WIN_WIDTH - MENU_WIDTH, (Game.WIN_HEIGHT - HEADER_HEIGHT) - FOOTER_HEIGHT);
                 stagePosition = new Vector2i(0, HEADER_HEIGHT);
@@ -159,12 +168,20 @@ public class Renderer {
                         int windowY = stagePosition.y + structure.position.y * tileSize;
 
                         Image wireImage = getWireImage(structure);
-                        wireImage.draw(windowX, windowY, filterColor);
+                        if (structure.isActive) {
+                                wireImage.draw(windowX, windowY, filterColor);
+                        } else {
+                                wireImage.draw(windowX, windowY, filterColor.multiply(inactiveColor));
+                        }
                 } else if (image != null) {
                         int structureTileX = stagePosition.x + structure.position.x * tileSize;
                         int structureTileY = stagePosition.y + structure.position.y * tileSize;
 
-                        image.draw(structureTileX, structureTileY);
+                        if (structure.isActive) {
+                                image.draw(structureTileX, structureTileY);
+                        } else {
+                                image.draw(structureTileX, structureTileY, inactiveColor);
+                        }
                 } else {
                         for (Vector2i occupiedTile : structure.occupiedTiles) {
                                 int structureTileX = stagePosition.x + (structure.position.x + occupiedTile.x) * tileSize;
@@ -273,6 +290,14 @@ public class Renderer {
                         particle.update(delta);
                 }
                 particles.removeIf((p) -> p.dead);
+
+
+                inactiveUpdateTime += 3 * delta;
+                inactiveAlpha = Math.abs((float)FastTrig.cos(inactiveUpdateTime));
+                inactiveColor = new Color(
+                        INACTIVE_BASE + inactiveAlpha * INACTIVE_DIFF,
+                        INACTIVE_BASE + inactiveAlpha * INACTIVE_DIFF,
+                        INACTIVE_BASE + inactiveAlpha * INACTIVE_DIFF);
         }
 
         public void spawnParticlesAtPosition(int x, int y, float velocity, float variance, int num, Color color, float lifeTime) {
