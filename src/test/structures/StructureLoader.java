@@ -88,8 +88,7 @@ public class StructureLoader {
 
         public static Structure getInstance(StructureType type, int x, int y) {
                 Vector2i pos = new Vector2i(x, y);
-                Structure structure = new Structure(pos);
-                structure.type = type;
+                Structure structure = new Structure(pos, type);
 
                 Properties properties = getProperties(type);
 

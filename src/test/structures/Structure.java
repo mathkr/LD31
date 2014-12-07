@@ -25,11 +25,13 @@ public class Structure {
         public StructureType type;
         public RoadAccess roadAccess;
         public boolean isActive;
+        public boolean isProducer;
 
         public Image image;
 
-        public Structure(Vector2i pos) {
+        public Structure(Vector2i pos, StructureType t) {
                 position = pos;
+                type = t;
                 occupiedTiles = new ArrayList<>();
                 buildCost = new ResourceTable();
                 productionInDelta = new ResourceTable();
@@ -39,6 +41,13 @@ public class Structure {
                 capacityIncrease = new ResourceTable();
                 roadAccess = RoadAccess.NONE;
                 isActive = false;
+                switch(type){
+                        case CopperRoad :
+                        case SilverRoad :
+                        case GlassRoad :
+                        case CPU_T1 :
+                        case MEMORY_T1 : isProducer = false;
+                }
         }
 
         public boolean collidesWith(Structure other){
@@ -81,17 +90,19 @@ public class Structure {
                         }
                 }
                 //pruefe, ob fuer mindestens eine der produzierten ressourcen kapazitaet vorhanden ist
-                boolean hasCapacity = false;
-                for(Map.Entry<Resource, Float> e : productionOutPerSec.resources.entrySet()){
-                        if(resources.get(e.getKey()) < cap.get(e.getKey())) {
-                                hasCapacity = true;
-                                break;
+                if(isProducer) {
+                        boolean hasCapacity = false;
+                        for (Map.Entry<Resource, Float> e : productionOutPerSec.resources.entrySet()) {
+                                if (resources.get(e.getKey()) < cap.get(e.getKey())) {
+                                        hasCapacity = true;
+                                        break;
+                                }
                         }
-                }
-                if(!hasCapacity) {
-                        //lager voll :(
-                        isActive = false;
-                        return;
+                        if (!hasCapacity) {
+                                //lager voll :(
+                                isActive = false;
+                                return;
+                        }
                 }
                 isActive = true;
                 //ziehe eingangsressourcen ab
