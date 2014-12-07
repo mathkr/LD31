@@ -245,7 +245,8 @@ public class UserInterface {
                                                 // Hier haben wir auf ein gueltiges tile geclickt
 
                                                 if (structureToPlace != null) {
-                                                        if (structureToPlace.canBePlaced()) {
+                                                        // can it be placed? roads get handled in mouse dragged callback
+                                                        if (structureToPlace.canBePlaced() && !structureToPlace.isRoad()) {
                                                                 structureToPlace.actuallyPlace();
 
                                                                 int particleX = x;
@@ -318,7 +319,30 @@ public class UserInterface {
                         public void mouseMoved(int oldx, int oldy, int newx, int newy) { }
 
                         @Override
-                        public void mouseDragged(int oldx, int oldy, int newx, int newy) { }
+                        public void mouseDragged(int oldx, int oldy, int newx, int newy) {
+                                if (structureToPlace != null) {
+                                        System.out.println(newx + " : " + newy);
+
+                                        // Placing roads
+                                        if (structureToPlace.canBePlaced() && structureToPlace.isRoad()) {
+                                                structureToPlace.actuallyPlace();
+
+                                                int particleX = newx;
+                                                int particleW = structureToPlace.dimensions.x * Game.PIXELS_PER_TILE * Game.PIXEL_SCALE;
+                                                int particleY = newy;
+                                                int particleH = structureToPlace.dimensions.y * Game.PIXELS_PER_TILE * Game.PIXEL_SCALE;
+
+                                                Game.renderer.spawnParticlesInArea(
+                                                        particleX, particleY,
+                                                        particleW, particleH,
+                                                        40, 1, 20,
+                                                        Game.renderer.TERRAIN_DEFAULT_COLOR.brighter(1.5f), 1f);
+
+                                                structureToPlace = StructureLoader.getInstance(structureToPlace.type, structureToPlace.position.x,
+                                                        structureToPlace.position.y);
+                                        }
+                                }
+                        }
 
                         @Override
                         public void setInput(Input input) { }
