@@ -249,9 +249,9 @@ public class UserInterface {
                                                                 structureToPlace.actuallyPlace();
 
                                                                 int particleX = x;
-                                                                int particleW = structureToPlace.image.getWidth();
+                                                                int particleW = structureToPlace.dimensions.x * Game.PIXELS_PER_TILE * Game.PIXEL_SCALE;
                                                                 int particleY = y;
-                                                                int particleH = structureToPlace.image.getHeight();
+                                                                int particleH = structureToPlace.dimensions.y * Game.PIXELS_PER_TILE * Game.PIXEL_SCALE;
 
                                                                 Game.renderer.spawnParticlesInArea(
                                                                         particleX, particleY,
@@ -384,8 +384,19 @@ public class UserInterface {
 
         public void update(GameContainer gc, float delta) {
                 if (structureToPlace != null) {
-                        structureToPlace.position.x = Game.getWorldMouseX();
-                        structureToPlace.position.y = Game.getWorldMouseY();
+                        int newPosX = Game.getWorldMouseX();
+                        int newPosY = Game.getWorldMouseY();
+
+                        newPosX = newPosX < 0 ? 0 : newPosX;
+                        newPosX = newPosX >= World.WORLD_DIMENSIONS.x - structureToPlace.dimensions.x
+                                ? (World.WORLD_DIMENSIONS.x - structureToPlace.dimensions.x) : newPosX;
+                        
+                        newPosY = newPosY < 0 ? 0 : newPosY;
+                        newPosY = newPosY >= World.WORLD_DIMENSIONS.y - structureToPlace.dimensions.y
+                                ? (World.WORLD_DIMENSIONS.y - structureToPlace.dimensions.y) : newPosY;
+
+                        structureToPlace.position.x = newPosX;
+                        structureToPlace.position.y = newPosY;
                 }
 
                 selectionColorTime += 5 * delta;
@@ -522,9 +533,10 @@ public class UserInterface {
                                 g.setColor(selectionColor);
                                 int selectedX = Game.renderer.stagePosition.x + selectedStructure.position.x * Game.renderer.tileSize;
                                 int selectedY = Game.renderer.stagePosition.y + selectedStructure.position.y * Game.renderer.tileSize;
-                                if(selectedStructure.image != null)
+
                                 g.drawRect(selectedX - 5, selectedY - 5,
-                                        selectedStructure.image.getWidth() + 10, selectedStructure.image.getHeight() + 10);
+                                        selectedStructure.dimensions.x * Game.PIXEL_SCALE * Game.PIXELS_PER_TILE + 10,
+                                        selectedStructure.dimensions.y * Game.PIXEL_SCALE * Game.PIXELS_PER_TILE + 10);
 
                                 removeButton.render(Game.appgc, g);
                         }

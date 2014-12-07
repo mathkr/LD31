@@ -3,6 +3,7 @@ package test;
 import org.newdawn.slick.*;
 import org.newdawn.slick.geom.Vector2f;
 import test.structures.Structure;
+import test.structures.StructureType;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -25,6 +26,7 @@ public class Renderer {
         public Color TERRAIN_GLASS_COLOR   = new Color(0x83, 0xe3, 0xe4);
 
         public Image debugStructure;
+        public WireImages wireImages;
 
         public static boolean debugGrid = true;
 
@@ -35,6 +37,8 @@ public class Renderer {
         public Renderer() {
                 loadedImages = new HashMap<>();
                 particles = new ArrayList<>();
+
+                wireImages = new WireImages();
 
                 stageDimensions = new Vector2i(Game.WIN_WIDTH - MENU_WIDTH, (Game.WIN_HEIGHT - HEADER_HEIGHT) - FOOTER_HEIGHT);
                 stagePosition = new Vector2i(0, HEADER_HEIGHT);
@@ -73,6 +77,111 @@ public class Renderer {
 
         public void renderStructure(Structure structure, Graphics g) {
                 Image image = structure.image;
+
+                if (structure.isRoad()) {
+                        Color filterColor = null;
+
+                        switch (structure.type) {
+                                case CopperRoad:
+                                        filterColor = TERRAIN_COPPER_COLOR;
+                                        break;
+                                case SilverRoad:
+                                        filterColor = TERRAIN_SILVER_COLOR;
+                                        break;
+                                case GlassRoad:
+                                        filterColor = TERRAIN_GLASS_COLOR;
+                                        break;
+                                default:
+                                        System.err.println("Road type unknown to renderer: " + structure.type);
+                                        System.exit(-1);
+                        }
+
+                        int x = structure.position.x;
+                        int y = structure.position.y;
+
+                        boolean w = false;
+                        boolean n = false;
+                        boolean e = false;
+                        boolean s = false;
+
+                        if (x > 0)
+                                w = Game.world.structureGrid[x - 1][y] != null && Game.world.structureGrid[x - 1][y].isRoad();
+
+                        if (x < Game.world.WORLD_DIMENSIONS.x - 1)
+                                e = Game.world.structureGrid[x + 1][y] != null && Game.world.structureGrid[x + 1][y].isRoad();
+
+                        if (y > 0)
+                                n = Game.world.structureGrid[x][y - 1] != null && Game.world.structureGrid[x][y - 1].isRoad();
+
+                        if (y < Game.world.WORLD_DIMENSIONS.y - 1)
+                                s = Game.world.structureGrid[x][y + 1] != null && Game.world.structureGrid[x][y + 1].isRoad();
+
+                        int windowX = stagePosition.x + structure.position.x * tileSize;
+                        int windowY = stagePosition.y + structure.position.y * tileSize;
+
+                        // 4 way
+                        if (w && n && e && s) {
+                                wireImages.intersection4.draw(windowX, windowY, filterColor);
+                                return;
+                        }
+
+                        // 3 way
+                        if (w && n && e) {
+                                wireImages.intersection3N.draw(windowX, windowY, filterColor);
+                                return;
+                        }
+
+                        if (n && e && s) {
+                                wireImages.intersection3E.draw(windowX, windowY, filterColor);
+                                return;
+                        }
+
+                        if (e && s && w) {
+                                wireImages.intersection3S.draw(windowX, windowY, filterColor);
+                                return;
+                        }
+
+                        if (s && w && n) {
+                                wireImages.intersection3W.draw(windowX, windowY, filterColor);
+                                return;
+                        }
+
+                        // corner
+                        if (w && n) {
+                                wireImages.cornerWN.draw(windowX, windowY, filterColor);
+                                return;
+                        }
+
+                        if (n && e) {
+                                wireImages.cornerNE.draw(windowX, windowY, filterColor);
+                                return;
+                        }
+
+                        if (e && s) {
+                                wireImages.cornerES.draw(windowX, windowY, filterColor);
+                                return;
+                        }
+
+                        if (s && w) {
+                                wireImages.cornerSW.draw(windowX, windowY, filterColor);
+                                return;
+                        }
+
+                        // straight
+                        if (w || e) {
+                                wireImages.straightHoriz.draw(windowX, windowY, filterColor);
+                                return;
+                        }
+
+                        if (n || s) {
+                                wireImages.straightVerti.draw(windowX, windowY, filterColor);
+                                return;
+                        }
+
+                        // alone or between buildings
+                        wireImages.intersection4.draw(windowX, windowY, filterColor);
+                        return;
+                }
 
                 if (image != null) {
                         int structureTileX = stagePosition.x + structure.position.x * tileSize;
@@ -214,6 +323,64 @@ public class Renderer {
                         particle.velocity.scale(vel);
                         particle.velocity.setTheta(theta);
                         particles.add(particle);
+                }
+        }
+
+        class WireImages {
+                Image straightHoriz;
+                Image straightVerti;
+
+                Image cornerWN;
+                Image cornerNE;
+                Image cornerES;
+                Image cornerSW;
+
+                Image intersection3N;
+                Image intersection3E;
+                Image intersection3S;
+                Image intersection3W;
+
+                Image intersection4;
+
+                WireImages() {
+                        // Straight
+                        Image straightBase = getImage("resources/wire/straight.png");
+
+                        straightHoriz = straightBase.copy();
+
+                        straightVerti = straightHoriz.copy();
+                        straightVerti.rotate(90);
+
+                        // Corners
+                        Image cornerBase = getImage("resources/wire/corner.png");
+
+                        cornerWN = cornerBase.copy();
+
+                        cornerNE = cornerBase.copy();
+                        cornerNE.rotate(90);
+
+                        cornerES = cornerBase.copy();
+                        cornerES.rotate(180);
+
+                        cornerSW = cornerBase.copy();
+                        cornerSW.rotate(270);
+
+                        // 3-Way-Intersecions
+                        Image intersection3Base = getImage("resources/wire/intersection_3.png");
+
+                        intersection3N = intersection3Base.copy();
+
+                        intersection3E = intersection3Base.copy();
+                        intersection3E.rotate(90);
+
+                        intersection3S = intersection3Base.copy();
+                        intersection3S.rotate(180);
+
+                        intersection3W = intersection3Base.copy();
+                        intersection3W.rotate(270);
+
+                        // 4-Way-Intersection
+                        intersection4 = getImage("resources/wire/intersection_4.png");
                 }
         }
 

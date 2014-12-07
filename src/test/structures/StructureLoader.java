@@ -117,9 +117,17 @@ public class StructureLoader {
                         image = null;
                 }
 
-//                structure.productionFactor = Float.parseFloat(properties.getProperty("productionFactor", "1f"));
-
                 ArrayList<Vector2i> occupiedTiles = getOccupiedTiles(type);
+
+                int maxX = occupiedTiles.get(0).x;
+                int maxY = occupiedTiles.get(0).y;
+                for (Vector2i occupiedTile : occupiedTiles) {
+                        maxX = maxX < occupiedTile.x ? occupiedTile.x : maxX;
+                        maxY = maxY < occupiedTile.y ? occupiedTile.y : maxY;
+                }
+                Vector2i dimensions = new Vector2i(maxX + 1, maxY + 1);
+                structure.dimensions = dimensions;
+
                 structure.occupiedTiles = occupiedTiles;
                 structure.image = image;
                 structure.updater = updaterMap.get(type);

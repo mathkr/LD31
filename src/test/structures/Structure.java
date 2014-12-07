@@ -13,6 +13,7 @@ import java.util.Map;
 
 public class Structure {
         public Vector2i position;
+        public Vector2i dimensions;
         public List<Vector2i> occupiedTiles;
         public ResourceTable buildCost;
         public ResourceTable productionInDelta;
