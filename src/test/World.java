@@ -22,6 +22,7 @@ public class World {
         public TerrainType[][] terrain;
         public Structure[][] structureGrid;
         public ArrayList<Structure> structures;
+        public Population population;
 
         public Structure cpu;
         public ResourceTable resources;
@@ -29,6 +30,7 @@ public class World {
 
         public World() {
                 structures = new ArrayList<>();
+                population = new Population();
                 structureGrid = new Structure[WORLD_DIMENSIONS.x][WORLD_DIMENSIONS.y];
                 structures = new ArrayList<Structure>();
                 resources = new ResourceTable(){{
@@ -53,6 +55,7 @@ public class World {
                 for (Structure structure : structures) {
                         structure.update(delta);
                 }
+                population.update(delta);
         }
 
         public void createWorld(Long seed){
