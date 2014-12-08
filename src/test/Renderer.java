@@ -8,6 +8,7 @@ import org.newdawn.slick.geom.Vector2f;
 import org.newdawn.slick.util.FastTrig;
 import test.structures.Structure;
 import test.structures.StructureState;
+import test.structures.StructureType;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -371,6 +372,19 @@ public class Renderer {
 
                 Structure placeStructure = Game.gui.structureToPlace;
                 if (placeStructure != null) {
+                        if (placeStructure.type == StructureType.CopperMine
+                                || placeStructure.type == StructureType.SilverMine
+                                || placeStructure.type == StructureType.GlassMine)
+                        {
+                                // render influenced area
+                                g.setColor(new Color(0xFF, 0xFF, 0xFF, 40));
+                                for (Vector2i tile : placeStructure.getInfluencedTiles()) {
+                                        int tileX = stagePosition.x + tile.x * tileSize;
+                                        int tileY = stagePosition.y + tile.y * tileSize;
+                                        g.fillRect(tileX, tileY, tileSize, tileSize);
+                                }
+                        }
+
                         renderStructure(placeStructure, g);
                         if (!placeStructure.canBePlaced()) {
                                 for (Vector2i occupiedTile : placeStructure.occupiedTiles) {

@@ -164,7 +164,7 @@ public class StructureLoader {
                 structure.refundResources = structure.buildCost.getMultiple(0.5f);
                 structure.refundResources.truncateToInt();
 
-                structure.resourceRadius = Integer.parseInt(properties.getProperty("resourceRadius", "1"));
+                structure.influenceRadius = Integer.parseInt(properties.getProperty("resourceRadius", "1"));
 
                 Image image;
                 if (properties.getProperty("image") != null) {

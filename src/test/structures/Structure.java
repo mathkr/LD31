@@ -1,6 +1,7 @@
 package test.structures;
 
 import org.newdawn.slick.Image;
+import org.newdawn.slick.geom.Vector2f;
 import test.Game;
 import test.Vector2i;
 import test.World;
@@ -28,7 +29,7 @@ public class Structure {
         public StructureState state;
         public boolean isProducer;
         public boolean wasPlaced;
-        public int resourceRadius;
+        public int influenceRadius;
 
         public Image image;
 
@@ -147,17 +148,17 @@ public class Structure {
 
                 switch (type) {
                         case CopperMine:
-                                if (getNearResources(World.TerrainType.COPPER, resourceRadius) == 0) {
+                                if (getNearResources(World.TerrainType.COPPER) == 0) {
                                         return false;
                                 }
                                 break;
                         case SilverMine:
-                                if (getNearResources(World.TerrainType.SILVER, resourceRadius) == 0) {
+                                if (getNearResources(World.TerrainType.SILVER) == 0) {
                                         return false;
                                 }
                                 break;
                         case GlassMine:
-                                if (getNearResources(World.TerrainType.GLASS, resourceRadius) == 0) {
+                                if (getNearResources(World.TerrainType.GLASS) == 0) {
                                         return false;
                                 }
                                 break;
@@ -171,30 +172,50 @@ public class Structure {
                 return true;
         }
 
-        public Integer getNearResources(World.TerrainType searchType, Integer area){
-                Vector2i min = new Vector2i(occupiedTiles.get(0).x, occupiedTiles.get(0).y);
-                Vector2i max = new Vector2i(occupiedTiles.get(0).x, occupiedTiles.get(0).y);
-                for (Vector2i occupiedTile : occupiedTiles) {
-                        if(min.x > occupiedTile.x)
-                                min.x = occupiedTile.x;
-                        if(min.y > occupiedTile.y)
-                                min.y = occupiedTile.y;
-                        if(max.x < occupiedTile.x)
-                                max.x = occupiedTile.x;
-                        if(max.y < occupiedTile.y)
-                                max.y = occupiedTile.y;
-                }
-                min.x = this.position.x + min.x - area > 0 ? min.x - area : 0;
-                min.y = this.position.y + min.y - area > 0 ? min.y - area : 0;
-                max.x = this.position.x + max.x + area < Game.world.WORLD_DIMENSIONS.x   ? max.x + area : max.x;
-                max.y = this.position.y + max.y + area < Game.world.WORLD_DIMENSIONS.y  ? max.y + area : max.y;
+        public List<Vector2i> getInfluencedTiles() {
+                ArrayList<Vector2i> res = new ArrayList<>();
 
-                Integer count = 0;
-                for (int i = min.x + this.position.x; i <= max.x + this.position.x; i++) {
-                        for (int j = min.y + this.position.y; j <= max.y + this.position.y; j++) {
-                                if(Game.world.terrain[i][j] == searchType){
-                                        ++count;
+                float radius = influenceRadius * (float)Math.sqrt(2.0);
+
+                for (int x = new Float(position.x - radius).intValue(); x < position.x + dimensions.x + radius; ++x) {
+                        if (x < 0 || x >= World.WORLD_DIMENSIONS.x) {
+                                continue;
+                        }
+
+                        for (int y = new Float(position.y - radius).intValue(); y < position.y + dimensions.y + radius; ++y) {
+                                if (y < 0 || y >= World.WORLD_DIMENSIONS.y) {
+                                        continue;
                                 }
+
+                                Vector2i currentTile = new Vector2i(x, y);
+
+                                Vector2f currentTileCenter = new Vector2f(x + 0.5f, y + 0.5f);
+                                Vector2f firstOccupiedCenter = new Vector2f(occupiedTiles.get(0).x + position.x + 0.5f, occupiedTiles.get(0).y + position.y + 0.5f);
+
+                                float minDist = currentTileCenter.distance(firstOccupiedCenter);
+
+                                for (Vector2i occupiedTile : occupiedTiles) {
+                                        Vector2f v = new Vector2f(occupiedTile.x + position.x + 0.5f, occupiedTile.y + position.y + 0.5f);
+                                        float dist = currentTileCenter.distance(v);
+
+                                        minDist = dist < minDist ? dist : minDist;
+                                }
+
+                                if (minDist <= radius) {
+                                        res.add(currentTile);
+                                }
+                        }
+                }
+
+                return res;
+        }
+
+        public int getNearResources(World.TerrainType searchType){
+                int count = 0;
+                List<Vector2i> influenced = getInfluencedTiles();
+                for (Vector2i tile : influenced) {
+                        if (Game.world.terrain[tile.x][tile.y] == searchType) {
+                                ++count;
                         }
                 }
                 return count;
@@ -202,11 +223,12 @@ public class Structure {
 
         public void actuallyPlace(){
                 switch(type){
-                        case SilverMine : productionOutPerSec.multiply(Resource.SILVER, getNearResources(World.TerrainType.SILVER, resourceRadius)); break;
-                        case CopperMine : productionOutPerSec.multiply(Resource.COPPER, getNearResources(World.TerrainType.COPPER, resourceRadius)); break;
-                        case GlassMine : productionOutPerSec.multiply(Resource.GLASS, getNearResources(World.TerrainType.GLASS, resourceRadius)); break;
-                        case CPU_T1 : Game.world.cpu = this;
+                        case SilverMine : productionOutPerSec.multiply(Resource.SILVER, getNearResources(World.TerrainType.SILVER)); break;
+                        case CopperMine : productionOutPerSec.multiply(Resource.COPPER, getNearResources(World.TerrainType.COPPER)); break;
+                        case GlassMine : productionOutPerSec.multiply(Resource.GLASS, getNearResources(World.TerrainType.GLASS)); break;
+                        case CPU_T1 : Game.world.cpu = this; break;
                 }
+
                 isProducer = false;
                 for(Resource resource : Resource.values())
                         if(productionOutPerSec.get(resource) > 0.0f) {

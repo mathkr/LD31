@@ -26,6 +26,13 @@ public class Vector2i {
                         && y == other.y;
         }
 
+        public static float getDist(Vector2i a, Vector2i b) {
+                double dx = a.x - b.x;
+                double dy = a.y - b.y;
+
+                return (float)(Math.sqrt(dx * dx + dy * dy));
+        }
+
         @Override
         public String toString() {
                 return "x: " + x + ", y: " + y;
