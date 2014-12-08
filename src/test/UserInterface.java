@@ -626,6 +626,14 @@ public class UserInterface {
                                                 g.drawRect(selectedX - 5, selectedY - 5,
                                                         over.dimensions.x * Game.PIXEL_SCALE * Game.PIXELS_PER_TILE + 10,
                                                         over.dimensions.y * Game.PIXEL_SCALE * Game.PIXELS_PER_TILE + 10);
+                                        } else {
+                                                g.setColor(Color.magenta);
+                                                int selectedX = Game.renderer.stagePosition.x + x * Game.renderer.tileSize;
+                                                int selectedY = Game.renderer.stagePosition.y + y * Game.renderer.tileSize;
+
+                                                g.drawRect(selectedX - 5, selectedY - 5,
+                                                        Game.PIXEL_SCALE * Game.PIXELS_PER_TILE + 10,
+                                                        Game.PIXEL_SCALE * Game.PIXELS_PER_TILE + 10);
                                         }
                                         return;
                                 case PLACING:
@@ -678,6 +686,13 @@ public class UserInterface {
                                 if (isOnStandby) {
                                         String standby = "On standby!";
                                         g.drawString(standby, leftX, lineY);
+                                        lineY += lineHeight;
+                                }
+
+                                if (!structure.isRoad() && structure.type != StructureType.CPU_T1) {
+                                        g.drawString("Populationfactor: " + structure.populationFactor, leftX, lineY);
+                                        lineY += lineHeight;
+                                        g.drawString("Wirefactor: " + structure.roadFactor, leftX, lineY);
                                         lineY += lineHeight;
                                 }
                         }
