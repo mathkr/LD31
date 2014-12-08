@@ -35,15 +35,13 @@ public class World {
                 structureGrid = new Structure[WORLD_DIMENSIONS.x][WORLD_DIMENSIONS.y];
                 structures = new ArrayList<Structure>();
                 resources = new ResourceTable(){{
-                        put(Resource.COPPER, 100.0f);
-                        put(Resource.ENERGY, 250.0f);
+                        put(Resource.COPPER, 200.0f);
+                        put(Resource.ENERGY, 500.0f);
                         put(Resource.SILICON, 500.0f);
                 }};
                 resourceCapacity = new ResourceTable(){{
-                        put(Resource.COPPER, 500.0f);
-                        put(Resource.SILVER, 250.0f);
-                        put(Resource.GLASS, 100.0f);
-                        put(Resource.ENERGY, 750.0f);
+                        put(Resource.COPPER, 200.0f);
+                        put(Resource.ENERGY, 500.0f);
                         put(Resource.SILICON, 1000.0f);
                         //TODO: balance numbers
                 }};
