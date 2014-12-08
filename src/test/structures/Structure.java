@@ -13,6 +13,9 @@ import java.util.List;
 import java.util.Map;
 
 public class Structure {
+
+        static final float freezeTime = 2.5f;
+
         public Vector2i position;
         public Vector2i dimensions;
         public List<Vector2i> occupiedTiles;
@@ -27,7 +30,9 @@ public class Structure {
         public StructureType type;
         public RoadAccess roadAccess;
         public StructureState state;
+        public float freezeDelta;
         public boolean isProducer;
+        public boolean isConsumer;
         public boolean wasPlaced;
         public float productionFactor;
         public int influenceRadius;
@@ -47,6 +52,7 @@ public class Structure {
                 roadAccess = RoadAccess.NONE;
                 wasPlaced = false;
                 productionFactor = 1.0F;
+                freezeDelta = 0.0f;
         }
 
         public boolean collidesWith(Structure other){
@@ -59,6 +65,8 @@ public class Structure {
         }
 
         public void setState(StructureState setState){
+                if(isConsumer && setState == StructureState.NoInputResources || isProducer && setState == StructureState.NoSpareCapacity)
+                        freezeDelta = freezeTime;
                 if(state == StructureState.Active && setState != StructureState.Active)
                         Game.world.resourceCapacity.subtract(capacityIncrease);
                 else if(state != StructureState.Active && setState == StructureState.Active)
@@ -80,17 +88,30 @@ public class Structure {
                         setState(StructureState.NoRoadAccess);
                         return;
                 }
-                if(isRoad())
+
+                if(!isConsumer && !isProducer){
+                        setState(StructureState.Active);
                         return;
+                }
+
+                if(freezeDelta > 0.0f){
+                        freezeDelta -= d;
+                        if(freezeDelta > 0.0f)
+                                return;
+                        freezeDelta = 0.0f;
+                        setState(StructureState.Active);
+                }
 
                 ResourceTable resources = Game.world.resources;
                 ResourceTable cap = Game.world.resourceCapacity;
 
                 //pruefe, ob eingagsressourcen vorhanden
-                for (Map.Entry<Resource, Float> e : productionInPerSec.resources.entrySet()) {
-                        if (e.getValue() > 0.0f && resources.get(e.getKey()) == 0.0f) {
-                                setState(StructureState.NoInputResources);
-                                return;
+                if(isConsumer) {
+                        for (Map.Entry<Resource, Float> e : productionInPerSec.resources.entrySet()) {
+                                if (e.getValue() > 0.0f && resources.get(e.getKey()) == 0.0f) {
+                                        setState(StructureState.NoInputResources);
+                                        return;
+                                }
                         }
                 }
 
@@ -110,17 +131,15 @@ public class Structure {
                         }
                 }
 
-                //buffere aenderungen
                 productionInPerSec.resources.forEach((res, val) -> {
-//                        if (productionInDelta.get(res) < 1.0f)
-                                productionInDelta.change(res, productionInPerSec.get(res) * d * productionFactor);
+                        productionInDelta.change(res, productionInPerSec.get(res) * d * productionFactor);
                 });
                 productionOutPerSec.resources.forEach((res, val) -> {
-//                        if (productionOutDelta.get(res) < 1.0f)
-                                productionOutDelta.change(res, productionOutPerSec.get(res) * d * productionFactor);
+                        productionOutDelta.change(res, productionOutPerSec.get(res) * d * productionFactor);
                 });
 
                 setState(StructureState.Active);
+
                 //ziehe eingangsressourcen ab
                 //UNSAFE fuer input von mehr als 1.0 unit resource pro frame
                 productionInDelta.resources.forEach((res, val) -> {
@@ -242,6 +261,12 @@ public class Structure {
                 for(Resource resource : Resource.values())
                         if(productionOutPerSec.get(resource) > 0.0f) {
                                 isProducer = true;
+                                break;
+                        }
+                isConsumer = false;
+                for(Resource resource : Resource.values())
+                        if(productionInPerSec.get(resource) > 0.0f) {
+                                isConsumer = true;
                                 break;
                         }
                 for(Vector2i v : occupiedTiles)
