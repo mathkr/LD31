@@ -21,6 +21,7 @@ public class Structure {
         public ResourceTable productionInPerSec;
         public ResourceTable productionOutPerSec;
         public ResourceTable capacityIncrease;
+        public ResourceTable refundResources;
         public StructureLoader.Updater updater;
         public StructureType type;
         public RoadAccess roadAccess;
@@ -201,12 +202,18 @@ public class Structure {
         public void remove(){
                 if(type == StructureType.CPU_T1)
                         Game.world.cpu = null;
+
                 Game.world.structures.remove(this);
+
                 for(Vector2i v : occupiedTiles)
                         Game.world.structureGrid[position.x+v.x][position.y+v.y] = null;
+
                 setState(StructureState.NoRoadAccess);
+
                 if(isRoad() || type == StructureType.CPU_T1)
                         Game.world.revalidateRoadAccess();
+
+                Game.world.resources.add(this.refundResources);
         }
 
         public RoadAccess getRoadAccess(){

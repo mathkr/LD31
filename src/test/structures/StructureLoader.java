@@ -161,6 +161,9 @@ public class StructureLoader {
                         structure.capacityIncrease.put(resource, Float.parseFloat(properties.getProperty("capacityIncrease" + resource.name(), "0f")));
                 }
 
+                structure.refundResources = structure.buildCost.getMultiple(0.5f);
+                structure.refundResources.truncateToInt();
+
                 Image image;
                 if (properties.getProperty("image") != null) {
                         image = Game.renderer.getImage("resources/" + properties.getProperty("image"));
