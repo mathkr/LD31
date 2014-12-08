@@ -125,6 +125,9 @@ public class UserInterface {
                                                         }
                                                 } else if (structureToPlace != null) {
                                                         // can it be placed? roads get handled in mouse dragged callback
+                                                        structureToPlace.position.x = worldX;
+                                                        structureToPlace.position.y = worldY;
+
                                                         if (structureToPlace.canBePlaced()) {
                                                                 structureToPlace.actuallyPlace();
 
