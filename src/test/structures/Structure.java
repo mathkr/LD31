@@ -29,6 +29,7 @@ public class Structure {
         public StructureState state;
         public boolean isProducer;
         public boolean wasPlaced;
+        public float productionFactor;
         public int influenceRadius;
 
         public Image image;
@@ -45,6 +46,7 @@ public class Structure {
                 capacityIncrease = new ResourceTable();
                 roadAccess = RoadAccess.NONE;
                 wasPlaced = false;
+                productionFactor = 1.0F;
         }
 
         public boolean collidesWith(Structure other){
@@ -82,11 +84,11 @@ public class Structure {
                 //buffere aenderungen, solange unter 1.0f
                 productionInPerSec.resources.forEach((res, val) -> {
                         if (productionInDelta.get(res) < 1.0f)
-                                productionInDelta.change(res, productionInPerSec.get(res) * d);
+                                productionInDelta.change(res, productionInPerSec.get(res) * d * productionFactor);
                 });
                 productionOutPerSec.resources.forEach((res, val) -> {
                         if (productionOutDelta.get(res) < 1.0f)
-                                productionOutDelta.change(res, productionOutPerSec.get(res) * d);
+                                productionOutDelta.change(res, productionOutPerSec.get(res) * d * productionFactor);
                 });
                 //pruefe, ob eingangsressourcen vorhanden
                 for(Map.Entry<Resource, Float> e : productionInDelta.resources.entrySet()){
@@ -148,6 +150,7 @@ public class Structure {
 
                 switch (type) {
                         case CopperMine:
+                        case FastCopperMine:
                                 if (getNearResources(World.TerrainType.COPPER) == 0) {
                                         return false;
                                 }
@@ -301,8 +304,12 @@ public class Structure {
                                 }
                                 return false;
                 }
-                if(roadAccess.compareTo(road) < 0)
+                if(roadAccess.compareTo(road) < 0){
                         roadAccess = road;
+                        if (road == RoadAccess.COPPER) this.productionFactor = 1.0F;
+                        if (road == RoadAccess.SILVER) this.productionFactor = 1.25F;
+                        if (road == RoadAccess.GLASS) this.productionFactor = 1.75F;
+                }
                 return false;
         }
 

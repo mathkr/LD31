@@ -373,6 +373,7 @@ public class Renderer {
                 Structure placeStructure = Game.gui.structureToPlace;
                 if (placeStructure != null) {
                         if (placeStructure.type == StructureType.CopperMine
+                                || placeStructure.type == StructureType.FastCopperMine
                                 || placeStructure.type == StructureType.SilverMine
                                 || placeStructure.type == StructureType.GlassMine)
                         {
