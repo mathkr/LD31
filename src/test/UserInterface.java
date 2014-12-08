@@ -430,13 +430,18 @@ public class UserInterface {
                 }
 
                 textX = (Game.WIN_WIDTH - buttonMargins / 2);
+                int index = 0;
                 for (Resource resource : data) {
                         String name = resource.name() + ":";
                         String res = Integer.toString(Math.round(Game.world.resources.get(resource)));
                         String div = "/";
                         String of = Integer.toString(Math.round(Game.world.resourceCapacity.get(resource)));
 
-                        textX -= Game.renderer.font.getWidth(of);
+                        if (index == 0) {
+                                textX -= Game.renderer.font.getWidth(of);
+                        } else {
+                                textX -= Game.renderer.font.getWidth(of) + Game.renderer.font.getWidth("#");
+                        }
                         g.drawString(of, textX, textY);
 
                         textX -= Game.renderer.font.getWidth(div);
@@ -460,6 +465,7 @@ public class UserInterface {
                         g.setColor(Color.white);
                         textX -= Game.renderer.font.getWidth(name) + Game.renderer.font.getWidth("#");
                         g.drawString(name, textX, textY);
+                        ++index;
                 }
 
                 menu.render(g);
