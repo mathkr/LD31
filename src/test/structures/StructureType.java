@@ -14,6 +14,8 @@ public enum StructureType {
         GraphicsCard,
         FastCopperMine,
         Ram_t1,
+        Ram_t2,
+        Ram_t3,
         Memory_t1,
         Memory_t2,
         CopperRoad,
