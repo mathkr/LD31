@@ -65,6 +65,8 @@ public class Structure {
         }
 
         public void setState(StructureState setState){
+                if(isConsumer && setState == StructureState.NoInputResources || isProducer && setState == StructureState.NoSpareCapacity)
+                        freezeDelta = freezeTime;
                 if(state == StructureState.Active && setState != StructureState.Active)
                         Game.world.resourceCapacity.subtract(capacityIncrease);
                 else if(state != StructureState.Active && setState == StructureState.Active)
@@ -92,14 +94,12 @@ public class Structure {
                         return;
                 }
 
-                if(isConsumer && state == StructureState.NoInputResources || isProducer && state == StructureState.NoSpareCapacity){
-                        freezeDelta += d;
-                        if(freezeDelta >= freezeTime){
-                                freezeDelta = 0.0f;
-                                setState(StructureState.Active);
-                        }else{
+                if(freezeDelta > 0.0f){
+                        freezeDelta -= d;
+                        if(freezeDelta > 0.0f)
                                 return;
-                        }
+                        freezeDelta = 0.0f;
+                        setState(StructureState.Active);
                 }
 
                 ResourceTable resources = Game.world.resources;
@@ -131,17 +131,15 @@ public class Structure {
                         }
                 }
 
-                //buffere aenderungen
                 productionInPerSec.resources.forEach((res, val) -> {
-//                        if (productionInDelta.get(res) < 1.0f)
-                                productionInDelta.change(res, productionInPerSec.get(res) * d * productionFactor);
+                        productionInDelta.change(res, productionInPerSec.get(res) * d * productionFactor);
                 });
                 productionOutPerSec.resources.forEach((res, val) -> {
-//                        if (productionOutDelta.get(res) < 1.0f)
-                                productionOutDelta.change(res, productionOutPerSec.get(res) * d * productionFactor);
+                        productionOutDelta.change(res, productionOutPerSec.get(res) * d * productionFactor);
                 });
 
                 setState(StructureState.Active);
+
                 //ziehe eingangsressourcen ab
                 //UNSAFE fuer input von mehr als 1.0 unit resource pro frame
                 productionInDelta.resources.forEach((res, val) -> {

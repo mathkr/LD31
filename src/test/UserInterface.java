@@ -25,7 +25,7 @@ public class UserInterface {
         public static Resource[] base = { Resource.COPPER, Resource.SILVER, Resource.GLASS, Resource.SILICON };
         public static Resource[] energy = { Resource.ENERGY };
         public static Resource[] population = { Resource.ELECTRON, Resource.PHOTON, Resource.QUANTUM };
-        public static Resource[] data = { Resource.DATA, Resource.PRODUKT1, Resource.PRODUKT2, Resource.PRODUKT3 };
+        public static Resource[] data = { Resource.DATA, Resource.SOUND, Resource.GRAPHICS, Resource.BITCOINS};
 
         public List<MyButton> buttons;
         private static Stack<MyButton> overlayButtons;
