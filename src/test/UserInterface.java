@@ -601,8 +601,18 @@ public class UserInterface {
                         }
 
                         { // producing
+                                boolean isMine = structure.type == StructureType.CopperMine
+                                        || structure.type == StructureType.SilverMine
+                                        || structure.type == StructureType.GlassMine;
+
                                 StringBuilder sb = new StringBuilder();
-                                sb.append("Produces (units per sec):\n");
+
+                                if (menuState == SideMenuState.PLACING && isMine) {
+                                        sb.append("Produces (units per sec\nper resource in range):\n");
+                                } else {
+                                        sb.append("Produces (units per sec):\n");
+                                }
+
                                 boolean produces = false;
                                 for (Resource resource : Resource.values()) {
                                         float value = structure.productionOutPerSec.get(resource);
@@ -708,7 +718,7 @@ public class UserInterface {
                                         if (structure.getRoadAccess() != RoadAccess.NONE) {
                                                 String roadAccess = "Quality of wiring to CPU:\n" + structure.getRoadAccess().name();
                                                 g.drawString(roadAccess, leftX, lineY);
-                                                lineY += Game.renderer.font.getHeight(roadAccess);
+                                                lineY += Game.renderer.font.getHeight(roadAccess) + margin;
                                         }
                                 }
 
@@ -718,12 +728,12 @@ public class UserInterface {
 
                                 { // rect around selected struct
                                         g.setColor(selectionColor);
-                                        int selectedX = Game.renderer.stagePosition.x + selectedStructure.position.x * Game.renderer.tileSize;
-                                        int selectedY = Game.renderer.stagePosition.y + selectedStructure.position.y * Game.renderer.tileSize;
+                                        int selectedX = Game.renderer.stagePosition.x + structure.position.x * Game.renderer.tileSize;
+                                        int selectedY = Game.renderer.stagePosition.y + structure.position.y * Game.renderer.tileSize;
 
                                         g.drawRect(selectedX - 5, selectedY - 5,
-                                                selectedStructure.dimensions.x * Game.PIXEL_SCALE * Game.PIXELS_PER_TILE + 10,
-                                                selectedStructure.dimensions.y * Game.PIXEL_SCALE * Game.PIXELS_PER_TILE + 10);
+                                                structure.dimensions.x * Game.PIXEL_SCALE * Game.PIXELS_PER_TILE + 10,
+                                                structure.dimensions.y * Game.PIXEL_SCALE * Game.PIXELS_PER_TILE + 10);
                                 }
                         }
                 }
