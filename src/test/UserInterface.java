@@ -238,7 +238,26 @@ public class UserInterface {
                                                                 }
                                                         } if (guiState == InterfaceState.REMOVING) {
                                                                 if (Game.world.structureGrid[currentx][currenty] != null) {
-                                                                     Game.world.structureGrid[currentx][currenty].remove();
+                                                                        Structure remStruct = Game.world.structureGrid[currentx][currenty];
+
+                                                                        int particleX = Game.renderer.stagePosition.x + remStruct.position.x * Game.PIXELS_PER_TILE * Game.PIXEL_SCALE;
+                                                                        int particleW = remStruct.dimensions.x * Game.PIXELS_PER_TILE * Game.PIXEL_SCALE;
+                                                                        int particleY = Game.renderer.stagePosition.y + remStruct.position.y * Game.PIXELS_PER_TILE * Game.PIXEL_SCALE;
+                                                                        int particleH = remStruct.dimensions.y * Game.PIXELS_PER_TILE * Game.PIXEL_SCALE;
+
+                                                                        Game.renderer.spawnParticlesInArea(
+                                                                                particleX, particleY,
+                                                                                particleW, particleH,
+                                                                                40, 1, 20,
+                                                                                Color.darkGray, 1f);
+
+                                                                        Game.renderer.spawnParticlesInArea(
+                                                                                particleX, particleY,
+                                                                                particleW, particleH,
+                                                                                40, 1, 20,
+                                                                                Color.lightGray, 1f);
+
+                                                                        remStruct.remove();
                                                                 }
                                                         }
 
@@ -416,12 +435,12 @@ public class UserInterface {
                 @Override
                 public void mouseClicked(int button, int x, int y, int clickCount) {
                         super.mouseClicked(button, x, y, clickCount);
-//                        if ( x > getX() && x < getX() + getWidth()
-//                                && y > getY() && y < getY() + getHeight())
-//                        {
-//                                // We have been clicked?
-//                                consumeEvent();
-//                        }
+                        if ( x > getX() && x < getX() + getWidth()
+                                && y > getY() && y < getY() + getHeight())
+                        {
+                                // We have been clicked?
+                                consumeEvent();
+                        }
                 }
 
                 @Override
@@ -499,7 +518,7 @@ public class UserInterface {
 
                 public SideMenu(){
                         try {
-                                String demolition = "Toggle demolition mode";
+                                String demolition = "Demolition mode";
                                 Image demolitionButtonImage = new Image(Game.renderer.font.getWidth(demolition) + 10, Game.renderer.font.getHeight(demolition) + 10);
                                 demolitionButtonImage.getGraphics().setFont(Game.renderer.font);
                                 demolitionButtonImage.getGraphics().drawString(demolition, 5, 5);
@@ -602,7 +621,7 @@ public class UserInterface {
                         int leftX = menuPos.x + margin;
                         int lineY = menuPos.y;
 
-                        demolitionButton.setX(leftX);
+                        demolitionButton.setX(Game.WIN_WIDTH - (demolitionButton.getWidth() + margin));
                         demolitionButton.setY(margin);
                         demolitionButton.render(Game.appgc, g);
 
