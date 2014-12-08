@@ -349,7 +349,28 @@ public class UserInterface {
                 while (!overlayButtons.empty()) {
                         MyButton button = overlayButtons.pop();
                         g.setColor(Color.white);
-                        g.drawString(button.buttonDescription, button.getX() + 10, button.getY() + 45);
+
+                        int boxW = Game.renderer.font.getWidth(button.buttonDescription) + buttonMargins;
+                        int boxH = Game.renderer.font.getHeight(button.buttonDescription) + buttonMargins;
+
+                        int ySign = button.getY() > Game.WIN_HEIGHT / 2 ? -1 : 1;
+                        int yOffset = 50;
+
+                        int boxX = button.getX();
+                        if (boxX + boxW > Game.WIN_WIDTH) {
+                                boxX = Game.WIN_WIDTH - (boxW + buttonMargins / 2);
+                        }
+
+                        int boxY = button.getY() + ySign * yOffset;
+
+                        g.setColor(Game.renderer.TERRAIN_DEFAULT_COLOR);
+                        g.fillRect(boxX, boxY, boxW, boxH);
+
+                        g.setColor(Color.white);
+                        g.drawString(button.buttonDescription, boxX + buttonMargins / 2, boxY + buttonMargins / 2);
+
+                        g.setColor(Game.renderer.TERRAIN_GLASS_COLOR);
+                        g.drawRect(boxX, boxY, boxW, boxH);
                 }
         }
 
@@ -398,7 +419,7 @@ public class UserInterface {
                              && y > getY() && y < getY() + getHeight())
                         {
                                 // We have been clicked?
-                                consumeEvent();
+//                                consumeEvent();
                         }
                 }
 
@@ -491,7 +512,7 @@ public class UserInterface {
 
                                 standbyButton.addListener(
                                         (comp) -> {
-                                                if (menuState == SideMenuState.SELECTING) {
+                                                if (menuState == SideMenuState.SELECTING && !selectedStructure.isRoad()) {
                                                         if (selectedStructure.state != StructureState.Standby) {
                                                                 selectedStructure.setState(StructureState.Standby);
                                                         } else {
@@ -602,6 +623,15 @@ public class UserInterface {
 
                         g.drawLine(leftX, lineY, leftX + lineWidth, lineY);
                         lineY += margin;
+
+                        if (menuState == SideMenuState.SELECTING) {
+                                boolean isOnStandby = structure.state == StructureState.Standby;
+                                if (isOnStandby) {
+                                        String standby = "On standby!";
+                                        g.drawString(standby, leftX, lineY);
+                                        lineY += lineHeight;
+                                }
+                        }
 
                         if (menuState == SideMenuState.PLACING) {
                                 StringBuilder sb = new StringBuilder();
@@ -745,14 +775,19 @@ public class UserInterface {
                                         }
                                 }
 
-                                standbyButton.setX(leftX);
-                                standbyButton.setY(lineY);
-                                standbyButton.render(Game.appgc, g);
-                                lineY += standbyButton.getHeight() + margin;
+                                lineY = menuPos.y + menuDim.y - (Game.PIXEL_SCALE + removeButton.getHeight());
 
                                 removeButton.setX(leftX);
                                 removeButton.setY(lineY);
                                 removeButton.render(Game.appgc, g);
+
+                                lineY -= removeButton.getHeight() + margin;
+
+                                if (!structure.isRoad()) {
+                                        standbyButton.setX(leftX);
+                                        standbyButton.setY(lineY);
+                                        standbyButton.render(Game.appgc, g);
+                                }
 
                                 { // rect around selected struct
                                         g.setColor(selectionColor);

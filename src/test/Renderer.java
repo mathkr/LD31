@@ -299,24 +299,63 @@ public class Renderer {
                         int windowX = stagePosition.x + structure.position.x * tileSize;
                         int windowY = stagePosition.y + structure.position.y * tileSize;
 
-                        Image wireImage = getWireImage(structure);
-                        if (!structure.canBePlaced()) {
-                                wireImage.draw(windowX, windowY, filterColor.multiply(cantPlaceColor));
-                        } else if (structure.state == StructureState.Active || structure.state == StructureState.NoSpareCapacity || !structure.wasPlaced) {
-                                wireImage.draw(windowX, windowY, filterColor);
-                        } else {
-                                wireImage.draw(windowX, windowY, filterColor.multiply(inactiveColor));
-                        }
-                } else if (image != null) {
-                        int structureTileX = stagePosition.x + structure.position.x * tileSize;
-                        int structureTileY = stagePosition.y + structure.position.y * tileSize;
+                        image = getWireImage(structure);
+//                        if (!structure.canBePlaced()) {
+//                                image.draw(windowX, windowY, filterColor.multiply(cantPlaceColor));
+//                        } else if (structure.state == StructureState.Active || structure.state == StructureState.NoSpareCapacity || !structure.wasPlaced) {
+//                                image.draw(windowX, windowY, filterColor);
+//                        } else {
+//                                image.draw(windowX, windowY, filterColor.multiply(inactiveColor));
+//                        }
 
                         if (!structure.canBePlaced()) {
-                                image.draw(structureTileX, structureTileY, cantPlaceColor);
-                        } else if (structure.state == StructureState.Active || structure.state == StructureState.NoSpareCapacity || !structure.wasPlaced) {
-                                image.draw(structureTileX, structureTileY);
+                                image.draw(windowX, windowY, filterColor.multiply(cantPlaceColor));
                         } else {
-                                image.draw(structureTileX, structureTileY, inactiveColor);
+                                switch (structure.state) {
+                                        case Standby:
+                                                image.draw(windowX, windowY, filterColor.multiply(Color.darkGray));
+                                                break;
+                                        case Active:
+                                                image.draw(windowX, windowY, filterColor);
+                                                break;
+                                        case NoRoadAccess:
+                                        case NoInputResources:
+                                        case NoSpareCapacity:
+                                                image.draw(windowX, windowY, filterColor.multiply(inactiveColor));
+                                                break;
+                                }
+                        }
+                } else if (image != null) {
+                        int windowX = stagePosition.x + structure.position.x * tileSize;
+                        int windowY = stagePosition.y + structure.position.y * tileSize;
+
+//                        int structureTileX = stagePosition.x + structure.position.x * tileSize;
+//                        int structureTileY = stagePosition.y + structure.position.y * tileSize;
+//
+//                        if (!structure.canBePlaced()) {
+//                                image.draw(structureTileX, structureTileY, cantPlaceColor);
+//                        } else if (structure.state == StructureState.Active || structure.state == StructureState.NoSpareCapacity || !structure.wasPlaced) {
+//                                image.draw(structureTileX, structureTileY);
+//                        } else {
+//                                image.draw(structureTileX, structureTileY, inactiveColor);
+//                        }
+
+                        if (!structure.canBePlaced()) {
+                                image.draw(windowX, windowY, cantPlaceColor);
+                        } else {
+                                switch (structure.state) {
+                                        case Standby:
+                                                image.draw(windowX, windowY, Color.darkGray);
+                                                break;
+                                        case Active:
+                                                image.draw(windowX, windowY);
+                                                break;
+                                        case NoRoadAccess:
+                                        case NoInputResources:
+                                        case NoSpareCapacity:
+                                                image.draw(windowX, windowY, inactiveColor);
+                                                break;
+                                }
                         }
                 } else {
                         for (Vector2i occupiedTile : structure.occupiedTiles) {

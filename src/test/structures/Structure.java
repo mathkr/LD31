@@ -37,6 +37,7 @@ public class Structure {
         public Structure(Vector2i pos, StructureType t) {
                 position = pos;
                 type = t;
+                state = StructureState.Active;
                 occupiedTiles = new ArrayList<>();
                 buildCost = new ResourceTable();
                 productionInDelta = new ResourceTable();
