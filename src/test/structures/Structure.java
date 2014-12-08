@@ -71,6 +71,10 @@ public class Structure {
                         updater.update(this);
                 }
 
+                if (state == StructureState.Standby) {
+                        return;
+                }
+
                 if(roadAccess == RoadAccess.NONE){
                         //keine strasse :(
                         setState(StructureState.NoRoadAccess);

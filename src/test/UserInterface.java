@@ -469,20 +469,43 @@ public class UserInterface {
 
         class SideMenu {
                 public MyButton removeButton;
+                public MyButton standbyButton;
 
                 public Vector2i menuPos;
                 public Vector2i menuDim;
 
                 public SideMenu(){
                         try {
+                                String standby = "Toggle standby";
+                                Image standbyButtonImage = new Image(Game.renderer.font.getWidth(standby) + 10, Game.renderer.font.getHeight(standby) + 10);
+                                standbyButtonImage.getGraphics().setFont(Game.renderer.font);
+                                standbyButtonImage.getGraphics().drawString(standby, 5, 5);
+                                standbyButtonImage.getGraphics().flush();
+                                Rectangle standbyRect = new Rectangle(0, 0, standbyButtonImage.getWidth(), standbyButtonImage.getHeight());
+
+                                standbyButton = new MyButton(
+                                        "Toggle the standby state of the structure",
+                                        Game.appgc,
+                                        standbyButtonImage,
+                                        standbyRect);
+
+                                standbyButton.addListener(
+                                        (comp) -> {
+                                                if (menuState == SideMenuState.SELECTING) {
+                                                        if (selectedStructure.state != StructureState.Standby) {
+                                                                selectedStructure.setState(StructureState.Standby);
+                                                        } else {
+                                                                selectedStructure.setState(StructureState.Active);
+                                                        }
+                                                }
+                                        });
+
                                 String remove = "Remove Structure";
                                 Image removeButtonImage = new Image(Game.renderer.font.getWidth(remove) + 10, Game.renderer.font.getHeight(remove) + 10);
                                 removeButtonImage.getGraphics().setFont(Game.renderer.font);
                                 removeButtonImage.getGraphics().drawString(remove, 5, 5);
                                 removeButtonImage.getGraphics().flush();
-
-                                Rectangle removeRect = new Rectangle(Game.renderer.stageDimensions.x + 10, Game.WIN_HEIGHT - 90,
-                                        removeButtonImage.getWidth(), removeButtonImage.getHeight());
+                                Rectangle removeRect = new Rectangle(0, 0, removeButtonImage.getWidth(), removeButtonImage.getHeight());
 
                                 removeButton = new MyButton(
                                         "Remove selected structure",
@@ -721,6 +744,11 @@ public class UserInterface {
                                                 lineY += Game.renderer.font.getHeight(roadAccess) + margin;
                                         }
                                 }
+
+                                standbyButton.setX(leftX);
+                                standbyButton.setY(lineY);
+                                standbyButton.render(Game.appgc, g);
+                                lineY += standbyButton.getHeight() + margin;
 
                                 removeButton.setX(leftX);
                                 removeButton.setY(lineY);
