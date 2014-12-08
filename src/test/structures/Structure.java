@@ -28,6 +28,7 @@ public class Structure {
         public StructureState state;
         public boolean isProducer;
         public boolean wasPlaced;
+        public int resourceRadius;
 
         public Image image;
 
@@ -144,6 +145,24 @@ public class Structure {
                         }
                 }
 
+                switch (type) {
+                        case CopperMine:
+                                if (getNearResources(World.TerrainType.COPPER, resourceRadius) == 0) {
+                                        return false;
+                                }
+                                break;
+                        case SilverMine:
+                                if (getNearResources(World.TerrainType.SILVER, resourceRadius) == 0) {
+                                        return false;
+                                }
+                                break;
+                        case GlassMine:
+                                if (getNearResources(World.TerrainType.GLASS, resourceRadius) == 0) {
+                                        return false;
+                                }
+                                break;
+                }
+
                 if(!Game.world.resources.greaterOrEqual(buildCost)) {
                         //zu teuer :(
                         return false;
@@ -183,9 +202,9 @@ public class Structure {
 
         public void actuallyPlace(){
                 switch(type){
-                        case SilverMine : productionOutPerSec.multiply(Resource.SILVER, getNearResources(World.TerrainType.SILVER, 1)); break;
-                        case CopperMine : productionOutPerSec.multiply(Resource.COPPER, getNearResources(World.TerrainType.COPPER, 1)); break;
-                        case GlassMine : productionOutPerSec.multiply(Resource.GLASS, getNearResources(World.TerrainType.GLASS, 1)); break;
+                        case SilverMine : productionOutPerSec.multiply(Resource.SILVER, getNearResources(World.TerrainType.SILVER, resourceRadius)); break;
+                        case CopperMine : productionOutPerSec.multiply(Resource.COPPER, getNearResources(World.TerrainType.COPPER, resourceRadius)); break;
+                        case GlassMine : productionOutPerSec.multiply(Resource.GLASS, getNearResources(World.TerrainType.GLASS, resourceRadius)); break;
                         case CPU_T1 : Game.world.cpu = this;
                 }
                 isProducer = false;

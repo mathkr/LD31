@@ -1,6 +1,7 @@
 name
 desc
 image
+resourceArea
 buildCostRESOURCE
 productionInPerSecRESOURCE
 productionOutPerSecRESOURCE
