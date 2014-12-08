@@ -414,18 +414,6 @@ public class UserInterface {
                 }
 
                 @Override
-                public void mouseClicked(int button, int x, int y, int clickCount) {
-                        super.mouseClicked(button, x, y, clickCount);
-
-                        if (    x > getX() && x < getX() + getWidth()
-                             && y > getY() && y < getY() + getHeight())
-                        {
-                                // We have been clicked?
-//                                consumeEvent();
-                        }
-                }
-
-                @Override
                 public void render(GUIContext container, Graphics g) {
                         g.setColor(Game.renderer.TERRAIN_DEFAULT_COLOR);
                         if (shape != null) {
@@ -514,7 +502,7 @@ public class UserInterface {
 
                                 standbyButton.addListener(
                                         (comp) -> {
-                                                if (guiState == InterfaceState.SELECTING && !selectedStructure.isRoad()) {
+                                                if (guiState == InterfaceState.SELECTING && !selectedStructure.isRoad() && selectedStructure.type != StructureType.CPU_T1) {
                                                         if (selectedStructure.state != StructureState.Standby) {
                                                                 selectedStructure.setState(StructureState.Standby);
                                                         } else {
@@ -788,7 +776,7 @@ public class UserInterface {
 
                                 lineY -= removeButton.getHeight() + margin;
 
-                                if (!structure.isRoad()) {
+                                if (!structure.isRoad() && structure.type != StructureType.CPU_T1) {
                                         standbyButton.setX(leftX);
                                         standbyButton.setY(lineY);
                                         standbyButton.render(Game.appgc, g);
