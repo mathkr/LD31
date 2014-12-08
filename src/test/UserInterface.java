@@ -195,7 +195,12 @@ public class UserInterface {
                         public void mouseDragged(int oldx, int oldy, int newx, int newy) {
                                 if (Game.appgc.getInput().isMouseButtonDown(Input.MOUSE_LEFT_BUTTON)) {
                                         if (structureToPlace != null) {
-                                                if (structureToPlace.isRoad()) {
+                                                if (structureToPlace.isRoad()
+                                                                && oldx >  Game.renderer.stagePosition.x
+                                                                && oldx <= Game.renderer.stagePosition.x + Game.renderer.stageDimensions.x
+                                                                && oldy >  Game.renderer.stagePosition.y
+                                                                && oldy <= Game.renderer.stagePosition.y + Game.renderer.stageDimensions.y)
+                                                {
                                                         // Placing roads
                                                         int startx = Game.getWorldX(oldx);
                                                         int starty = Game.getWorldY(oldy);
