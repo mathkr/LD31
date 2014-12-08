@@ -230,13 +230,13 @@ public class Renderer {
                 boolean s = false;
 
                 if (x > 0)
-                        w = Game.world.structureGrid[x - 1][y] != null && Game.world.structureGrid[x - 1][y].isRoad();
+                        w = Game.world.structureGrid[x - 1][y] != null;
                 if (x < Game.world.WORLD_DIMENSIONS.x - 1)
-                        e = Game.world.structureGrid[x + 1][y] != null && Game.world.structureGrid[x + 1][y].isRoad();
+                        e = Game.world.structureGrid[x + 1][y] != null;
                 if (y > 0)
-                        n = Game.world.structureGrid[x][y - 1] != null && Game.world.structureGrid[x][y - 1].isRoad();
+                        n = Game.world.structureGrid[x][y - 1] != null;
                 if (y < Game.world.WORLD_DIMENSIONS.y - 1)
-                        s = Game.world.structureGrid[x][y + 1] != null && Game.world.structureGrid[x][y + 1].isRoad();
+                        s = Game.world.structureGrid[x][y + 1] != null;
 
                 // 4 way
                 if (w && n && e && s)
