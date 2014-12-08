@@ -715,7 +715,7 @@ public class UserInterface {
                                 }
 
                                 {
-                                        if (structure.getRoadAccess() != RoadAccess.NONE) {
+                                        if (structure.getRoadAccess() != RoadAccess.NONE && structure.type != StructureType.CPU_T1) {
                                                 String roadAccess = "Quality of wiring to CPU:\n" + structure.getRoadAccess().name();
                                                 g.drawString(roadAccess, leftX, lineY);
                                                 lineY += Game.renderer.font.getHeight(roadAccess) + margin;

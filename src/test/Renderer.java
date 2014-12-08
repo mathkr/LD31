@@ -40,6 +40,7 @@ public class Renderer {
         public final float INACTIVE_BASE = 0.5f;
         public final float INACTIVE_DIFF = 1f - INACTIVE_BASE;
         public Color inactiveColor;
+        public Color cantPlaceColor;
 
         public Map<String, Image> loadedImages;
 
@@ -57,6 +58,7 @@ public class Renderer {
                 wireImages = new WireImages();
 
                 inactiveColor = new Color(0, 0, 0);
+                cantPlaceColor = new Color(0, 0, 0);
 
                 try {
                         font = new AngelCodeFont("resources/font/font.fnt", new Image("resources/font/font.png", false, Image.FILTER_NEAREST));
@@ -298,7 +300,9 @@ public class Renderer {
                         int windowY = stagePosition.y + structure.position.y * tileSize;
 
                         Image wireImage = getWireImage(structure);
-                        if (structure.state == StructureState.Active || structure.state == StructureState.NoSpareCapacity || !structure.wasPlaced) {
+                        if (!structure.canBePlaced()) {
+                                wireImage.draw(windowX, windowY, filterColor.multiply(cantPlaceColor));
+                        } else if (structure.state == StructureState.Active || structure.state == StructureState.NoSpareCapacity || !structure.wasPlaced) {
                                 wireImage.draw(windowX, windowY, filterColor);
                         } else {
                                 wireImage.draw(windowX, windowY, filterColor.multiply(inactiveColor));
@@ -307,7 +311,9 @@ public class Renderer {
                         int structureTileX = stagePosition.x + structure.position.x * tileSize;
                         int structureTileY = stagePosition.y + structure.position.y * tileSize;
 
-                        if (structure.state == StructureState.Active || structure.state == StructureState.NoSpareCapacity || !structure.wasPlaced) {
+                        if (!structure.canBePlaced()) {
+                                image.draw(structureTileX, structureTileY, cantPlaceColor);
+                        } else if (structure.state == StructureState.Active || structure.state == StructureState.NoSpareCapacity || !structure.wasPlaced) {
                                 image.draw(structureTileX, structureTileY);
                         } else {
                                 image.draw(structureTileX, structureTileY, inactiveColor);
@@ -387,16 +393,6 @@ public class Renderer {
                         }
 
                         renderStructure(placeStructure, g);
-                        if (!placeStructure.canBePlaced()) {
-                                for (Vector2i occupiedTile : placeStructure.occupiedTiles) {
-                                        int structureTileX = stagePosition.x + (placeStructure.position.x + occupiedTile.x) * tileSize;
-                                        int structureTileY = stagePosition.y + (placeStructure.position.y + occupiedTile.y) * tileSize;
-
-                                        g.drawImage(debugStructure, structureTileX, structureTileY);
-                                        g.setColor(new Color(255, 0, 0, 40));
-                                        g.fillRect(structureTileX, structureTileY, tileSize, tileSize);
-                                }
-                        }
                 }
         }
 
@@ -413,11 +409,16 @@ public class Renderer {
                         INACTIVE_BASE + inactiveAlpha * INACTIVE_DIFF,
                         INACTIVE_BASE + inactiveAlpha * INACTIVE_DIFF,
                         INACTIVE_BASE + inactiveAlpha * INACTIVE_DIFF);
+
+                cantPlaceColor = new Color(
+                        INACTIVE_BASE + inactiveAlpha * INACTIVE_DIFF,
+                        0,
+                        0);
         }
 
         public void spawnParticlesAtWorldPosition(int x, int y, float velocity, float variance, int num, Color color, float lifeTime) {
-                int windowX = stagePosition.x + x * tileSize;
-                int windowY = stagePosition.y + y * tileSize;
+                int windowX = stagePosition.x + x * tileSize + tileSize / 2;
+                int windowY = stagePosition.y + y * tileSize + tileSize / 2;
                 spawnParticlesAtPosition(windowX, windowY, velocity, variance, num, color, lifeTime);
         }
 

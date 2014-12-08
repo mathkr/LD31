@@ -47,7 +47,7 @@ public class StructureLoader {
                 float spawnVelocity = 10f;
                 float spawnVariance = 0.4f;
                 int spawnNum = 1;
-                float spawnLifeTime = 0.4f;
+                float spawnLifeTime = 0.8f;
 
                 updaterMap.put(StructureType.CopperRoad, (structure) -> {
                         if (Math.random() < spawnFrequency) {

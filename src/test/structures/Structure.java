@@ -138,6 +138,9 @@ public class Structure {
         }
 
         public boolean canBePlaced(){
+                if(wasPlaced)
+                        return true;
+
                 if(type == StructureType.CPU_T1 && Game.world.cpu != null)
                         //schon eine CPU vorhanden - mehr geht nicht
                         return false;
