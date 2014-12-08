@@ -89,7 +89,7 @@ public class Game extends BasicGame {
                         appgc = new AppGameContainer(new Game("Simple Slick Game"));
                         appgc.setDisplayMode(WIN_WIDTH, WIN_HEIGHT, false);
                         appgc.setTargetFrameRate(60);
-                        appgc.setShowFPS(true);
+                        appgc.setShowFPS(false);
                         appgc.start();
                 } catch (SlickException ex) {
                         Logger.getLogger(Game.class.getName()).log(Level.SEVERE, null, ex);

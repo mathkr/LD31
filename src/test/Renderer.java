@@ -17,7 +17,7 @@ import java.util.Map;
 public class Renderer {
         public static final int MENU_WIDTH = 200;
         public static final int HEADER_HEIGHT = 50;
-        public static final int FOOTER_HEIGHT = 30;
+        public static final int FOOTER_HEIGHT = 60;
 
         public Vector2i stageDimensions;
         public Vector2i stagePosition;
@@ -58,7 +58,7 @@ public class Renderer {
                 inactiveColor = new Color(0, 0, 0);
 
                 try {
-                        font = new AngelCodeFont("resources/font/font2.fnt", new Image("resources/font/font2.png", false, Image.FILTER_NEAREST));
+                        font = new AngelCodeFont("resources/font/font.fnt", new Image("resources/font/font.png", false, Image.FILTER_NEAREST));
                 } catch (SlickException e) {
                         e.printStackTrace();
                 }

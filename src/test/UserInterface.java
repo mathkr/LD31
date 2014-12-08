@@ -5,8 +5,6 @@ import org.newdawn.slick.Color;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.geom.Rectangle;
-import org.newdawn.slick.geom.Shape;
-import org.newdawn.slick.geom.Vector2f;
 import org.newdawn.slick.gui.ComponentListener;
 import org.newdawn.slick.gui.GUIContext;
 import org.newdawn.slick.gui.MouseOverArea;
@@ -307,17 +305,49 @@ public class UserInterface {
 
                 g.setColor(Color.white);
 
-                String resources = String.format("Copper: %.0f/%.0f | Silver: %.0f/%.0f | Glass: %.0f/%.0f | Silicon: %.0f/%.0f | Energy: %.0f/%.0f ||| Electrons: %.0f/%.0f | Photons: %.0f/%.0f | Quants: %.0f/%.0f",
-                        Game.world.resources.get(Resource.COPPER), Game.world.resourceCapacity.get(Resource.COPPER),
-                        Game.world.resources.get(Resource.SILVER), Game.world.resourceCapacity.get(Resource.SILVER),
-                        Game.world.resources.get(Resource.GLASS), Game.world.resourceCapacity.get(Resource.GLASS),
-                        Game.world.resources.get(Resource.SILICON), Game.world.resourceCapacity.get(Resource.SILICON),
-                        Game.world.resources.get(Resource.ENERGY), Game.world.resourceCapacity.get(Resource.ENERGY),
-                        Game.world.resources.get(Resource.ELECTRON), Game.world.resourceCapacity.get(Resource.ELECTRON),
-                        Game.world.resources.get(Resource.PHOTON), Game.world.resourceCapacity.get(Resource.PHOTON),
-                        Game.world.resources.get(Resource.QUANTUM), Game.world.resourceCapacity.get(Resource.QUANTUM));
+                int textY = (Game.WIN_HEIGHT - Renderer.FOOTER_HEIGHT) + buttonMargins / 2;
+                int textX = buttonMargins / 2;
 
-                g.drawString(resources, buttonMargins / 2, Game.renderer.stagePosition.y + Game.renderer.stageDimensions.y + 5);
+                Resource[] base = { Resource.COPPER, Resource.SILVER, Resource.GLASS, Resource.SILICON };
+                Resource[] energy = { Resource.ENERGY };
+                Resource[] population = { Resource.ELECTRON, Resource.PHOTON, Resource.QUANTUM };
+                Resource[] data = { Resource.DATA, Resource.PRODUKT1, Resource.PRODUKT2, Resource.PRODUKT3 };
+
+                StringBuilder baseSB = new StringBuilder();
+                for (Resource resource : base) {
+                        baseSB.append(resource.name() + ": " + (Math.round(Game.world.resources.get(resource))) + "/"
+                                + (Math.round(Game.world.resourceCapacity.get(resource))) + " ");
+                }
+
+                StringBuilder energySB = new StringBuilder();
+                for (Resource resource : energy) {
+                        energySB.append(resource.name() + ": " + (Math.round(Game.world.resources.get(resource))) + "/"
+                                + (Math.round(Game.world.resourceCapacity.get(resource))) + " ");
+                }
+
+                StringBuilder populationSB = new StringBuilder();
+                for (Resource resource : population) {
+                        populationSB.append(resource.name() + ": " + (Math.round(Game.world.resources.get(resource))) + "/"
+                                + (Math.round(Game.world.resourceCapacity.get(resource))) + " ");
+                }
+
+                StringBuilder dataSB = new StringBuilder();
+                for (Resource resource : data) {
+                        dataSB.append(resource.name() + ": " + (Math.round(Game.world.resources.get(resource))) + "/"
+                                + (Math.round(Game.world.resourceCapacity.get(resource))) + " ");
+                }
+
+                g.drawString(baseSB.toString(), textX, textY);
+
+                textX = (Game.WIN_WIDTH - buttonMargins / 2) - Game.renderer.font.getWidth(energySB.toString());
+                g.drawString(energySB.toString(), textX, textY);
+
+                textX = buttonMargins / 2;
+                textY += buttonMargins / 2 + Game.renderer.font.getHeight("|");
+                g.drawString(populationSB.toString(), textX, textY);
+
+                textX = (Game.WIN_WIDTH - buttonMargins / 2) - Game.renderer.font.getWidth(dataSB.toString());
+                g.drawString(dataSB.toString(), textX, textY);
 
                 menu.render(g);
 
