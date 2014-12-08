@@ -25,7 +25,7 @@ public class UserInterface {
         public static Resource[] base = { Resource.COPPER, Resource.SILVER, Resource.GLASS, Resource.SILICON };
         public static Resource[] energy = { Resource.ENERGY };
         public static Resource[] population = { Resource.ELECTRON, Resource.PHOTON, Resource.QUANTUM };
-        public static Resource[] data = { Resource.DATA, Resource.PRODUKT1, Resource.PRODUKT2, Resource.PRODUKT3 };
+        public static Resource[] data = { Resource.DATA, Resource.SOUND, Resource.GRAPHICS, Resource.BITCOINS};
 
         public List<MyButton> buttons;
         private static Stack<MyButton> overlayButtons;
@@ -118,7 +118,11 @@ public class UserInterface {
                                         if (worldX >= 0 && worldX < Game.world.WORLD_DIMENSIONS.x && worldY >= 0 && worldY < Game.world.WORLD_DIMENSIONS.y) {
                                                 // Hier haben wir auf ein gueltiges tile geclickt
 
-                                                if (structureToPlace != null) {
+                                                if (guiState == InterfaceState.REMOVING) {
+                                                        if (Game.world.structureGrid[worldX][worldY] != null) {
+                                                                Game.world.structureGrid[worldX][worldY].remove();
+                                                        }
+                                                } else if (structureToPlace != null) {
                                                         // can it be placed? roads get handled in mouse dragged callback
                                                         if (structureToPlace.canBePlaced()) {
                                                                 structureToPlace.actuallyPlace();
@@ -174,15 +178,9 @@ public class UserInterface {
                                 }
 
                                 if (button == Input.MOUSE_RIGHT_BUTTON) {
-                                        if (guiState == InterfaceState.PLACING) {
-                                                // Abbrechen
-                                                structureToPlace = null;
-                                                guiState = InterfaceState.OFF;
-                                        } else if (guiState == InterfaceState.SELECTING) {
-                                                // Abbrechen
-                                                selectedStructure = null;
-                                                guiState = InterfaceState.OFF;
-                                        }
+                                        structureToPlace = null;
+                                        selectedStructure = null;
+                                        guiState = InterfaceState.OFF;
                                 }
                         }
 
@@ -192,32 +190,31 @@ public class UserInterface {
                         @Override
                         public void mouseDragged(int oldx, int oldy, int newx, int newy) {
                                 if (Game.appgc.getInput().isMouseButtonDown(Input.MOUSE_LEFT_BUTTON)) {
-                                        if (structureToPlace != null && guiState == InterfaceState.PLACING) {
-                                                if (structureToPlace.isRoad()
-                                                                && oldx >  Game.renderer.stagePosition.x
-                                                                && oldx <= Game.renderer.stagePosition.x + Game.renderer.stageDimensions.x
-                                                                && oldy >  Game.renderer.stagePosition.y
-                                                                && oldy <= Game.renderer.stagePosition.y + Game.renderer.stageDimensions.y)
-                                                {
-                                                        // Placing roads
-                                                        int startx = Game.getWorldX(oldx);
-                                                        int starty = Game.getWorldY(oldy);
+                                        if (       oldx >  Game.renderer.stagePosition.x
+                                                && oldx <= Game.renderer.stagePosition.x + Game.renderer.stageDimensions.x
+                                                && oldy >  Game.renderer.stagePosition.y
+                                                && oldy <= Game.renderer.stagePosition.y + Game.renderer.stageDimensions.y)
+                                        {
+                                                int startx = Game.getWorldX(oldx);
+                                                int starty = Game.getWorldY(oldy);
 
-                                                        int endx = Game.getWorldX(newx);
-                                                        int endy = Game.getWorldY(newy);
+                                                int endx = Game.getWorldX(newx);
+                                                int endy = Game.getWorldY(newy);
 
-                                                        int deltax = endx - startx;
-                                                        int deltay = endy - starty;
+                                                int deltax = endx - startx;
+                                                int deltay = endy - starty;
 
-                                                        int signx = (int)Math.signum(deltax);
-                                                        int signy = (int)Math.signum(deltay);
+                                                int signx = (int)Math.signum(deltax);
+                                                int signy = (int)Math.signum(deltay);
 
-                                                        boolean stepX = Math.abs(deltax) > Math.abs(deltay);
+                                                boolean stepX = Math.abs(deltax) > Math.abs(deltay);
 
-                                                        int currentx = startx;
-                                                        int currenty = starty;
+                                                int currentx = startx;
+                                                int currenty = starty;
 
-                                                        while (true) {
+                                                while (true) {
+                                                        if (structureToPlace != null && guiState == InterfaceState.PLACING && structureToPlace.isRoad()) {
+                                                                // Placing roads
                                                                 structureToPlace.position.x = currentx;
                                                                 structureToPlace.position.y = currenty;
 
@@ -238,30 +235,32 @@ public class UserInterface {
                                                                         structureToPlace = StructureLoader.getInstance(structureToPlace.type, structureToPlace.position.x,
                                                                                 structureToPlace.position.y);
                                                                 }
-
-                                                                if (currentx == endx && currenty == endy) {
-                                                                        break;
-                                                                }
-
-                                                                if (currentx == endx) {
-                                                                        stepX = false;
-                                                                }
-
-                                                                if (currenty == endy) {
-                                                                        stepX = true;
-                                                                }
-
-                                                                if (stepX) {
-                                                                        currentx += signx;
-                                                                        stepX = !stepX;
-                                                                } else {
-                                                                        currenty += signy;
-                                                                        stepX = !stepX;
+                                                        } if (guiState == InterfaceState.REMOVING) {
+                                                                if (Game.world.structureGrid[currentx][currenty] != null) {
+                                                                     Game.world.structureGrid[currentx][currenty].remove();
                                                                 }
                                                         }
-                                                }
-                                        } else if (guiState == InterfaceState.REMOVING) {
 
+                                                        if (currentx == endx && currenty == endy) {
+                                                                break;
+                                                        }
+
+                                                        if (currentx == endx) {
+                                                                stepX = false;
+                                                        }
+
+                                                        if (currenty == endy) {
+                                                                stepX = true;
+                                                        }
+
+                                                        if (stepX) {
+                                                                currentx += signx;
+                                                                stepX = !stepX;
+                                                        } else {
+                                                                currenty += signy;
+                                                                stepX = !stepX;
+                                                        }
+                                                }
                                         }
                                 }
                         }
@@ -481,12 +480,37 @@ public class UserInterface {
         class SideMenu {
                 public MyButton removeButton;
                 public MyButton standbyButton;
+                public MyButton demolitionButton;
 
                 public Vector2i menuPos;
                 public Vector2i menuDim;
 
                 public SideMenu(){
                         try {
+                                String demolition = "Toggle demolition mode";
+                                Image demolitionButtonImage = new Image(Game.renderer.font.getWidth(demolition) + 10, Game.renderer.font.getHeight(demolition) + 10);
+                                demolitionButtonImage.getGraphics().setFont(Game.renderer.font);
+                                demolitionButtonImage.getGraphics().drawString(demolition, 5, 5);
+                                demolitionButtonImage.getGraphics().flush();
+                                Rectangle demolitionRect = new Rectangle(0, 0, demolitionButtonImage.getWidth(), demolitionButtonImage.getHeight());
+
+                                demolitionButton = new MyButton(
+                                        "Demolition mode allows you to demolish placed structures",
+                                        Game.appgc,
+                                        demolitionButtonImage,
+                                        demolitionRect);
+
+                                demolitionButton.addListener(
+                                        (comp) -> {
+                                                if (guiState == InterfaceState.REMOVING) {
+                                                        guiState = InterfaceState.OFF;
+                                                } else {
+                                                        guiState = InterfaceState.REMOVING;
+                                                        selectedStructure = null;
+                                                        structureToPlace = null;
+                                                }
+                                        });
+
                                 String standby = "Toggle standby";
                                 Image standbyButtonImage = new Image(Game.renderer.font.getWidth(standby) + 10, Game.renderer.font.getHeight(standby) + 10);
                                 standbyButtonImage.getGraphics().setFont(Game.renderer.font);
@@ -566,11 +590,31 @@ public class UserInterface {
                         int leftX = menuPos.x + margin;
                         int lineY = menuPos.y;
 
+                        demolitionButton.setX(leftX);
+                        demolitionButton.setY(margin);
+                        demolitionButton.render(Game.appgc, g);
+
                         switch (guiState) {
                                 case OFF:
                                         return;
                                 case REMOVING:
                                         g.drawString("Removing structures...", leftX, lineY);
+
+                                        int x = Game.getWorldMouseX();
+                                        int y = Game.getWorldMouseY();
+
+                                        if (Game.world.structureGrid[x][y] != null) {
+                                                // draw red rectangle
+                                                Structure over = Game.world.structureGrid[x][y];
+
+                                                g.setColor(Color.red);
+                                                int selectedX = Game.renderer.stagePosition.x + over.position.x * Game.renderer.tileSize;
+                                                int selectedY = Game.renderer.stagePosition.y + over.position.y * Game.renderer.tileSize;
+
+                                                g.drawRect(selectedX - 5, selectedY - 5,
+                                                        over.dimensions.x * Game.PIXEL_SCALE * Game.PIXELS_PER_TILE + 10,
+                                                        over.dimensions.y * Game.PIXEL_SCALE * Game.PIXELS_PER_TILE + 10);
+                                        }
                                         return;
                                 case PLACING:
                                         structure = structureToPlace;
