@@ -353,10 +353,10 @@ public class Structure {
                 if(roadAccess.compareTo(road) < 0)
                         roadAccess = road;
                 switch(road){
-                        case NONE : roadFactor = 0.0f;
-                        case COPPER : roadFactor = 1.0f;
-                        case SILVER : roadFactor = 1.25f;
-                        case GLASS : roadFactor = 1.75f;
+                        case NONE : roadFactor = 0.0f; break;
+                        case COPPER : roadFactor = 1.0f; break;
+                        case SILVER : roadFactor = 1.25f; break;
+                        case GLASS : roadFactor = 1.75f; break;
                 }
                 return false;
         }

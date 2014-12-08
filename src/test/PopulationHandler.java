@@ -45,16 +45,16 @@ public class PopulationHandler {
         ResourceTable quantumSustainCostDelta = new ResourceTable();
         sustainCostDelta.put(Resource.QUANTUM, quantumSustainCostDelta);
 
-        electronSustainCost.put(Resource.SILICON, 0.02f);
-        photonSustainCost.put(Resource.SILVER, 0.01f);
-        quantumSustainCost.put(Resource.GLASS, 0.01f);
+        electronSustainCost.put(Resource.SOUND, 0.01f);
+        photonSustainCost.put(Resource.GRAPHICS, 0.01f);
+        quantumSustainCost.put(Resource.BITCOINS, 0.01f);
 
         growthPerSecond.put(Resource.ELECTRON, 1.0f);
         decayPerSecond.put(Resource.ELECTRON, 1.0f);
-        growthPerSecond.put(Resource.PHOTON, 1.0f);
-        decayPerSecond.put(Resource.PHOTON, 1.0f);
-        growthPerSecond.put(Resource.QUANTUM, 0.2f);
-        decayPerSecond.put(Resource.QUANTUM, 0.2f);
+        growthPerSecond.put(Resource.PHOTON, 0.3f);
+        decayPerSecond.put(Resource.PHOTON, 0.3f);
+        growthPerSecond.put(Resource.QUANTUM, 0.1f);
+        decayPerSecond.put(Resource.QUANTUM, 0.1f);
     }
 
     public void update(float d){
