@@ -115,9 +115,12 @@ public class StructureLoader {
 
         private static Properties readPropertiesFile(String file) {
                 Properties res = new Properties();
-                try {
-                        InputStream is = new FileInputStream(file);
+                try (InputStream is = new FileInputStream(file)) {
                         res.load(is);
+
+                        if (System.getProperties().getProperty("os.name").equals("Linux")) {
+                                Thread.sleep(50);
+                        }
 
                         boolean isValid = true;
                         // Check if properties are valid
@@ -131,10 +134,10 @@ public class StructureLoader {
                         if (!isValid) {
                                 System.exit(-1);
                         }
-
                 } catch (Exception e) {
                         e.printStackTrace();
                 }
+
                 return res;
         }
 
