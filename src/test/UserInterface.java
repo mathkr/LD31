@@ -15,10 +15,11 @@ import test.structures.*;
 import java.util.*;
 
 public class UserInterface {
-        enum SideMenuState {
+        enum InterfaceState {
                 OFF,
                 PLACING,
                 SELECTING,
+                REMOVING,
         }
 
         public static Resource[] base = { Resource.COPPER, Resource.SILVER, Resource.GLASS, Resource.SILICON };
@@ -30,7 +31,7 @@ public class UserInterface {
         private static Stack<MyButton> overlayButtons;
 
         public SideMenu menu;
-        public SideMenuState menuState;
+        public InterfaceState guiState;
         public Structure structureToPlace;
         public Structure selectedStructure;
 
@@ -46,7 +47,7 @@ public class UserInterface {
                 overlayButtons = new Stack<>();
 
                 structureToPlace = null;
-                menuState = SideMenuState.OFF;
+                guiState = InterfaceState.OFF;
                 selectedStructure = null;
 
                 // Add a button per StructureType
@@ -89,7 +90,7 @@ public class UserInterface {
                                                 0,
                                                 0
                                         );
-                                        menuState = SideMenuState.PLACING;
+                                        guiState = InterfaceState.PLACING;
                                 });
 
                         buttons.add(button);
@@ -102,8 +103,7 @@ public class UserInterface {
                         public void mouseWheelMoved(int change) { }
 
                         @Override
-                        public void mouseClicked(int button, int x, int y, int clickCount) {
-                        }
+                        public void mouseClicked(int button, int x, int y, int clickCount) { }
 
                         @Override
                         public void mousePressed(int button, int x, int y) { }
@@ -136,7 +136,7 @@ public class UserInterface {
 
                                                                 if (!structureToPlace.isRoad()) { // Only stop placing if we arent placing a wire
                                                                         structureToPlace = null;
-                                                                        menuState = SideMenuState.OFF;
+                                                                        guiState = InterfaceState.OFF;
                                                                 } else { // If we are, make a new wire piece to place
                                                                         structureToPlace = StructureLoader.getInstance(structureToPlace.type, structureToPlace.position.x,
                                                                                 structureToPlace.position.y);
@@ -162,26 +162,26 @@ public class UserInterface {
                                                         if (clickedStructure != null) {
                                                                 // We clicked on a structure
                                                                 selectedStructure = clickedStructure;
-                                                                menuState = SideMenuState.SELECTING;
+                                                                guiState = InterfaceState.SELECTING;
                                                                 selectionColorTime = 0f;
                                                         } else {
                                                                 // We clicked on nothing
                                                                 selectedStructure = null;
-                                                                menuState = SideMenuState.OFF;
+                                                                guiState = InterfaceState.OFF;
                                                         }
                                                 }
                                         }
                                 }
 
                                 if (button == Input.MOUSE_RIGHT_BUTTON) {
-                                        if (menuState == SideMenuState.PLACING) {
+                                        if (guiState == InterfaceState.PLACING) {
                                                 // Abbrechen
                                                 structureToPlace = null;
-                                                menuState = SideMenuState.OFF;
-                                        } else if (menuState == SideMenuState.SELECTING) {
+                                                guiState = InterfaceState.OFF;
+                                        } else if (guiState == InterfaceState.SELECTING) {
                                                 // Abbrechen
                                                 selectedStructure = null;
-                                                menuState = SideMenuState.OFF;
+                                                guiState = InterfaceState.OFF;
                                         }
                                 }
                         }
@@ -192,7 +192,7 @@ public class UserInterface {
                         @Override
                         public void mouseDragged(int oldx, int oldy, int newx, int newy) {
                                 if (Game.appgc.getInput().isMouseButtonDown(Input.MOUSE_LEFT_BUTTON)) {
-                                        if (structureToPlace != null) {
+                                        if (structureToPlace != null && guiState == InterfaceState.PLACING) {
                                                 if (structureToPlace.isRoad()
                                                                 && oldx >  Game.renderer.stagePosition.x
                                                                 && oldx <= Game.renderer.stagePosition.x + Game.renderer.stageDimensions.x
@@ -260,6 +260,8 @@ public class UserInterface {
                                                                 }
                                                         }
                                                 }
+                                        } else if (guiState == InterfaceState.REMOVING) {
+
                                         }
                                 }
                         }
@@ -349,7 +351,28 @@ public class UserInterface {
                 while (!overlayButtons.empty()) {
                         MyButton button = overlayButtons.pop();
                         g.setColor(Color.white);
-                        g.drawString(button.buttonDescription, button.getX() + 10, button.getY() + 45);
+
+                        int boxW = Game.renderer.font.getWidth(button.buttonDescription) + buttonMargins;
+                        int boxH = Game.renderer.font.getHeight(button.buttonDescription) + buttonMargins;
+
+                        int ySign = button.getY() > Game.WIN_HEIGHT / 2 ? -1 : 1;
+                        int yOffset = 50;
+
+                        int boxX = button.getX();
+                        if (boxX + boxW > Game.WIN_WIDTH) {
+                                boxX = Game.WIN_WIDTH - (boxW + buttonMargins / 2);
+                        }
+
+                        int boxY = button.getY() + ySign * yOffset;
+
+                        g.setColor(Game.renderer.TERRAIN_DEFAULT_COLOR);
+                        g.fillRect(boxX, boxY, boxW, boxH);
+
+                        g.setColor(Color.white);
+                        g.drawString(button.buttonDescription, boxX + buttonMargins / 2, boxY + buttonMargins / 2);
+
+                        g.setColor(Game.renderer.TERRAIN_GLASS_COLOR);
+                        g.drawRect(boxX, boxY, boxW, boxH);
                 }
         }
 
@@ -398,7 +421,7 @@ public class UserInterface {
                              && y > getY() && y < getY() + getHeight())
                         {
                                 // We have been clicked?
-                                consumeEvent();
+//                                consumeEvent();
                         }
                 }
 
@@ -469,20 +492,43 @@ public class UserInterface {
 
         class SideMenu {
                 public MyButton removeButton;
+                public MyButton standbyButton;
 
                 public Vector2i menuPos;
                 public Vector2i menuDim;
 
                 public SideMenu(){
                         try {
+                                String standby = "Toggle standby";
+                                Image standbyButtonImage = new Image(Game.renderer.font.getWidth(standby) + 10, Game.renderer.font.getHeight(standby) + 10);
+                                standbyButtonImage.getGraphics().setFont(Game.renderer.font);
+                                standbyButtonImage.getGraphics().drawString(standby, 5, 5);
+                                standbyButtonImage.getGraphics().flush();
+                                Rectangle standbyRect = new Rectangle(0, 0, standbyButtonImage.getWidth(), standbyButtonImage.getHeight());
+
+                                standbyButton = new MyButton(
+                                        "Toggle the standby state of the structure",
+                                        Game.appgc,
+                                        standbyButtonImage,
+                                        standbyRect);
+
+                                standbyButton.addListener(
+                                        (comp) -> {
+                                                if (guiState == InterfaceState.SELECTING && !selectedStructure.isRoad()) {
+                                                        if (selectedStructure.state != StructureState.Standby) {
+                                                                selectedStructure.setState(StructureState.Standby);
+                                                        } else {
+                                                                selectedStructure.setState(StructureState.Active);
+                                                        }
+                                                }
+                                        });
+
                                 String remove = "Remove Structure";
                                 Image removeButtonImage = new Image(Game.renderer.font.getWidth(remove) + 10, Game.renderer.font.getHeight(remove) + 10);
                                 removeButtonImage.getGraphics().setFont(Game.renderer.font);
                                 removeButtonImage.getGraphics().drawString(remove, 5, 5);
                                 removeButtonImage.getGraphics().flush();
-
-                                Rectangle removeRect = new Rectangle(Game.renderer.stageDimensions.x + 10, Game.WIN_HEIGHT - 90,
-                                        removeButtonImage.getWidth(), removeButtonImage.getHeight());
+                                Rectangle removeRect = new Rectangle(0, 0, removeButtonImage.getWidth(), removeButtonImage.getHeight());
 
                                 removeButton = new MyButton(
                                         "Remove selected structure",
@@ -492,7 +538,7 @@ public class UserInterface {
 
                                 removeButton.addListener(
                                         (comp) -> {
-                                                if (menuState == SideMenuState.SELECTING) {
+                                                if (guiState == InterfaceState.SELECTING) {
                                                         int particleX = Game.renderer.stagePosition.x + selectedStructure.position.x * Game.PIXELS_PER_TILE * Game.PIXEL_SCALE;
                                                         int particleW = selectedStructure.dimensions.x * Game.PIXELS_PER_TILE * Game.PIXEL_SCALE;
                                                         int particleY = Game.renderer.stagePosition.y + selectedStructure.position.y * Game.PIXELS_PER_TILE * Game.PIXEL_SCALE;
@@ -500,7 +546,7 @@ public class UserInterface {
 
                                                         selectedStructure.remove();
                                                         selectedStructure = null;
-                                                        menuState = SideMenuState.OFF;
+                                                        guiState = InterfaceState.OFF;
 
                                                         Game.renderer.spawnParticlesInArea(
                                                                 particleX, particleY,
@@ -532,8 +578,11 @@ public class UserInterface {
                         int leftX = menuPos.x + margin;
                         int lineY = menuPos.y;
 
-                        switch (menuState) {
+                        switch (guiState) {
                                 case OFF:
+                                        return;
+                                case REMOVING:
+                                        g.drawString("Removing structures...", leftX, lineY);
                                         return;
                                 case PLACING:
                                         structure = structureToPlace;
@@ -580,7 +629,16 @@ public class UserInterface {
                         g.drawLine(leftX, lineY, leftX + lineWidth, lineY);
                         lineY += margin;
 
-                        if (menuState == SideMenuState.PLACING) {
+                        if (guiState == InterfaceState.SELECTING) {
+                                boolean isOnStandby = structure.state == StructureState.Standby;
+                                if (isOnStandby) {
+                                        String standby = "On standby!";
+                                        g.drawString(standby, leftX, lineY);
+                                        lineY += lineHeight;
+                                }
+                        }
+
+                        if (guiState == InterfaceState.PLACING) {
                                 StringBuilder sb = new StringBuilder();
                                 sb.append("Build costs:\n");
                                 boolean hasCosts = false;
@@ -607,7 +665,7 @@ public class UserInterface {
 
                                 StringBuilder sb = new StringBuilder();
 
-                                if (menuState == SideMenuState.PLACING && isMine) {
+                                if (guiState == InterfaceState.PLACING && isMine) {
                                         sb.append("Produces (units per sec\nper resource in range):\n");
                                 } else {
                                         sb.append("Produces (units per sec):\n");
@@ -670,7 +728,7 @@ public class UserInterface {
                                 }
                         }
 
-                        if (menuState == SideMenuState.SELECTING) {
+                        if (guiState == InterfaceState.SELECTING) {
                                 { // refund
                                         StringBuilder sb = new StringBuilder();
                                         sb.append("Refunds when demolished:\n");
@@ -722,9 +780,19 @@ public class UserInterface {
                                         }
                                 }
 
+                                lineY = menuPos.y + menuDim.y - (Game.PIXEL_SCALE + removeButton.getHeight());
+
                                 removeButton.setX(leftX);
                                 removeButton.setY(lineY);
                                 removeButton.render(Game.appgc, g);
+
+                                lineY -= removeButton.getHeight() + margin;
+
+                                if (!structure.isRoad()) {
+                                        standbyButton.setX(leftX);
+                                        standbyButton.setY(lineY);
+                                        standbyButton.render(Game.appgc, g);
+                                }
 
                                 { // rect around selected struct
                                         g.setColor(selectionColor);

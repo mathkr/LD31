@@ -46,7 +46,6 @@ public class Renderer {
 
         public List<Particle> particles;
 
-        public Vector2f[][] terrainIntersections;
         public Image terrainImage;
 
         public AngelCodeFont font;
@@ -69,30 +68,6 @@ public class Renderer {
                 stageDimensions = new Vector2i(Game.WIN_WIDTH - MENU_WIDTH, (Game.WIN_HEIGHT - HEADER_HEIGHT) - FOOTER_HEIGHT);
                 stagePosition = new Vector2i(0, HEADER_HEIGHT);
                 tileSize = Game.PIXELS_PER_TILE * Game.PIXEL_SCALE;
-
-                // TODO(matthis): code rausnehmen den du garnicht erst haettest hinzufuegen sollen?
-                float variance = 0.0f * Game.PIXELS_PER_TILE;
-                terrainIntersections = new Vector2f[World.WORLD_DIMENSIONS.x + 1][World.WORLD_DIMENSIONS.y + 1];
-                for (int x = 1; x < World.WORLD_DIMENSIONS.x; ++x) {
-                        for (int y = 1; y < World.WORLD_DIMENSIONS.y; ++y) {
-                                float intersectionX = (x * Game.PIXELS_PER_TILE + variance) - (float)(2 * Math.random() * variance);
-                                float intersectionY = (y * Game.PIXELS_PER_TILE + variance) - (float)(2 * Math.random() * variance);
-                                terrainIntersections[x][y] = new Vector2f(intersectionX, intersectionY);
-                        }
-                }
-                // initialize the points on the edges straight
-                for (int x = 0; x < terrainIntersections.length; ++x) {
-                        terrainIntersections[x][0] = new Vector2f(x * Game.PIXELS_PER_TILE, 0);
-                        terrainIntersections[x][terrainIntersections[0].length - 1] = new Vector2f(
-                                x * Game.PIXELS_PER_TILE * Game.PIXEL_SCALE,
-                                (terrainIntersections[0].length - 1) * Game.PIXELS_PER_TILE);
-                }
-                for (int y = 0; y < terrainIntersections[0].length; ++y) {
-                        terrainIntersections[0][y] = new Vector2f(0, + y * Game.PIXELS_PER_TILE);
-                        terrainIntersections[terrainIntersections.length - 1][y] = new Vector2f(
-                                (terrainIntersections.length - 1) * Game.PIXELS_PER_TILE,
-                                y * Game.PIXELS_PER_TILE);
-                }
 
                 try {
                         terrainImage = new Image(World.WORLD_DIMENSIONS.x * Game.PIXELS_PER_TILE, World.WORLD_DIMENSIONS.y * Game.PIXELS_PER_TILE, Image.FILTER_NEAREST);
@@ -168,15 +143,9 @@ public class Renderer {
                                         // Draw tile
                                         terrainGraphics.setColor(tileColor);
 
-                                        float[] points = {
-                                                terrainIntersections[x][y].x, terrainIntersections[x][y].y,
-                                                terrainIntersections[x + 1][y].x, terrainIntersections[x + 1][y].y,
-                                                terrainIntersections[x + 1][y + 1].x, terrainIntersections[x + 1][y + 1].y,
-                                                terrainIntersections[x][y + 1].x, terrainIntersections[x][y + 1].y,
-                                        };
-                                        Shape shape = new Polygon(points);
-
-                                        terrainGraphics.fill(shape);
+                                        int tileX = x * Game.PIXELS_PER_TILE;
+                                        int tileY = y * Game.PIXELS_PER_TILE;
+                                        terrainGraphics.fillRect(tileX, tileY, tileX + Game.PIXELS_PER_TILE, tileY + Game.PIXELS_PER_TILE);
                                 }
                         }
                         terrainGraphics.flush();
@@ -299,24 +268,45 @@ public class Renderer {
                         int windowX = stagePosition.x + structure.position.x * tileSize;
                         int windowY = stagePosition.y + structure.position.y * tileSize;
 
-                        Image wireImage = getWireImage(structure);
-                        if (!structure.canBePlaced()) {
-                                wireImage.draw(windowX, windowY, filterColor.multiply(cantPlaceColor));
-                        } else if (structure.state == StructureState.Active || structure.state == StructureState.NoSpareCapacity || !structure.wasPlaced) {
-                                wireImage.draw(windowX, windowY, filterColor);
-                        } else {
-                                wireImage.draw(windowX, windowY, filterColor.multiply(inactiveColor));
-                        }
-                } else if (image != null) {
-                        int structureTileX = stagePosition.x + structure.position.x * tileSize;
-                        int structureTileY = stagePosition.y + structure.position.y * tileSize;
+                        image = getWireImage(structure);
 
                         if (!structure.canBePlaced()) {
-                                image.draw(structureTileX, structureTileY, cantPlaceColor);
-                        } else if (structure.state == StructureState.Active || structure.state == StructureState.NoSpareCapacity || !structure.wasPlaced) {
-                                image.draw(structureTileX, structureTileY);
+                                image.draw(windowX, windowY, filterColor.multiply(cantPlaceColor));
                         } else {
-                                image.draw(structureTileX, structureTileY, inactiveColor);
+                                switch (structure.state) {
+                                        case Standby:
+                                                image.draw(windowX, windowY, filterColor.multiply(Color.darkGray));
+                                                break;
+                                        case Active:
+                                                image.draw(windowX, windowY, filterColor);
+                                                break;
+                                        case NoRoadAccess:
+                                        case NoInputResources:
+                                        case NoSpareCapacity:
+                                                image.draw(windowX, windowY, filterColor.multiply(inactiveColor));
+                                                break;
+                                }
+                        }
+                } else if (image != null) {
+                        int windowX = stagePosition.x + structure.position.x * tileSize;
+                        int windowY = stagePosition.y + structure.position.y * tileSize;
+
+                        if (!structure.canBePlaced()) {
+                                image.draw(windowX, windowY, cantPlaceColor);
+                        } else {
+                                switch (structure.state) {
+                                        case Standby:
+                                                image.draw(windowX, windowY, Color.darkGray);
+                                                break;
+                                        case Active:
+                                                image.draw(windowX, windowY);
+                                                break;
+                                        case NoRoadAccess:
+                                        case NoInputResources:
+                                        case NoSpareCapacity:
+                                                image.draw(windowX, windowY, inactiveColor);
+                                                break;
+                                }
                         }
                 } else {
                         for (Vector2i occupiedTile : structure.occupiedTiles) {
