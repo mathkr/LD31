@@ -297,7 +297,7 @@ public class Renderer {
                         int windowY = stagePosition.y + structure.position.y * tileSize;
 
                         Image wireImage = getWireImage(structure);
-                        if (structure.state == StructureState.Active) {
+                        if (structure.state == StructureState.Active || !structure.wasPlaced) {
                                 wireImage.draw(windowX, windowY, filterColor);
                         } else {
                                 wireImage.draw(windowX, windowY, filterColor.multiply(inactiveColor));
@@ -306,7 +306,7 @@ public class Renderer {
                         int structureTileX = stagePosition.x + structure.position.x * tileSize;
                         int structureTileY = stagePosition.y + structure.position.y * tileSize;
 
-                        if (structure.state == StructureState.Active) {
+                        if (structure.state == StructureState.Active || !structure.wasPlaced) {
                                 image.draw(structureTileX, structureTileY);
                         } else {
                                 image.draw(structureTileX, structureTileY, inactiveColor);

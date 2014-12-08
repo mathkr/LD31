@@ -27,6 +27,7 @@ public class Structure {
         public RoadAccess roadAccess;
         public StructureState state;
         public boolean isProducer;
+        public boolean wasPlaced;
 
         public Image image;
 
@@ -41,6 +42,7 @@ public class Structure {
                 productionOutPerSec = new ResourceTable();
                 capacityIncrease = new ResourceTable();
                 roadAccess = RoadAccess.NONE;
+                wasPlaced = false;
         }
 
         public boolean collidesWith(Structure other){
@@ -197,6 +199,7 @@ public class Structure {
                 Game.world.structures.add(this);
                 Game.world.resources.subtract(this.buildCost);
                 Game.world.revalidateRoadAccess();
+                wasPlaced = true;
         }
 
         public void remove(){
