@@ -66,20 +66,12 @@ public class World {
                 }
         }
 
-        //deprecated
-        public void trimResourcesToCap(){
-                resources.resources.forEach((r, v) ->{
-                        float rCap = resourceCapacity.get(r);
-                        if(v > rCap)
-                                resourceCapacity.put(r, rCap);
-                });
-        }
-
-        public void resourceDecay(float delta){
+        public void resourceDecay(float d){
                 for(Resource resource : Resource.values()){
                         float top = resources.get(resource) - resourceCapacity.get(resource);
                         if(top > 0.0f){
-                                decayDelta.change(resource, top*0.5f*delta/10.0f);
+                                //reduziere mit halbwertszeit 10sec, mindestens aber mit 1/sec
+                                decayDelta.change(resource, top*0.5f*d/10.0f > d ? top*0.5f*d/10.0f : d);
                                 float rDelta = decayDelta.get(resource).intValue();
                                 if(rDelta >= 1.0f){
                                         decayDelta.change(resource, -rDelta);
