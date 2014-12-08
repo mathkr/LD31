@@ -38,6 +38,8 @@ public class Game extends BasicGame {
 
         @Override
         public void render(GameContainer gc, Graphics g) throws SlickException {
+                g.setFont(renderer.font);
+                g.setLineWidth(2f);
                 renderer.render(gc, g);
                 gui.render(gc, g);
         }

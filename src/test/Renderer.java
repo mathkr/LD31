@@ -1,6 +1,7 @@
 package test;
 
 import org.newdawn.slick.*;
+import org.newdawn.slick.Color;
 import org.newdawn.slick.geom.Polygon;
 import org.newdawn.slick.geom.Shape;
 import org.newdawn.slick.geom.Vector2f;
@@ -31,7 +32,7 @@ public class Renderer {
         public Image debugStructure;
         public WireImages wireImages;
 
-        public static boolean debugGrid = true;
+        public static boolean debugGrid = false;
 
         public float inactiveAlpha = 0f;
         public float inactiveUpdateTime = 0f;
@@ -44,6 +45,9 @@ public class Renderer {
         public List<Particle> particles;
 
         public Vector2f[][] terrainIntersections;
+        public Image terrainImage;
+
+        public AngelCodeFont font;
 
         public Renderer() {
                 loadedImages = new HashMap<>();
@@ -53,34 +57,130 @@ public class Renderer {
 
                 inactiveColor = new Color(0, 0, 0);
 
+                try {
+                        font = new AngelCodeFont("resources/font/font2.fnt", new Image("resources/font/font2.png", false, Image.FILTER_NEAREST));
+                } catch (SlickException e) {
+                        e.printStackTrace();
+                }
+
                 stageDimensions = new Vector2i(Game.WIN_WIDTH - MENU_WIDTH, (Game.WIN_HEIGHT - HEADER_HEIGHT) - FOOTER_HEIGHT);
                 stagePosition = new Vector2i(0, HEADER_HEIGHT);
                 tileSize = Game.PIXELS_PER_TILE * Game.PIXEL_SCALE;
 
-                Game.appgc.getGraphics().setBackground(Color.darkGray);
-
-                // TODO(matthis): code rausnehmen den du garnicht erst haettest hinzufuegen sollen
-                float variance = 0.2f * Game.PIXELS_PER_TILE * Game.PIXEL_SCALE;
+                // TODO(matthis): code rausnehmen den du garnicht erst haettest hinzufuegen sollen?
+                float variance = 0.0f * Game.PIXELS_PER_TILE;
                 terrainIntersections = new Vector2f[World.WORLD_DIMENSIONS.x + 1][World.WORLD_DIMENSIONS.y + 1];
                 for (int x = 1; x < World.WORLD_DIMENSIONS.x; ++x) {
                         for (int y = 1; y < World.WORLD_DIMENSIONS.y; ++y) {
-                                float intersectionX = stagePosition.x + ((x * Game.PIXELS_PER_TILE * Game.PIXEL_SCALE + variance) - (float)(2 * Math.random() * variance));
-                                float intersectionY = stagePosition.y + ((y * Game.PIXELS_PER_TILE * Game.PIXEL_SCALE + variance) - (float)(2 * Math.random() * variance));
+                                float intersectionX = (x * Game.PIXELS_PER_TILE + variance) - (float)(2 * Math.random() * variance);
+                                float intersectionY = (y * Game.PIXELS_PER_TILE + variance) - (float)(2 * Math.random() * variance);
                                 terrainIntersections[x][y] = new Vector2f(intersectionX, intersectionY);
                         }
                 }
                 // initialize the points on the edges straight
                 for (int x = 0; x < terrainIntersections.length; ++x) {
-                        terrainIntersections[x][0] = new Vector2f(stagePosition.x + x * Game.PIXELS_PER_TILE * Game.PIXEL_SCALE, stagePosition.y);
+                        terrainIntersections[x][0] = new Vector2f(x * Game.PIXELS_PER_TILE, 0);
                         terrainIntersections[x][terrainIntersections[0].length - 1] = new Vector2f(
-                                stagePosition.x + x * Game.PIXELS_PER_TILE * Game.PIXEL_SCALE,
-                                stagePosition.y + (terrainIntersections[0].length - 1) * Game.PIXELS_PER_TILE * Game.PIXEL_SCALE);
+                                x * Game.PIXELS_PER_TILE * Game.PIXEL_SCALE,
+                                (terrainIntersections[0].length - 1) * Game.PIXELS_PER_TILE);
                 }
                 for (int y = 0; y < terrainIntersections[0].length; ++y) {
-                        terrainIntersections[0][y] = new Vector2f(stagePosition.x, stagePosition.y + y * Game.PIXELS_PER_TILE * Game.PIXEL_SCALE);
+                        terrainIntersections[0][y] = new Vector2f(0, + y * Game.PIXELS_PER_TILE);
                         terrainIntersections[terrainIntersections.length - 1][y] = new Vector2f(
-                                stagePosition.x + (terrainIntersections.length - 1) * Game.PIXELS_PER_TILE * Game.PIXEL_SCALE,
-                                stagePosition.y + y * Game.PIXELS_PER_TILE * Game.PIXEL_SCALE);
+                                (terrainIntersections.length - 1) * Game.PIXELS_PER_TILE,
+                                y * Game.PIXELS_PER_TILE);
+                }
+
+                try {
+                        terrainImage = new Image(World.WORLD_DIMENSIONS.x * Game.PIXELS_PER_TILE, World.WORLD_DIMENSIONS.y * Game.PIXELS_PER_TILE, Image.FILTER_NEAREST);
+                        Graphics terrainGraphics = terrainImage.getGraphics();
+
+                        float saturationFactor = 0.8f;
+
+                        // create desaturated colors
+                        org.lwjgl.util.Color default_color = new org.lwjgl.util.Color(
+                                TERRAIN_DEFAULT_COLOR.getRed(),
+                                TERRAIN_DEFAULT_COLOR.getGreen(),
+                                TERRAIN_DEFAULT_COLOR.getBlue());
+                        float[] default_hsb = new float[3];
+                        default_color.toHSB(default_hsb);
+                        default_hsb[1] *= saturationFactor;
+                        default_color.fromHSB(default_hsb[0], default_hsb[1], default_hsb[2]);
+                        Color slick_default_color = new Color(default_color.getRed(), default_color.getGreen(), default_color.getBlue());
+
+                        org.lwjgl.util.Color copper_color = new org.lwjgl.util.Color(
+                                TERRAIN_COPPER_COLOR.getRed(),
+                                TERRAIN_COPPER_COLOR.getGreen(),
+                                TERRAIN_COPPER_COLOR.getBlue());
+                        float[] copper_hsb = new float[3];
+                        copper_color.toHSB(copper_hsb);
+                        copper_hsb[1] *= saturationFactor;
+                        copper_color.fromHSB(copper_hsb[0], copper_hsb[1], copper_hsb[2]);
+                        Color slick_copper_color = new Color(copper_color.getRed(), copper_color.getGreen(), copper_color.getBlue());
+
+                        org.lwjgl.util.Color silver_color = new org.lwjgl.util.Color(
+                                TERRAIN_SILVER_COLOR.getRed(),
+                                TERRAIN_SILVER_COLOR.getGreen(),
+                                TERRAIN_SILVER_COLOR.getBlue());
+                        float[] silver_hsb = new float[3];
+                        silver_color.toHSB(silver_hsb);
+                        silver_hsb[1] *= saturationFactor;
+                        silver_color.fromHSB(silver_hsb[0], silver_hsb[1], silver_hsb[2]);
+                        Color slick_silver_color = new Color(silver_color.getRed(), silver_color.getGreen(), silver_color.getBlue());
+
+                        org.lwjgl.util.Color glass_color = new org.lwjgl.util.Color(
+                                TERRAIN_GLASS_COLOR.getRed(),
+                                TERRAIN_GLASS_COLOR.getGreen(),
+                                TERRAIN_GLASS_COLOR.getBlue());
+                        float[] glass_hsb = new float[3];
+                        glass_color.toHSB(glass_hsb);
+                        glass_hsb[1] *= saturationFactor;
+                        glass_color.fromHSB(glass_hsb[0], glass_hsb[1], glass_hsb[2]);
+                        Color slick_glass_color = new Color(glass_color.getRed(), glass_color.getGreen(), glass_color.getBlue());
+
+                        // Draw terrain to image
+                        for (int x = 0; x < Game.world.WORLD_DIMENSIONS.x; ++x) {
+                                for (int y = 0; y < Game.world.WORLD_DIMENSIONS.y; ++y) {
+                                        // Set color depending on terrainType
+                                        World.TerrainType terrainType = Game.world.terrain[x][y];
+                                        Color tileColor = null;
+                                        switch (terrainType) {
+                                                case DEFAULT:
+                                                        tileColor = slick_default_color;
+                                                        break;
+                                                case COPPER:
+                                                        tileColor = slick_copper_color;
+                                                        break;
+                                                case SILVER:
+                                                        tileColor = slick_silver_color;
+                                                        break;
+                                                case GLASS:
+                                                        tileColor = slick_glass_color;
+                                                        break;
+                                                default:
+                                                        System.err.println("Terrain type unknown to renderer. Fix it!");
+                                                        System.exit(-1);
+                                        }
+
+                                        // Draw tile
+                                        terrainGraphics.setColor(tileColor);
+
+                                        float[] points = {
+                                                terrainIntersections[x][y].x, terrainIntersections[x][y].y,
+                                                terrainIntersections[x + 1][y].x, terrainIntersections[x + 1][y].y,
+                                                terrainIntersections[x + 1][y + 1].x, terrainIntersections[x + 1][y + 1].y,
+                                                terrainIntersections[x][y + 1].x, terrainIntersections[x][y + 1].y,
+                                        };
+                                        Shape shape = new Polygon(points);
+
+                                        terrainGraphics.fill(shape);
+                                }
+                        }
+                        terrainGraphics.flush();
+
+                        Game.appgc.getGraphics().setBackground(slick_default_color.darker());
+                } catch (SlickException e) {
+                        e.printStackTrace();
                 }
         }
 
@@ -231,50 +331,11 @@ public class Renderer {
                 }
 
                 // Render terrain
-                for (int x = 0; x < Game.world.WORLD_DIMENSIONS.x; ++x) {
-                        for (int y = 0; y < Game.world.WORLD_DIMENSIONS.y; ++y) {
-                                // Set color depending on terrainType
-                                World.TerrainType terrainType = Game.world.terrain[x][y];
-                                Color tileColor = null;
-                                switch (terrainType) {
-                                        case DEFAULT:
-                                                tileColor = TERRAIN_DEFAULT_COLOR;
-                                                break;
-                                        case COPPER:
-                                                tileColor = TERRAIN_COPPER_COLOR;
-                                                break;
-                                        case SILVER:
-                                                tileColor = TERRAIN_SILVER_COLOR;
-                                                break;
-                                        case GLASS:
-                                                tileColor = TERRAIN_GLASS_COLOR;
-                                                break;
-                                        default:
-                                                System.err.println("Terrain type unknown to renderer. Fix it!");
-                                                System.exit(-1);
-                                }
-
-                                // Draw tile
-                                g.setColor(tileColor);
-                                int drawX = stagePosition.x + x * tileSize;
-                                int drawY = stagePosition.y + y * tileSize;
-
-                                float[] points = {
-                                        terrainIntersections[x][y].x, terrainIntersections[x][y].y,
-                                        terrainIntersections[x + 1][y].x, terrainIntersections[x + 1][y].y,
-                                        terrainIntersections[x + 1][y + 1].x, terrainIntersections[x + 1][y + 1].y,
-                                        terrainIntersections[x][y + 1].x, terrainIntersections[x][y + 1].y,
-                                };
-                                Shape shape = new Polygon(points);
-
-                                g.fill(shape);
-                                //g.fillRect(drawX, drawY, tileSize, tileSize);
-                        }
-                }
+                terrainImage.draw(stagePosition.x, stagePosition.y, Game.PIXEL_SCALE);
 
                 // Draw grid
                 if (debugGrid) {
-                        g.setColor(new Color(30, 30, 30, 30));
+                        g.setColor(new Color(0xFF, 0xFF, 0xFF, 40));
 
                         int y0 = stagePosition.y;
                         int y1 = stagePosition.y + stageDimensions.y;
@@ -337,6 +398,12 @@ public class Renderer {
                         INACTIVE_BASE + inactiveAlpha * INACTIVE_DIFF,
                         INACTIVE_BASE + inactiveAlpha * INACTIVE_DIFF,
                         INACTIVE_BASE + inactiveAlpha * INACTIVE_DIFF);
+        }
+
+        public void spawnParticlesAtWorldPosition(int x, int y, float velocity, float variance, int num, Color color, float lifeTime) {
+                int windowX = stagePosition.x + x * tileSize;
+                int windowY = stagePosition.y + y * tileSize;
+                spawnParticlesAtPosition(windowX, windowY, velocity, variance, num, color, lifeTime);
         }
 
         public void spawnParticlesAtPosition(int x, int y, float velocity, float variance, int num, Color color, float lifeTime) {

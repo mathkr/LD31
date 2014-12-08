@@ -1,12 +1,9 @@
 package test.structures;
 
-import org.newdawn.slick.Color;
 import org.newdawn.slick.Image;
 import test.Game;
 import test.Vector2i;
-import test.World;
 import test.resources.Resource;
-import test.resources.ResourceTable;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -46,16 +43,38 @@ public class StructureLoader {
                 }
 
                 // Updaters:
-//                updaterMap.put(StructureType.CopperMine, (structure) -> {
-//                        Integer value = structure.getNearResources(World.TerrainType.COPPER, 1);
-//                        structure.productionOutPerSec.put(Resource.COPPER, structure.productionFactor * value);
-//                });
-//
-//                updaterMap.put(StructureType.GlassMine, (structure) -> {
-//                        Integer value = structure.getNearResources(World.TerrainType.GLASS, 1);
-//                        structure.productionOutPerSec.put(Resource.GLASS, structure.productionFactor * value);
-//                        System.out.println("value: " + value);
-//                });
+                float spawnFrequency = 0.01f;
+                float spawnVelocity = 10f;
+                float spawnVariance = 0.4f;
+                int spawnNum = 1;
+                float spawnLifeTime = 0.4f;
+
+                updaterMap.put(StructureType.CopperRoad, (structure) -> {
+                        if (Math.random() < spawnFrequency) {
+                                if (structure.state == StructureState.Active) {
+                                        Game.renderer.spawnParticlesAtWorldPosition(structure.position.x, structure.position.y,
+                                                spawnVelocity, spawnVariance, spawnNum, Game.renderer.TERRAIN_COPPER_COLOR, spawnLifeTime);
+                                }
+                        }
+                });
+
+                updaterMap.put(StructureType.SilverRoad, (structure) -> {
+                        if (Math.random() < spawnFrequency) {
+                                if (structure.state == StructureState.Active) {
+                                        Game.renderer.spawnParticlesAtWorldPosition(structure.position.x, structure.position.y,
+                                                spawnVelocity, spawnVariance, spawnNum, Game.renderer.TERRAIN_SILVER_COLOR, spawnLifeTime);
+                                }
+                        }
+                });
+
+                updaterMap.put(StructureType.GlassRoad, (structure) -> {
+                        if (Math.random() < spawnFrequency) {
+                                if (structure.state == StructureState.Active) {
+                                        Game.renderer.spawnParticlesAtWorldPosition(structure.position.x, structure.position.y,
+                                                spawnVelocity, spawnVariance, spawnNum, Game.renderer.TERRAIN_GLASS_COLOR, spawnLifeTime);
+                                }
+                        }
+                });
         }
 
         public static ArrayList<Vector2i> getOccupiedTiles(StructureType type) {

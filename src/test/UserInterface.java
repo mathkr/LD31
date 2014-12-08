@@ -37,7 +37,7 @@ public class UserInterface {
         Color selectionColor = new Color(0xFF, 0xFF, 0xFF);
         float selectionColorTime = 0f;
 
-        public int buttonMargins = 10;
+        public int buttonMargins = 20;
         public int buttonSize = Renderer.HEADER_HEIGHT - buttonMargins;
 
         public UserInterface(GameContainer gc) {
@@ -56,7 +56,7 @@ public class UserInterface {
                         String desc = StructureLoader.getProperties(structureType).getProperty("desc", "no description");
                         String imgPath = StructureLoader.getProperties(structureType).getProperty("image");
 
-                        Shape shape = new Rectangle(buttonPos.x, buttonPos.y, buttonSize, buttonSize);
+                        Rectangle shape = new Rectangle(buttonPos.x, buttonPos.y, buttonSize, buttonSize);
 
                         Image image = null;
 
@@ -132,7 +132,7 @@ public class UserInterface {
                                                                         particleX, particleY,
                                                                         particleW, particleH,
                                                                         40, 1, 20,
-                                                                        Game.renderer.TERRAIN_DEFAULT_COLOR.brighter(1.5f), 1f);
+                                                                        Game.renderer.TERRAIN_DEFAULT_COLOR.brighter(0.7f), 1f);
 
                                                                 if (!structureToPlace.isRoad()) { // Only stop placing if we arent placing a wire
                                                                         structureToPlace = null;
@@ -235,7 +235,7 @@ public class UserInterface {
                                                                                 particleX, particleY,
                                                                                 particleW, particleH,
                                                                                 40, 1, 20,
-                                                                                Game.renderer.TERRAIN_DEFAULT_COLOR.brighter(1.5f), 1f);
+                                                                                Game.renderer.TERRAIN_DEFAULT_COLOR.brighter(0.7f), 1f);
 
                                                                         structureToPlace = StructureLoader.getInstance(structureToPlace.type, structureToPlace.position.x,
                                                                                 structureToPlace.position.y);
@@ -352,14 +352,14 @@ public class UserInterface {
 
         public static class MyButton extends MouseOverArea {
                 public String buttonDescription;
-                public Shape shape;
+                public Rectangle shape;
 
                 public MyButton(String desc, GUIContext container, Image image, int x, int y, int width, int height) {
                         super(container, image, x, y, width, height);
                         buttonDescription = desc;
                 }
 
-                public MyButton(String desc, GUIContext container, Image image, Shape shape) {
+                public MyButton(String desc, GUIContext container, Image image, Rectangle shape) {
                         super(container, image, shape);
                         this.shape = shape;
                         buttonDescription = desc;
@@ -379,9 +379,6 @@ public class UserInterface {
 
                 @Override
                 public void render(GUIContext container, Graphics g) {
-                        Rectangle clip = g.getClip();
-                        g.setClip(getX() - 1, getY(), getWidth() + 2, getHeight() + 1);
-
                         g.setColor(Game.renderer.TERRAIN_DEFAULT_COLOR);
                         if (shape != null) {
                                 g.fill(shape);
@@ -391,7 +388,12 @@ public class UserInterface {
                                 overlayButtons.push(this);
                         }
 
+                        Rectangle clip = g.getClip();
+                        g.setClip(getX(), getY(), getWidth(), getHeight());
+
                         super.render(container, g);
+
+                        g.setClip(clip);
 
                         if (isMouseOver()) {
                                 g.setColor(Game.renderer.TERRAIN_GLASS_COLOR);
@@ -400,10 +402,8 @@ public class UserInterface {
                         }
 
                         if (shape != null) {
-                                g.draw(shape);
+                                g.drawRect(shape.getX(), shape.getY(), shape.getWidth(), shape.getHeight());
                         }
-
-                        g.setClip(clip);
                 }
         }
 
@@ -442,13 +442,13 @@ public class UserInterface {
                                                                 particleX, particleY,
                                                                 particleW, particleH,
                                                                 40, 1, 20,
-                                                                Color.black, 1f);
+                                                                Color.darkGray, 1f);
 
                                                         Game.renderer.spawnParticlesInArea(
                                                                 particleX, particleY,
                                                                 particleW, particleH,
                                                                 40, 1, 20,
-                                                                Color.white, 1f);
+                                                                Color.lightGray, 1f);
                                                 }
                                         });
                         } catch (SlickException e) {
