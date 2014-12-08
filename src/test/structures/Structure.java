@@ -34,7 +34,8 @@ public class Structure {
         public boolean isProducer;
         public boolean isConsumer;
         public boolean wasPlaced;
-        public float productionFactor;
+        public float roadFactor;
+        public float populationFactor;
         public int influenceRadius;
 
         public Image image;
@@ -51,7 +52,8 @@ public class Structure {
                 capacityIncrease = new ResourceTable();
                 roadAccess = RoadAccess.NONE;
                 wasPlaced = false;
-                productionFactor = 1.0F;
+                roadFactor = 0.0f;
+                populationFactor = 1.0f;
                 freezeDelta = 0.0f;
         }
 
@@ -62,6 +64,19 @@ public class Structure {
                                         && this.position.y+thisPos.y == other.position.y+otherPos.y)
                                         return true;
                 return false;
+        }
+
+        public float updatePopulationFactor(){
+                ResourceTable resources = Game.world.resources;
+                float res = 1.0f;
+                res += resources.get(Resource.ELECTRON) * (1.0f / 4000.0f);
+                res += resources.get(Resource.PHOTON) * (1.0f / 1000.f);
+                res += resources.get(Resource.QUANTUM) * (1.0f / 250.0f);
+                return populationFactor = res;
+        }
+
+        public float getProductionFactor(){
+                return populationFactor * roadFactor;
         }
 
         public void setState(StructureState setState){
@@ -79,12 +94,14 @@ public class Structure {
                         updater.update(this);
                 }
 
+                if(isProducer)
+                        updatePopulationFactor();
+
                 if (state == StructureState.Standby) {
                         return;
                 }
 
                 if(roadAccess == RoadAccess.NONE){
-                        //keine strasse :(
                         setState(StructureState.NoRoadAccess);
                         return;
                 }
@@ -131,12 +148,14 @@ public class Structure {
                         }
                 }
 
-                productionInPerSec.resources.forEach((res, val) -> {
-                        productionInDelta.change(res, productionInPerSec.get(res) * d * productionFactor);
-                });
-                productionOutPerSec.resources.forEach((res, val) -> {
-                        productionOutDelta.change(res, productionOutPerSec.get(res) * d * productionFactor);
-                });
+                float f = getProductionFactor();
+
+                productionInPerSec.resources.forEach((res, val) ->
+                        productionInDelta.change(res, productionInPerSec.get(res) * d * (isProducer ? f : 1.0f))
+                );
+                productionOutPerSec.resources.forEach((res, val) ->
+                        productionOutDelta.change(res, productionOutPerSec.get(res) * d * f)
+                );
 
                 setState(StructureState.Active);
 
@@ -192,12 +211,7 @@ public class Structure {
                                 break;
                 }
 
-                if(!Game.world.resources.greaterOrEqual(buildCost)) {
-                        //zu teuer :(
-                        return false;
-                }
-
-                return true;
+                return Game.world.resources.greaterOrEqual((buildCost));
         }
 
         public List<Vector2i> getInfluencedTiles() {
@@ -251,8 +265,9 @@ public class Structure {
 
         public void actuallyPlace(){
                 switch(type){
+                        case CopperMine :
+                        case FastCopperMine : productionOutPerSec.multiply(Resource.COPPER, getNearResources(World.TerrainType.COPPER)); break;
                         case SilverMine : productionOutPerSec.multiply(Resource.SILVER, getNearResources(World.TerrainType.SILVER)); break;
-                        case CopperMine : productionOutPerSec.multiply(Resource.COPPER, getNearResources(World.TerrainType.COPPER)); break;
                         case GlassMine : productionOutPerSec.multiply(Resource.GLASS, getNearResources(World.TerrainType.GLASS)); break;
                         case CPU_T1 : Game.world.cpu = this; break;
                 }
@@ -335,11 +350,13 @@ public class Structure {
                                 }
                                 return false;
                 }
-                if(roadAccess.compareTo(road) < 0){
+                if(roadAccess.compareTo(road) < 0)
                         roadAccess = road;
-                        if (road == RoadAccess.COPPER) this.productionFactor = 1.0F;
-                        if (road == RoadAccess.SILVER) this.productionFactor = 1.25F;
-                        if (road == RoadAccess.GLASS) this.productionFactor = 1.75F;
+                switch(road){
+                        case NONE : roadFactor = 0.0f;
+                        case COPPER : roadFactor = 1.0f;
+                        case SILVER : roadFactor = 1.25f;
+                        case GLASS : roadFactor = 1.75f;
                 }
                 return false;
         }
