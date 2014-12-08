@@ -22,7 +22,7 @@ public class PopulationHandler {
         sustainCost = new HashMap<Resource, ResourceTable>(5);
         sustainCostDelta = new HashMap<Resource, ResourceTable>(5);
         isGrowing = new HashMap<Resource, Boolean>(5);
-        couldNotPayLastUpdate = new HashMap<Resource, Boolean>();
+        couldNotPayLastUpdate = new HashMap<Resource, Boolean>(5);
         for(Resource res : new Resource[]{Resource.ELECTRON, Resource.PHOTON, Resource.QUANTUM}) {
             isGrowing.put(res, true);
             couldNotPayLastUpdate.put(res, false);
@@ -59,8 +59,8 @@ public class PopulationHandler {
 
     public void update(float d){
         update(d, Resource.ELECTRON);
-//        update(d, Resource.PHOTON);
-//        update(d, Resource.QUANTUM);
+        update(d, Resource.PHOTON);
+        update(d, Resource.QUANTUM);
     }
 
     private void update(float d, Resource popType){
@@ -68,11 +68,11 @@ public class PopulationHandler {
             couldNotPayLastUpdate.put(popType, false);
             incrementSustainCostDelta(d, popType);
             if(isGrowing.get(popType)) {
-                System.out.println("doesn't need to pay : grow");
+//                System.out.println("doesn't need to pay : grow");
                 grow(d, popType);
             }else {
                 decay(d, popType);
-                System.out.println("doesn't need to pay : decay");
+//                System.out.println("doesn't need to pay : decay");
             }
         }
 
@@ -80,17 +80,17 @@ public class PopulationHandler {
             pay(popType);
             incrementSustainCostDelta(d, popType);
             if(couldNotPayLastUpdate.get(popType)) {
-                System.out.println("needs to pay & can pay : decay");
+//                System.out.println("needs to pay & can pay : decay");
                 decay(d, popType);
             }else{
-                System.out.println("needs to pay & can pay : grow");
+//                System.out.println("needs to pay & can pay : grow");
                 isGrowing.put(popType, true);
                 grow(d, popType);
             }
         }
 
         else{
-            System.out.println("needs to pay & can't pay : decay");
+//            System.out.println("needs to pay & can't pay : decay");
             isGrowing.put(popType, false);
             couldNotPayLastUpdate.put(popType, true);
             decay(d, popType);
