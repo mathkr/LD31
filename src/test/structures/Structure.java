@@ -86,24 +86,15 @@ public class Structure {
 
                 ResourceTable resources = Game.world.resources;
                 ResourceTable cap = Game.world.resourceCapacity;
-                //buffere aenderungen, solange unter 1.0f
-                productionInPerSec.resources.forEach((res, val) -> {
-                        if (productionInDelta.get(res) < 1.0f)
-                                productionInDelta.change(res, productionInPerSec.get(res) * d * productionFactor);
-                });
-                productionOutPerSec.resources.forEach((res, val) -> {
-                        if (productionOutDelta.get(res) < 1.0f)
-                                productionOutDelta.change(res, productionOutPerSec.get(res) * d * productionFactor);
-                });
-                //pruefe, ob eingangsressourcen vorhanden
-                for(Map.Entry<Resource, Float> e : productionInDelta.resources.entrySet()){
-                        float rDelta = e.getValue().intValue();
-                        if (rDelta >= 1.0f && !resources.canSubtract(e.getKey(), rDelta)) {
-                                //kein saft :(
+
+                //pruefe, ob eingagsressourcen vorhanden
+                for (Map.Entry<Resource, Float> e : productionInPerSec.resources.entrySet()) {
+                        if (e.getValue() > 0.0f && resources.get(e.getKey()) == 0.0f) {
                                 setState(StructureState.NoInputResources);
                                 return;
                         }
                 }
+
                 //pruefe, ob fuer mindestens eine der produzierten ressourcen kapazitaet vorhanden ist
                 if(isProducer) {
                         boolean hasCapacity = false;
@@ -114,30 +105,38 @@ public class Structure {
                                 }
                         }
                         if (!hasCapacity) {
-                                //lager voll :(
                                 //vielleicht hier was anderes machen
                                 setState(StructureState.NoSpareCapacity);
                                 return;
                         }
                 }
+
+                //buffere aenderungen
+                productionInPerSec.resources.forEach((res, val) -> {
+//                        if (productionInDelta.get(res) < 1.0f)
+                                productionInDelta.change(res, productionInPerSec.get(res) * d * productionFactor);
+                });
+                productionOutPerSec.resources.forEach((res, val) -> {
+//                        if (productionOutDelta.get(res) < 1.0f)
+                                productionOutDelta.change(res, productionOutPerSec.get(res) * d * productionFactor);
+                });
+
                 setState(StructureState.Active);
                 //ziehe eingangsressourcen ab
+                //UNSAFE fuer input von mehr als 1.0 unit resource pro frame
                 productionInDelta.resources.forEach((res, val) -> {
                         float rDelta = val.intValue();
-                        if (rDelta >= 1.0f) {
+                        if (rDelta > 0.0f) {
                                 productionInDelta.change(res, -rDelta);
                                 resources.change(res, -rDelta);
                         }
                 });
-                //addiere ausgangsressourcen
+                //addiere ausgangsressourcen (soweit moeglich)
                 productionOutDelta.resources.forEach((res, val) -> {
                         float rDelta = val.intValue();
-                        if(rDelta >= 1.0f){
-                                float currentRes = resources.get(res);
-                                float resourceCap = cap.get(res);
-                                rDelta = rDelta + currentRes <= resourceCap ? rDelta : resourceCap - currentRes;
+                        if(rDelta > 0.0f){
                                 productionOutDelta.change(res, -rDelta);
-                                resources.change(res, rDelta);
+                                resources.change(res, Math.min(rDelta, cap.get(res) - resources.get(res)));
                         }
                 });
         }
