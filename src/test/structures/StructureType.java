@@ -10,6 +10,7 @@ public enum StructureType {
         GlassMine,
         DataPortIn,
         SoundCard,
+        BitCoinCPU,
         GraphicsCard,
         FastCopperMine,
         RAM_T1,
