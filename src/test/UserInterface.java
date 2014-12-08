@@ -125,6 +125,9 @@ public class UserInterface {
                                                         }
                                                 } else if (structureToPlace != null) {
                                                         // can it be placed? roads get handled in mouse dragged callback
+                                                        structureToPlace.position.x = worldX;
+                                                        structureToPlace.position.y = worldY;
+
                                                         if (structureToPlace.canBePlaced()) {
                                                                 structureToPlace.actuallyPlace();
 
@@ -329,41 +332,141 @@ public class UserInterface {
                 int textY = (Game.WIN_HEIGHT - Renderer.FOOTER_HEIGHT) + buttonMargins / 2;
                 int textX = buttonMargins / 2;
 
-                StringBuilder baseSB = new StringBuilder();
                 for (Resource resource : base) {
-                        baseSB.append(resource.name() + ": " + (Math.round(Game.world.resources.get(resource))) + "/"
-                                + (Math.round(Game.world.resourceCapacity.get(resource))) + " ");
+                        String name = resource.name() + ":";
+                        String res = Integer.toString(Math.round(Game.world.resources.get(resource)));
+                        String div = "/";
+                        String of = Integer.toString(Math.round(Game.world.resourceCapacity.get(resource)));
+
+                        g.drawString(name, textX, textY);
+                        textX += Game.renderer.font.getWidth(name) + Game.renderer.font.getWidth("#");
+
+                        float resourceVal = Game.world.resources.get(resource);
+                        float resourceCap = Game.world.resourceCapacity.get(resource);
+
+                        boolean atCap = resourceVal == resourceCap;
+                        boolean overCap = resourceVal > resourceCap;
+
+                        if (atCap) {
+                                g.setColor(Color.yellow);
+                        } else if (overCap) {
+                                g.setColor(Color.red);
+                        }
+                        g.drawString(res, textX, textY);
+                        textX += Game.renderer.font.getWidth(res);
+
+                        g.setColor(Color.white);
+                        g.drawString(div, textX, textY);
+                        textX += Game.renderer.font.getWidth(div);
+
+                        g.drawString(of, textX, textY);
+                        textX += Game.renderer.font.getWidth(of) + Game.renderer.font.getWidth("#");
                 }
 
-                StringBuilder energySB = new StringBuilder();
+                textX = (Game.WIN_WIDTH - buttonMargins / 2);
                 for (Resource resource : energy) {
-                        energySB.append(resource.name() + ": " + (Math.round(Game.world.resources.get(resource))) + "/"
-                                + (Math.round(Game.world.resourceCapacity.get(resource))) + " ");
+                        String name = resource.name() + ":";
+                        String res = Integer.toString(Math.round(Game.world.resources.get(resource)));
+                        String div = "/";
+                        String of = Integer.toString(Math.round(Game.world.resourceCapacity.get(resource)));
+
+                        textX -= Game.renderer.font.getWidth(of);
+                        g.drawString(of, textX, textY);
+
+                        textX -= Game.renderer.font.getWidth(div);
+                        g.drawString(div, textX, textY);
+
+
+                        float resourceVal = Game.world.resources.get(resource);
+                        float resourceCap = Game.world.resourceCapacity.get(resource);
+
+                        boolean atCap = resourceVal == resourceCap;
+                        boolean overCap = resourceVal > resourceCap;
+
+                        if (atCap) {
+                                g.setColor(Color.yellow);
+                        } else if (overCap) {
+                                g.setColor(Color.red);
+                        }
+                        textX -= Game.renderer.font.getWidth(res);
+                        g.drawString(res, textX, textY);
+
+                        g.setColor(Color.white);
+                        textX -= Game.renderer.font.getWidth(name) + Game.renderer.font.getWidth("#");
+                        g.drawString(name, textX, textY);
                 }
-
-                StringBuilder populationSB = new StringBuilder();
-                for (Resource resource : population) {
-                        populationSB.append(resource.name() + ": " + (Math.round(Game.world.resources.get(resource))) + "/"
-                                + (Math.round(Game.world.resourceCapacity.get(resource))) + " ");
-                }
-
-                StringBuilder dataSB = new StringBuilder();
-                for (Resource resource : data) {
-                        dataSB.append(resource.name() + ": " + (Math.round(Game.world.resources.get(resource))) + "/"
-                                + (Math.round(Game.world.resourceCapacity.get(resource))) + " ");
-                }
-
-                g.drawString(baseSB.toString(), textX, textY);
-
-                textX = (Game.WIN_WIDTH - buttonMargins / 2) - Game.renderer.font.getWidth(energySB.toString());
-                g.drawString(energySB.toString(), textX, textY);
 
                 textX = buttonMargins / 2;
                 textY += buttonMargins / 2 + Game.renderer.font.getLineHeight();
-                g.drawString(populationSB.toString(), textX, textY);
+                for (Resource resource : population) {
+                        String name = resource.name() + ":";
+                        String res = Integer.toString(Math.round(Game.world.resources.get(resource)));
+                        String div = "/";
+                        String of = Integer.toString(Math.round(Game.world.resourceCapacity.get(resource)));
 
-                textX = (Game.WIN_WIDTH - buttonMargins / 2) - Game.renderer.font.getWidth(dataSB.toString());
-                g.drawString(dataSB.toString(), textX, textY);
+                        g.drawString(name, textX, textY);
+                        textX += Game.renderer.font.getWidth(name) + Game.renderer.font.getWidth("#");
+
+                        float resourceVal = Game.world.resources.get(resource);
+                        float resourceCap = Game.world.resourceCapacity.get(resource);
+
+                        boolean atCap = resourceVal == resourceCap;
+                        boolean overCap = resourceVal > resourceCap;
+
+                        if (atCap) {
+                                g.setColor(Color.yellow);
+                        } else if (overCap) {
+                                g.setColor(Color.red);
+                        }
+                        g.drawString(res, textX, textY);
+                        textX += Game.renderer.font.getWidth(res);
+
+                        g.setColor(Color.white);
+                        g.drawString(div, textX, textY);
+                        textX += Game.renderer.font.getWidth(div);
+
+                        g.drawString(of, textX, textY);
+                        textX += Game.renderer.font.getWidth(of) + Game.renderer.font.getWidth("#");
+                }
+
+                textX = (Game.WIN_WIDTH - buttonMargins / 2);
+                int index = 0;
+                for (Resource resource : data) {
+                        String name = resource.name() + ":";
+                        String res = Integer.toString(Math.round(Game.world.resources.get(resource)));
+                        String div = "/";
+                        String of = Integer.toString(Math.round(Game.world.resourceCapacity.get(resource)));
+
+                        if (index == 0) {
+                                textX -= Game.renderer.font.getWidth(of);
+                        } else {
+                                textX -= Game.renderer.font.getWidth(of) + Game.renderer.font.getWidth("#");
+                        }
+                        g.drawString(of, textX, textY);
+
+                        textX -= Game.renderer.font.getWidth(div);
+                        g.drawString(div, textX, textY);
+
+
+                        float resourceVal = Game.world.resources.get(resource);
+                        float resourceCap = Game.world.resourceCapacity.get(resource);
+
+                        boolean atCap = resourceVal == resourceCap;
+                        boolean overCap = resourceVal > resourceCap;
+
+                        if (atCap) {
+                                g.setColor(Color.yellow);
+                        } else if (overCap) {
+                                g.setColor(Color.red);
+                        }
+                        textX -= Game.renderer.font.getWidth(res);
+                        g.drawString(res, textX, textY);
+
+                        g.setColor(Color.white);
+                        textX -= Game.renderer.font.getWidth(name) + Game.renderer.font.getWidth("#");
+                        g.drawString(name, textX, textY);
+                        ++index;
+                }
 
                 menu.render(g);
 
@@ -430,17 +533,6 @@ public class UserInterface {
                         super(container, image, shape);
                         this.shape = shape;
                         buttonDescription = desc;
-                }
-
-                @Override
-                public void mouseClicked(int button, int x, int y, int clickCount) {
-//                        super.mouseClicked(button, x, y, clickCount);
-//                        if ( x > getX() && x < getX() + getWidth()
-//                                && y > getY() && y < getY() + getHeight())
-//                        {
-//                                // We have been clicked?
-//                                consumeEvent();
-//                        }
                 }
 
                 @Override
