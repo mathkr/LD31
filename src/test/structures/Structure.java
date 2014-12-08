@@ -182,7 +182,7 @@ public class Structure {
                 if(wasPlaced)
                         return true;
 
-                if(type == StructureType.CPU_T1 && Game.world.cpu != null)
+                if(type == StructureType.Cpu_t1 && Game.world.cpu != null)
                         //schon eine CPU vorhanden - mehr geht nicht
                         return false;
                 for(Structure other : Game.world.structures) {
@@ -269,7 +269,7 @@ public class Structure {
                         case FastCopperMine : productionOutPerSec.multiply(Resource.COPPER, getNearResources(World.TerrainType.COPPER)); break;
                         case SilverMine : productionOutPerSec.multiply(Resource.SILVER, getNearResources(World.TerrainType.SILVER)); break;
                         case GlassMine : productionOutPerSec.multiply(Resource.GLASS, getNearResources(World.TerrainType.GLASS)); break;
-                        case CPU_T1 : Game.world.cpu = this; break;
+                        case Cpu_t1: Game.world.cpu = this; break;
                 }
 
                 isProducer = false;
@@ -293,7 +293,7 @@ public class Structure {
         }
 
         public void remove(){
-                if(type == StructureType.CPU_T1)
+                if(type == StructureType.Cpu_t1)
                         Game.world.cpu = null;
 
                 Game.world.structures.remove(this);
@@ -303,7 +303,7 @@ public class Structure {
 
                 setState(StructureState.NoRoadAccess);
 
-                if(isRoad() || type == StructureType.CPU_T1)
+                if(isRoad() || type == StructureType.Cpu_t1)
                         Game.world.revalidateRoadAccess();
 
                 Game.world.resources.add(this.refundResources);

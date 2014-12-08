@@ -557,7 +557,7 @@ public class UserInterface {
 
                                 standbyButton.addListener(
                                         (comp) -> {
-                                                if (guiState == InterfaceState.SELECTING && !selectedStructure.isRoad() && selectedStructure.type != StructureType.CPU_T1) {
+                                                if (guiState == InterfaceState.SELECTING && !selectedStructure.isRoad() && selectedStructure.type != StructureType.Cpu_t1) {
                                                         if (selectedStructure.state != StructureState.Standby) {
                                                                 selectedStructure.setState(StructureState.Standby);
                                                         } else {
@@ -708,7 +708,7 @@ public class UserInterface {
                                         lineY += lineHeight;
                                 }
 
-                                if (!structure.isRoad() && structure.type != StructureType.CPU_T1) {
+                                if (!structure.isRoad() && structure.type != StructureType.Cpu_t1) {
                                         g.drawString("Populationfactor: " + structure.populationFactor, leftX, lineY);
                                         lineY += lineHeight;
                                         g.drawString("Wirefactor: " + structure.roadFactor, leftX, lineY);
@@ -851,7 +851,7 @@ public class UserInterface {
                                 }
 
                                 {
-                                        if (structure.getRoadAccess() != RoadAccess.NONE && structure.type != StructureType.CPU_T1) {
+                                        if (structure.getRoadAccess() != RoadAccess.NONE && structure.type != StructureType.Cpu_t1) {
                                                 String roadAccess = "Quality of wiring to CPU:\n" + structure.getRoadAccess().name();
                                                 g.drawString(roadAccess, leftX, lineY);
                                                 lineY += Game.renderer.font.getHeight(roadAccess) + margin;
@@ -866,7 +866,7 @@ public class UserInterface {
 
                                 lineY -= removeButton.getHeight() + margin;
 
-                                if (!structure.isRoad() && structure.type != StructureType.CPU_T1) {
+                                if (!structure.isRoad() && structure.type != StructureType.Cpu_t1) {
                                         standbyButton.setX(leftX);
                                         standbyButton.setY(lineY);
                                         standbyButton.render(Game.appgc, g);
