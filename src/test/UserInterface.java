@@ -434,13 +434,13 @@ public class UserInterface {
 
                 @Override
                 public void mouseClicked(int button, int x, int y, int clickCount) {
-                        super.mouseClicked(button, x, y, clickCount);
-                        if ( x > getX() && x < getX() + getWidth()
-                                && y > getY() && y < getY() + getHeight())
-                        {
-                                // We have been clicked?
-                                consumeEvent();
-                        }
+//                        super.mouseClicked(button, x, y, clickCount);
+//                        if ( x > getX() && x < getX() + getWidth()
+//                                && y > getY() && y < getY() + getHeight())
+//                        {
+//                                // We have been clicked?
+//                                consumeEvent();
+//                        }
                 }
 
                 @Override
