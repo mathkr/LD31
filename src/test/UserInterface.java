@@ -7,8 +7,8 @@ import org.newdawn.slick.Image;
 import org.newdawn.slick.geom.Rectangle;
 import org.newdawn.slick.gui.ComponentListener;
 import org.newdawn.slick.gui.GUIContext;
-import org.newdawn.slick.gui.MouseOverArea;
 import org.newdawn.slick.util.FastTrig;
+import slick.MouseOverArea;
 import test.resources.Resource;
 import test.structures.*;
 
@@ -106,7 +106,8 @@ public class UserInterface {
                         public void mouseClicked(int button, int x, int y, int clickCount) { }
 
                         @Override
-                        public void mousePressed(int button, int x, int y) { }
+                        public void mousePressed(int button, int x, int y) {
+                        }
 
                         @Override
                         public void mouseReleased(int button, int x, int y) {
@@ -410,6 +411,17 @@ public class UserInterface {
                         super(container, image, shape);
                         this.shape = shape;
                         buttonDescription = desc;
+                }
+
+                @Override
+                public void mouseClicked(int button, int x, int y, int clickCount) {
+                        super.mouseClicked(button, x, y, clickCount);
+//                        if ( x > getX() && x < getX() + getWidth()
+//                                && y > getY() && y < getY() + getHeight())
+//                        {
+//                                // We have been clicked?
+//                                consumeEvent();
+//                        }
                 }
 
                 @Override
