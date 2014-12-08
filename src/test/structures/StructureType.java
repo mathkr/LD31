@@ -1,12 +1,15 @@
 package test.structures;
 
 public enum StructureType {
+        SiliconMine,
+        PSU_T1,
+        PSU_T2,
+        PSU_T3,
         CopperMine,
         SilverMine,
         GlassMine,
-        PSU_T1,
+        FastCopperMine,
         RAM_T1,
-        SiliconMine,
         MEMORY_T1,
         CopperRoad,
         SilverRoad,
