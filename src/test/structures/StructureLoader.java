@@ -146,7 +146,8 @@ public class StructureLoader {
 
                 // TODO(Matthis): add debug output
                 for (Resource resource : Resource.values()) {
-                        structure.buildCost.put(resource, Float.parseFloat(properties.getProperty("buildCost" + resource.name(), "0f")));
+                        structure.buildCost.put(resource, 0.0f); //DEBUG
+//                        structure.buildCost.put(resource, Float.parseFloat(properties.getProperty("buildCost" + resource.name(), "0f")));
                 }
 
                 for (Resource resource : Resource.values()) {
@@ -187,6 +188,8 @@ public class StructureLoader {
                 structure.occupiedTiles = occupiedTiles;
                 structure.image = image;
                 structure.updater = updaterMap.get(type);
+
+                structure.setState(StructureState.Active);
 
                 return structure;
         }
