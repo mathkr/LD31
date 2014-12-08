@@ -8,6 +8,7 @@ import org.newdawn.slick.geom.Vector2f;
 import org.newdawn.slick.util.FastTrig;
 import test.structures.Structure;
 import test.structures.StructureState;
+import test.structures.StructureType;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -17,7 +18,7 @@ import java.util.Map;
 public class Renderer {
         public static final int MENU_WIDTH = 200;
         public static final int HEADER_HEIGHT = 50;
-        public static final int FOOTER_HEIGHT = 30;
+        public static final int FOOTER_HEIGHT = 60;
 
         public Vector2i stageDimensions;
         public Vector2i stagePosition;
@@ -39,6 +40,7 @@ public class Renderer {
         public final float INACTIVE_BASE = 0.5f;
         public final float INACTIVE_DIFF = 1f - INACTIVE_BASE;
         public Color inactiveColor;
+        public Color cantPlaceColor;
 
         public Map<String, Image> loadedImages;
 
@@ -56,9 +58,10 @@ public class Renderer {
                 wireImages = new WireImages();
 
                 inactiveColor = new Color(0, 0, 0);
+                cantPlaceColor = new Color(0, 0, 0);
 
                 try {
-                        font = new AngelCodeFont("resources/font/font2.fnt", new Image("resources/font/font2.png", false, Image.FILTER_NEAREST));
+                        font = new AngelCodeFont("resources/font/font.fnt", new Image("resources/font/font.png", false, Image.FILTER_NEAREST));
                 } catch (SlickException e) {
                         e.printStackTrace();
                 }
@@ -230,13 +233,13 @@ public class Renderer {
                 boolean s = false;
 
                 if (x > 0)
-                        w = Game.world.structureGrid[x - 1][y] != null && Game.world.structureGrid[x - 1][y].isRoad();
+                        w = Game.world.structureGrid[x - 1][y] != null;
                 if (x < Game.world.WORLD_DIMENSIONS.x - 1)
-                        e = Game.world.structureGrid[x + 1][y] != null && Game.world.structureGrid[x + 1][y].isRoad();
+                        e = Game.world.structureGrid[x + 1][y] != null;
                 if (y > 0)
-                        n = Game.world.structureGrid[x][y - 1] != null && Game.world.structureGrid[x][y - 1].isRoad();
+                        n = Game.world.structureGrid[x][y - 1] != null;
                 if (y < Game.world.WORLD_DIMENSIONS.y - 1)
-                        s = Game.world.structureGrid[x][y + 1] != null && Game.world.structureGrid[x][y + 1].isRoad();
+                        s = Game.world.structureGrid[x][y + 1] != null;
 
                 // 4 way
                 if (w && n && e && s)
@@ -297,7 +300,9 @@ public class Renderer {
                         int windowY = stagePosition.y + structure.position.y * tileSize;
 
                         Image wireImage = getWireImage(structure);
-                        if (structure.state == StructureState.Active) {
+                        if (!structure.canBePlaced()) {
+                                wireImage.draw(windowX, windowY, filterColor.multiply(cantPlaceColor));
+                        } else if (structure.state == StructureState.Active || structure.state == StructureState.NoSpareCapacity || !structure.wasPlaced) {
                                 wireImage.draw(windowX, windowY, filterColor);
                         } else {
                                 wireImage.draw(windowX, windowY, filterColor.multiply(inactiveColor));
@@ -306,7 +311,9 @@ public class Renderer {
                         int structureTileX = stagePosition.x + structure.position.x * tileSize;
                         int structureTileY = stagePosition.y + structure.position.y * tileSize;
 
-                        if (structure.state == StructureState.Active) {
+                        if (!structure.canBePlaced()) {
+                                image.draw(structureTileX, structureTileY, cantPlaceColor);
+                        } else if (structure.state == StructureState.Active || structure.state == StructureState.NoSpareCapacity || !structure.wasPlaced) {
                                 image.draw(structureTileX, structureTileY);
                         } else {
                                 image.draw(structureTileX, structureTileY, inactiveColor);
@@ -371,17 +378,21 @@ public class Renderer {
 
                 Structure placeStructure = Game.gui.structureToPlace;
                 if (placeStructure != null) {
-                        renderStructure(placeStructure, g);
-                        if (!placeStructure.canBePlaced()) {
-                                for (Vector2i occupiedTile : placeStructure.occupiedTiles) {
-                                        int structureTileX = stagePosition.x + (placeStructure.position.x + occupiedTile.x) * tileSize;
-                                        int structureTileY = stagePosition.y + (placeStructure.position.y + occupiedTile.y) * tileSize;
-
-                                        g.drawImage(debugStructure, structureTileX, structureTileY);
-                                        g.setColor(new Color(255, 0, 0, 40));
-                                        g.fillRect(structureTileX, structureTileY, tileSize, tileSize);
+                        if (placeStructure.type == StructureType.CopperMine
+                                || placeStructure.type == StructureType.FastCopperMine
+                                || placeStructure.type == StructureType.SilverMine
+                                || placeStructure.type == StructureType.GlassMine)
+                        {
+                                // render influenced area
+                                g.setColor(new Color(0xFF, 0xFF, 0xFF, 40));
+                                for (Vector2i tile : placeStructure.getInfluencedTiles()) {
+                                        int tileX = stagePosition.x + tile.x * tileSize;
+                                        int tileY = stagePosition.y + tile.y * tileSize;
+                                        g.fillRect(tileX, tileY, tileSize, tileSize);
                                 }
                         }
+
+                        renderStructure(placeStructure, g);
                 }
         }
 
@@ -398,11 +409,16 @@ public class Renderer {
                         INACTIVE_BASE + inactiveAlpha * INACTIVE_DIFF,
                         INACTIVE_BASE + inactiveAlpha * INACTIVE_DIFF,
                         INACTIVE_BASE + inactiveAlpha * INACTIVE_DIFF);
+
+                cantPlaceColor = new Color(
+                        INACTIVE_BASE + inactiveAlpha * INACTIVE_DIFF,
+                        0,
+                        0);
         }
 
         public void spawnParticlesAtWorldPosition(int x, int y, float velocity, float variance, int num, Color color, float lifeTime) {
-                int windowX = stagePosition.x + x * tileSize;
-                int windowY = stagePosition.y + y * tileSize;
+                int windowX = stagePosition.x + x * tileSize + tileSize / 2;
+                int windowY = stagePosition.y + y * tileSize + tileSize / 2;
                 spawnParticlesAtPosition(windowX, windowY, velocity, variance, num, color, lifeTime);
         }
 

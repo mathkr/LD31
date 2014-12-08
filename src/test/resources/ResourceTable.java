@@ -36,6 +36,20 @@ public class ResourceTable {
 
     public void multiply(Resource r, float f) { resources.put(r, get(r) * f); }
 
+    public ResourceTable getMultiple(float f) {
+        ResourceTable res = new ResourceTable();
+        for (Resource resource : Resource.values()) {
+            res.put(resource, get(resource) * f);
+        }
+        return res;
+    }
+
+    public void truncateToInt() {
+        for (Resource resource : Resource.values()) {
+            put(resource, get(resource).intValue());
+        }
+    }
+
     public void change(Resource r, float f){
         resources.put(r, get(r) + f);
     }

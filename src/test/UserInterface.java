@@ -5,8 +5,6 @@ import org.newdawn.slick.Color;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.geom.Rectangle;
-import org.newdawn.slick.geom.Shape;
-import org.newdawn.slick.geom.Vector2f;
 import org.newdawn.slick.gui.ComponentListener;
 import org.newdawn.slick.gui.GUIContext;
 import org.newdawn.slick.gui.MouseOverArea;
@@ -14,10 +12,7 @@ import org.newdawn.slick.util.FastTrig;
 import test.resources.Resource;
 import test.structures.*;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Stack;
+import java.util.*;
 
 public class UserInterface {
         enum SideMenuState {
@@ -25,6 +20,11 @@ public class UserInterface {
                 PLACING,
                 SELECTING,
         }
+
+        public static Resource[] base = { Resource.COPPER, Resource.SILVER, Resource.GLASS, Resource.SILICON };
+        public static Resource[] energy = { Resource.ENERGY };
+        public static Resource[] population = { Resource.ELECTRON, Resource.PHOTON, Resource.QUANTUM };
+        public static Resource[] data = { Resource.DATA, Resource.PRODUKT1, Resource.PRODUKT2, Resource.PRODUKT3 };
 
         public List<MyButton> buttons;
         private static Stack<MyButton> overlayButtons;
@@ -158,8 +158,6 @@ public class UserInterface {
 
                                                                 ++structureIndex;
                                                         }
-
-                                                        System.out.println("clicked: " + clickedPosition);
 
                                                         if (clickedStructure != null) {
                                                                 // We clicked on a structure
@@ -307,17 +305,44 @@ public class UserInterface {
 
                 g.setColor(Color.white);
 
-                String resources = String.format("Copper: %.0f/%.0f | Silver: %.0f/%.0f | Glass: %.0f/%.0f | Silicon: %.0f/%.0f | Energy: %.0f/%.0f ||| Electrons: %.0f/%.0f | Photons: %.0f/%.0f | Quants: %.0f/%.0f",
-                        Game.world.resources.get(Resource.COPPER), Game.world.resourceCapacity.get(Resource.COPPER),
-                        Game.world.resources.get(Resource.SILVER), Game.world.resourceCapacity.get(Resource.SILVER),
-                        Game.world.resources.get(Resource.GLASS), Game.world.resourceCapacity.get(Resource.GLASS),
-                        Game.world.resources.get(Resource.SILICON), Game.world.resourceCapacity.get(Resource.SILICON),
-                        Game.world.resources.get(Resource.ENERGY), Game.world.resourceCapacity.get(Resource.ENERGY),
-                        Game.world.resources.get(Resource.ELECTRON), Game.world.resourceCapacity.get(Resource.ELECTRON),
-                        Game.world.resources.get(Resource.PHOTON), Game.world.resourceCapacity.get(Resource.PHOTON),
-                        Game.world.resources.get(Resource.QUANTUM), Game.world.resourceCapacity.get(Resource.QUANTUM));
+                int textY = (Game.WIN_HEIGHT - Renderer.FOOTER_HEIGHT) + buttonMargins / 2;
+                int textX = buttonMargins / 2;
 
-                g.drawString(resources, buttonMargins / 2, Game.renderer.stagePosition.y + Game.renderer.stageDimensions.y + 5);
+                StringBuilder baseSB = new StringBuilder();
+                for (Resource resource : base) {
+                        baseSB.append(resource.name() + ": " + (Math.round(Game.world.resources.get(resource))) + "/"
+                                + (Math.round(Game.world.resourceCapacity.get(resource))) + " ");
+                }
+
+                StringBuilder energySB = new StringBuilder();
+                for (Resource resource : energy) {
+                        energySB.append(resource.name() + ": " + (Math.round(Game.world.resources.get(resource))) + "/"
+                                + (Math.round(Game.world.resourceCapacity.get(resource))) + " ");
+                }
+
+                StringBuilder populationSB = new StringBuilder();
+                for (Resource resource : population) {
+                        populationSB.append(resource.name() + ": " + (Math.round(Game.world.resources.get(resource))) + "/"
+                                + (Math.round(Game.world.resourceCapacity.get(resource))) + " ");
+                }
+
+                StringBuilder dataSB = new StringBuilder();
+                for (Resource resource : data) {
+                        dataSB.append(resource.name() + ": " + (Math.round(Game.world.resources.get(resource))) + "/"
+                                + (Math.round(Game.world.resourceCapacity.get(resource))) + " ");
+                }
+
+                g.drawString(baseSB.toString(), textX, textY);
+
+                textX = (Game.WIN_WIDTH - buttonMargins / 2) - Game.renderer.font.getWidth(energySB.toString());
+                g.drawString(energySB.toString(), textX, textY);
+
+                textX = buttonMargins / 2;
+                textY += buttonMargins / 2 + Game.renderer.font.getLineHeight();
+                g.drawString(populationSB.toString(), textX, textY);
+
+                textX = (Game.WIN_WIDTH - buttonMargins / 2) - Game.renderer.font.getWidth(dataSB.toString());
+                g.drawString(dataSB.toString(), textX, textY);
 
                 menu.render(g);
 
@@ -407,24 +432,63 @@ public class UserInterface {
                 }
         }
 
+        public static String addLineBreaks(String string, int width) {
+                int w = 0;
+                int lastSpaceIndex = -1;
+
+                StringBuilder sb = new StringBuilder(string);
+
+                for (int i = 0; i < string.length(); ++i) {
+                        if (string.charAt(i) == ' ') {
+                                lastSpaceIndex = i;
+                        }
+
+                        w += Game.renderer.font.getWidth(Character.toString(string.charAt(i)));
+
+                        if (w > width) {
+                                if (lastSpaceIndex != -1) {
+                                        sb.setCharAt(lastSpaceIndex, '\n');
+
+                                        int newWidth = 0;
+                                        for (int j = lastSpaceIndex + 1; j <= i; ++j) {
+                                                newWidth += Game.renderer.font.getWidth(Character.toString(string.charAt(j)));
+                                        }
+
+                                        lastSpaceIndex = -1;
+                                        w = newWidth;
+                                } else {
+                                        sb.insert(i, '\n');
+                                        lastSpaceIndex = -1;
+                                        w = 0;
+                                }
+                        }
+                }
+
+                return sb.toString();
+        }
+
         class SideMenu {
-                private Image background;
                 public MyButton removeButton;
+
+                public Vector2i menuPos;
+                public Vector2i menuDim;
 
                 public SideMenu(){
                         try {
-                                background = new Image("resources/debug_menu.png");
+                                String remove = "Remove Structure";
+                                Image removeButtonImage = new Image(Game.renderer.font.getWidth(remove) + 10, Game.renderer.font.getHeight(remove) + 10);
+                                removeButtonImage.getGraphics().setFont(Game.renderer.font);
+                                removeButtonImage.getGraphics().drawString(remove, 5, 5);
+                                removeButtonImage.getGraphics().flush();
 
-                                Image removeButtonImage = new Image("resources/debug_button_invert.png").getScaledCopy(80, 20);
+                                Rectangle removeRect = new Rectangle(Game.renderer.stageDimensions.x + 10, Game.WIN_HEIGHT - 90,
+                                        removeButtonImage.getWidth(), removeButtonImage.getHeight());
 
                                 removeButton = new MyButton(
                                         "Remove selected structure",
                                         Game.appgc,
                                         removeButtonImage,
-                                        Game.renderer.stageDimensions.x + 10,
-                                        Game.WIN_HEIGHT - 90,
-                                        80,
-                                        20);
+                                        removeRect);
 
                                 removeButton.addListener(
                                         (comp) -> {
@@ -454,10 +518,19 @@ public class UserInterface {
                         } catch (SlickException e) {
                                 e.printStackTrace();
                         }
+
+                        menuPos = new Vector2i(Game.WIN_WIDTH - Renderer.MENU_WIDTH, Renderer.HEADER_HEIGHT);
+                        menuDim = new Vector2i(Renderer.MENU_WIDTH, Game.WIN_HEIGHT - (Renderer.HEADER_HEIGHT + Renderer.FOOTER_HEIGHT));
                 }
 
                 public void render(Graphics g) {
                         Structure structure = null;
+
+                        int margin = 10;
+                        int lineHeight = Game.renderer.font.getLineHeight() + margin;
+                        int lineWidth = menuDim.x - 2 * margin;
+                        int leftX = menuPos.x + margin;
+                        int lineY = menuPos.y;
 
                         switch (menuState) {
                                 case OFF:
@@ -473,43 +546,195 @@ public class UserInterface {
                                         System.exit(-1);
                         }
 
-                        // Game.renderer.xOffset
-                        Integer x = Game.renderer.stageDimensions.x;
-                        Integer y = Renderer.HEADER_HEIGHT;
-                        Integer xi = Game.WIN_WIDTH;
-                        Integer yi = Game.WIN_HEIGHT - Renderer.FOOTER_HEIGHT;
+                        Properties props = StructureLoader.getProperties(structure.type);
 
-                        g.drawImage(background,x,y,xi,yi,0,0, background.getWidth(),background.getHeight());
-
+                        int thumbSize = 50;
                         Image image = structure.image;
-                        if(image != null){
+                        if (image != null) {
+                                g.setColor(Game.renderer.TERRAIN_DEFAULT_COLOR);
+                                g.fillRect(leftX, lineY, thumbSize, thumbSize);
                                 g.setColor(Color.white);
-                                int width = image.getWidth();
-                                int height = image.getHeight();
-                                g.fillRect(xi - (width + 20), y, (width + 20), height + 20);
-                                g.drawImage(image, xi - (width + 10), y + 10 );
+
+                                // Draw the image clipped
+                                Rectangle clip = g.getClip();
+                                g.setClip(leftX, lineY, thumbSize, thumbSize);
+                                if (image.getWidth() < thumbSize && image.getHeight() < thumbSize) {
+                                        image.drawCentered(leftX + thumbSize / 2, lineY + thumbSize / 2);
+                                } else {
+                                        image.draw(leftX + margin, lineY + margin);
+                                }
+                                g.setClip(clip);
+
+                                g.drawRect(leftX, lineY, thumbSize, thumbSize);
+                        }
+                        lineY += thumbSize + margin;
+
+                        String name = addLineBreaks(props.getProperty("name"), lineWidth);
+                        g.drawString(name, leftX, lineY);
+                        lineY += lineHeight;
+
+                        String description = addLineBreaks(props.getProperty("desc"), lineWidth);
+                        g.drawString(description, leftX, lineY);
+                        lineY += Game.renderer.font.getHeight(description) + margin;
+
+                        g.drawLine(leftX, lineY, leftX + lineWidth, lineY);
+                        lineY += margin;
+
+                        if (menuState == SideMenuState.PLACING) {
+                                StringBuilder sb = new StringBuilder();
+                                sb.append("Build costs:\n");
+                                boolean hasCosts = false;
+                                for (Resource resource : Resource.values()) {
+                                        float value = structure.buildCost.get(resource);
+                                        if (value != 0) {
+                                                sb.append(resource.name() + ": " + value + "\n");
+                                                hasCosts = true;
+                                        }
+                                }
+
+                                if (hasCosts) {
+                                        // Delete last newline char
+                                        sb.deleteCharAt(sb.length() - 1);
+                                        g.drawString(sb.toString(), leftX, lineY);
+                                        lineY += Game.renderer.font.getHeight(sb.toString()) + margin;
+                                }
                         }
 
-                        int h = y + 30 + (image != null ? image.getHeight() : 0);
-                        g.setColor(Color.white);
-                        g.drawLine(x,h, xi, h);
+                        { // producing
+                                boolean isMine = structure.type == StructureType.CopperMine
+                                        || structure.type == StructureType.SilverMine
+                                        || structure.type == StructureType.GlassMine;
 
-                        h += 10;
-                        for (Map.Entry<Resource,Float> resource : structure.buildCost.resources.entrySet()) {
-                                g.drawString(resource.getKey() + " : " + resource.getValue(),x + 10, h  );
-                                h+= 20;
+                                StringBuilder sb = new StringBuilder();
+
+                                if (menuState == SideMenuState.PLACING && isMine) {
+                                        sb.append("Produces (units per sec\nper resource in range):\n");
+                                } else {
+                                        sb.append("Produces (units per sec):\n");
+                                }
+
+                                boolean produces = false;
+                                for (Resource resource : Resource.values()) {
+                                        float value = structure.productionOutPerSec.get(resource);
+                                        if (value != 0) {
+                                                sb.append(resource.name() + ": " + value + "\n");
+                                                produces = true;
+                                        }
+                                }
+
+                                if (produces) {
+                                        // Delete last newline char
+                                        sb.deleteCharAt(sb.length() - 1);
+                                        g.drawString(sb.toString(), leftX, lineY);
+                                        lineY += Game.renderer.font.getHeight(sb.toString()) + margin;
+                                }
+                        }
+
+                        { // raising cap
+                                StringBuilder sb = new StringBuilder();
+                                sb.append("Raises capacity:\n");
+                                boolean raises = false;
+                                for (Resource resource : Resource.values()) {
+                                        float value = structure.capacityIncrease.get(resource);
+                                        if (value != 0) {
+                                                sb.append(resource.name() + ": " + value + "\n");
+                                                raises = true;
+                                        }
+                                }
+
+                                if (raises) {
+                                        // Delete last newline char
+                                        sb.deleteCharAt(sb.length() - 1);
+                                        g.drawString(sb.toString(), leftX, lineY);
+                                        lineY += Game.renderer.font.getHeight(sb.toString()) + margin;
+                                }
+                        }
+
+                        { // consumes
+                                StringBuilder sb = new StringBuilder();
+                                sb.append("Consumes (units per sec):\n");
+                                boolean consumes = false;
+                                for (Resource resource : Resource.values()) {
+                                        float value = structure.productionInPerSec.get(resource);
+                                        if (value != 0) {
+                                                sb.append(resource.name() + ": " + value + "\n");
+                                                consumes = true;
+                                        }
+                                }
+
+                                if (consumes) {
+                                        // Delete last newline char
+                                        sb.deleteCharAt(sb.length() - 1);
+                                        g.drawString(sb.toString(), leftX, lineY);
+                                        lineY += Game.renderer.font.getHeight(sb.toString()) + margin;
+                                }
                         }
 
                         if (menuState == SideMenuState.SELECTING) {
-                                g.setColor(selectionColor);
-                                int selectedX = Game.renderer.stagePosition.x + selectedStructure.position.x * Game.renderer.tileSize;
-                                int selectedY = Game.renderer.stagePosition.y + selectedStructure.position.y * Game.renderer.tileSize;
+                                { // refund
+                                        StringBuilder sb = new StringBuilder();
+                                        sb.append("Refunds when demolished:\n");
+                                        boolean refunds = false;
+                                        for (Resource resource : Resource.values()) {
+                                                float value = structure.refundResources.get(resource);
+                                                if (value != 0) {
+                                                        sb.append(resource.name() + ": " + value + "\n");
+                                                        refunds = true;
+                                                }
+                                        }
 
-                                g.drawRect(selectedX - 5, selectedY - 5,
-                                        selectedStructure.dimensions.x * Game.PIXEL_SCALE * Game.PIXELS_PER_TILE + 10,
-                                        selectedStructure.dimensions.y * Game.PIXEL_SCALE * Game.PIXELS_PER_TILE + 10);
+                                        if (refunds) {
+                                                // Delete last newline char
+                                                sb.deleteCharAt(sb.length() - 1);
+                                                g.drawString(sb.toString(), leftX, lineY);
+                                                lineY += Game.renderer.font.getHeight(sb.toString()) + margin;
+                                        }
+                                }
 
+                                g.drawLine(leftX, lineY, leftX + lineWidth, lineY);
+                                lineY += margin;
+
+                                // show failure states
+                                List<String> failureReasons = new ArrayList<>();
+                                switch (structure.state) {
+                                        case NoRoadAccess:
+                                                failureReasons.add("Pathfinding failure! Not connected to the CPU!");
+                                                break;
+                                        case NoInputResources:
+                                                failureReasons.add("No input signal! Not enough input resources!");
+                                                break;
+                                        case NoSpareCapacity:
+                                                failureReasons.add("Stack overflow error! No spare capacity!");
+                                                break;
+                                }
+
+                                for (String failure : failureReasons) {
+                                        String text = addLineBreaks(failure, lineWidth);
+                                        g.drawString(text, leftX, lineY);
+                                        lineY += Game.renderer.font.getHeight(text) + margin;
+                                }
+
+                                {
+                                        if (structure.getRoadAccess() != RoadAccess.NONE && structure.type != StructureType.CPU_T1) {
+                                                String roadAccess = "Quality of wiring to CPU:\n" + structure.getRoadAccess().name();
+                                                g.drawString(roadAccess, leftX, lineY);
+                                                lineY += Game.renderer.font.getHeight(roadAccess) + margin;
+                                        }
+                                }
+
+                                removeButton.setX(leftX);
+                                removeButton.setY(lineY);
                                 removeButton.render(Game.appgc, g);
+
+                                { // rect around selected struct
+                                        g.setColor(selectionColor);
+                                        int selectedX = Game.renderer.stagePosition.x + structure.position.x * Game.renderer.tileSize;
+                                        int selectedY = Game.renderer.stagePosition.y + structure.position.y * Game.renderer.tileSize;
+
+                                        g.drawRect(selectedX - 5, selectedY - 5,
+                                                structure.dimensions.x * Game.PIXEL_SCALE * Game.PIXELS_PER_TILE + 10,
+                                                structure.dimensions.y * Game.PIXEL_SCALE * Game.PIXELS_PER_TILE + 10);
+                                }
                         }
                 }
         }

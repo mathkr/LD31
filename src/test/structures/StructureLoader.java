@@ -47,7 +47,7 @@ public class StructureLoader {
                 float spawnVelocity = 10f;
                 float spawnVariance = 0.4f;
                 int spawnNum = 1;
-                float spawnLifeTime = 0.4f;
+                float spawnLifeTime = 0.8f;
 
                 updaterMap.put(StructureType.CopperRoad, (structure) -> {
                         if (Math.random() < spawnFrequency) {
@@ -160,6 +160,11 @@ public class StructureLoader {
                 for (Resource resource : Resource.values()) {
                         structure.capacityIncrease.put(resource, Float.parseFloat(properties.getProperty("capacityIncrease" + resource.name(), "0f")));
                 }
+
+                structure.refundResources = structure.buildCost.getMultiple(0.5f);
+                structure.refundResources.truncateToInt();
+
+                structure.influenceRadius = Integer.parseInt(properties.getProperty("resourceRadius", "1"));
 
                 Image image;
                 if (properties.getProperty("image") != null) {
