@@ -22,7 +22,7 @@ public class World {
         public TerrainType[][] terrain;
         public Structure[][] structureGrid;
         public ArrayList<Structure> structures;
-        public Population population;
+        public PopulationHandler population;
 
         public Structure cpu;
         public ResourceTable resources;
@@ -31,7 +31,7 @@ public class World {
 
         public World() {
                 structures = new ArrayList<>();
-                population = new Population();
+                population = new PopulationHandler();
                 structureGrid = new Structure[WORLD_DIMENSIONS.x][WORLD_DIMENSIONS.y];
                 structures = new ArrayList<Structure>();
                 resources = new ResourceTable(){{
