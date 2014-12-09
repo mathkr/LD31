@@ -86,8 +86,10 @@ public class World {
         //startet bei der CPU
         //die CPU hat immer maximalen (GLASS) road access zu sich selbst
         public void revalidateRoadAccess(){
-                for(Structure structure : structures)
+                for(Structure structure : structures) {
                         structure.roadAccess = RoadAccess.NONE;
+                        structure.roadFactor = 0.0f;
+                }
                 if(cpu == null)
                         //keine CPU - kein Strassenzugang!
                         return;

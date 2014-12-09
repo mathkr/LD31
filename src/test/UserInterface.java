@@ -829,28 +829,22 @@ public class UserInterface {
                         }
 
                         { // producing
-                                boolean isMine = structure.type == StructureType.CopperMine
-                                        || structure.type == StructureType.SilverMine
-                                        || structure.type == StructureType.GlassMine;
-
                                 StringBuilder sb = new StringBuilder();
 
-                                if (guiState == InterfaceState.PLACING && isMine) {
+                                if (guiState == InterfaceState.PLACING && structure.usesTerrain()) {
                                         sb.append("Produces (units per sec\nper resource in range):\n");
                                 } else {
                                         sb.append("Produces (units per sec):\n");
                                 }
 
-                                boolean produces = false;
                                 for (Resource resource : Resource.values()) {
                                         float value = structure.productionOutPerSec.get(resource);
                                         if (value != 0) {
-                                                sb.append(resource.name() + ": " + value + "\n");
-                                                produces = true;
+                                                sb.append(resource.name() + ": " + (value * structure.getProductionFactor()) + "\n");
                                         }
                                 }
 
-                                if (produces) {
+                                if (structure.isProducer) {
                                         // Delete last newline char
                                         sb.deleteCharAt(sb.length() - 1);
                                         g.drawString(sb.toString(), leftX, lineY);
@@ -881,16 +875,14 @@ public class UserInterface {
                         { // consumes
                                 StringBuilder sb = new StringBuilder();
                                 sb.append("Consumes (units per sec):\n");
-                                boolean consumes = false;
                                 for (Resource resource : Resource.values()) {
                                         float value = structure.productionInPerSec.get(resource);
                                         if (value != 0) {
-                                                sb.append(resource.name() + ": " + value + "\n");
-                                                consumes = true;
+                                                sb.append(resource.name() + ": " + (value * (structure.isProducer ? structure.getProductionFactor() : 1.0f)) + "\n");
                                         }
                                 }
 
-                                if (consumes) {
+                                if (structure.isConsumer) {
                                         // Delete last newline char
                                         sb.deleteCharAt(sb.length() - 1);
                                         g.drawString(sb.toString(), leftX, lineY);

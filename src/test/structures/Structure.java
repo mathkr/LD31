@@ -53,7 +53,7 @@ public class Structure {
                 capacityIncrease = new ResourceTable();
                 roadAccess = RoadAccess.NONE;
                 wasPlaced = false;
-                roadFactor = 0.0f;
+                roadFactor = 1.0f;
                 populationFactor = 1.0f;
                 freezeDelta = 0.0f;
         }
@@ -264,6 +264,26 @@ public class Structure {
                 return count;
         }
 
+        public boolean initIsProducer(){
+                isProducer = false;
+                for(Resource resource : Resource.values())
+                        if(productionOutPerSec.get(resource) > 0.0f) {
+                                isProducer = true;
+                                break;
+                        }
+                return isProducer;
+        }
+
+        public boolean initIsConsumer(){
+                isConsumer = false;
+                for(Resource resource : Resource.values())
+                        if(productionInPerSec.get(resource) > 0.0f) {
+                                isConsumer = true;
+                                break;
+                        }
+                return isConsumer;
+        }
+
         public void actuallyPlace(){
                 switch(type){
                         case CopperMine :
@@ -272,19 +292,6 @@ public class Structure {
                         case GlassMine : productionOutPerSec.multiply(Resource.GLASS, getNearResources(World.TerrainType.GLASS)); break;
                         case Cpu_t1: Game.world.cpu = this; break;
                 }
-
-                isProducer = false;
-                for(Resource resource : Resource.values())
-                        if(productionOutPerSec.get(resource) > 0.0f) {
-                                isProducer = true;
-                                break;
-                        }
-                isConsumer = false;
-                for(Resource resource : Resource.values())
-                        if(productionInPerSec.get(resource) > 0.0f) {
-                                isConsumer = true;
-                                break;
-                        }
                 Game.world.resourceCapacity.add(capacityIncrease);
                 for(Vector2i v : occupiedTiles)
                         Game.world.structureGrid[position.x+v.x][position.y+v.y] = this;
@@ -352,13 +359,14 @@ public class Structure {
                                 }
                                 return false;
                 }
-                if(roadAccess.compareTo(road) < 0)
+                if(roadAccess.compareTo(road) < 0) {
                         roadAccess = road;
-                switch(road){
-                        case NONE : roadFactor = 0.0f; break;
-                        case COPPER : roadFactor = 1.0f; break;
-                        case SILVER : roadFactor = 1.25f; break;
-                        case GLASS : roadFactor = 1.75f; break;
+                        switch(road){
+                                case NONE : roadFactor = 0.0f; break;
+                                case COPPER : roadFactor = 1.0f; break;
+                                case SILVER : roadFactor = 1.25f; break;
+                                case GLASS : roadFactor = 1.75f; break;
+                        }
                 }
                 return false;
         }
@@ -368,6 +376,16 @@ public class Structure {
                         case CopperRoad :
                         case SilverRoad :
                         case GlassRoad : return true;
+                        default : return false;
+                }
+        }
+
+        public boolean usesTerrain(){
+                switch(type){
+                        case CopperMine :
+                        case FastCopperMine :
+                        case SilverMine :
+                        case GlassMine : return true;
                         default : return false;
                 }
         }
