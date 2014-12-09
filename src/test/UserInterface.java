@@ -128,6 +128,12 @@ public class UserInterface {
                                                         structureToPlace.position.x = worldX;
                                                         structureToPlace.position.y = worldY;
 
+                                                        structureToPlace.position.x = structureToPlace.position.x + structureToPlace.dimensions.x >= World.WORLD_DIMENSIONS.x ?
+                                                                World.WORLD_DIMENSIONS.x - structureToPlace.dimensions.x : structureToPlace.position.x;
+
+                                                        structureToPlace.position.y = structureToPlace.position.y + structureToPlace.dimensions.y >= World.WORLD_DIMENSIONS.y ?
+                                                                World.WORLD_DIMENSIONS.y - structureToPlace.dimensions.y : structureToPlace.position.y;
+
                                                         if (structureToPlace.canBePlaced()) {
                                                                 structureToPlace.actuallyPlace();
 
@@ -713,8 +719,8 @@ public class UserInterface {
                         int leftX = menuPos.x + margin;
                         int lineY = menuPos.y;
 
-                        demolitionButton.setX(Game.WIN_WIDTH - (demolitionButton.getWidth() + margin));
-                        demolitionButton.setY(margin);
+                        demolitionButton.setX(Game.WIN_WIDTH / 2 - (demolitionButton.getWidth() / 2));
+                        demolitionButton.setY((Game.WIN_HEIGHT - Renderer.FOOTER_HEIGHT) + Renderer.FOOTER_HEIGHT / 2 - demolitionButton.getHeight() / 2);
                         demolitionButton.render(Game.appgc, g);
 
                         switch (guiState) {
