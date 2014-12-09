@@ -15,6 +15,7 @@ public class Game extends BasicGame {
 
         public static World world;
         public static Renderer renderer;
+        public static SoundLib sound;
         public static UserInterface gui;
 
         public Game(String gamename) {
@@ -25,6 +26,7 @@ public class Game extends BasicGame {
         public void init(GameContainer gc) throws SlickException {
                 world = new World();
                 renderer = new Renderer();
+                sound = new SoundLib();
                 gui = new UserInterface(gc);
         }
 

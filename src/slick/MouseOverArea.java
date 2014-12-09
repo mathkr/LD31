@@ -10,6 +10,7 @@ import org.newdawn.slick.geom.Shape;
 import org.newdawn.slick.gui.AbstractComponent;
 import org.newdawn.slick.gui.ComponentListener;
 import org.newdawn.slick.gui.GUIContext;
+import test.Game;
 
 /**
  * Had to hack something in! Sorry we were running out of time! #LD31
@@ -405,6 +406,7 @@ public class MouseOverArea extends AbstractComponent {
 
 			if (over) {
 				notifyListeners();
+				Game.sound.play(Game.sound.click);
 			}
 		}
 	}
