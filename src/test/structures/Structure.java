@@ -167,7 +167,7 @@ public class Structure {
 
                 //ziehe eingangsressourcen ab
                 //UNSAFE fuer input von mehr als 1.0 unit resource pro frame
-                for (Map.Entry<Resource, Float> entry : productionInPerSec.resources.entrySet()) {
+                for (Map.Entry<Resource, Float> entry : productionInDelta.resources.entrySet()) {
                         Resource res = entry.getKey();
                         Float val = entry.getValue();
 
@@ -179,7 +179,7 @@ public class Structure {
                 }
 
                 //addiere ausgangsressourcen (soweit moeglich)
-                for (Map.Entry<Resource, Float> entry : productionOutPerSec.resources.entrySet()) {
+                for (Map.Entry<Resource, Float> entry : productionOutDelta.resources.entrySet()) {
                         Resource res = entry.getKey();
                         Float val = entry.getValue();
 
