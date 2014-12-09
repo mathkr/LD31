@@ -121,8 +121,6 @@ public class UserInterface {
 
                                                 if (guiState == InterfaceState.REMOVING) {
                                                         if (Game.world.structureGrid[worldX][worldY] != null) {
-                                                                Game.world.structureGrid[worldX][worldY].remove();
-
                                                                 Structure remStruct = Game.world.structureGrid[worldX][worldY];
                                                                 int particleX = Game.renderer.stagePosition.x + remStruct.position.x * Game.PIXELS_PER_TILE * Game.PIXEL_SCALE;
                                                                 int particleW = remStruct.dimensions.x * Game.PIXELS_PER_TILE * Game.PIXEL_SCALE;
@@ -138,6 +136,8 @@ public class UserInterface {
                                                                         particleW, particleH,
                                                                         40, 1, 20,
                                                                         Color.lightGray, 1f);
+
+                                                                Game.world.structureGrid[worldX][worldY].remove();
                                                         }
                                                 } else if (structureToPlace != null) {
                                                         // can it be placed? roads get handled in mouse dragged callback
