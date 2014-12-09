@@ -285,12 +285,17 @@ public class Structure {
         }
 
         public void actuallyPlace(){
+                Game.sound.playSingle(Game.sound.place);
+
                 switch(type){
                         case CopperMine :
                         case FastCopperMine : productionOutPerSec.multiply(Resource.COPPER, getNearResources(World.TerrainType.COPPER)); break;
                         case SilverMine : productionOutPerSec.multiply(Resource.SILVER, getNearResources(World.TerrainType.SILVER)); break;
                         case GlassMine : productionOutPerSec.multiply(Resource.GLASS, getNearResources(World.TerrainType.GLASS)); break;
-                        case Cpu_t1: Game.world.cpu = this; break;
+                        case Cpu_t1:
+                                Game.sound.play(Game.sound.cpu);
+                                Game.world.cpu = this;
+                                break;
                 }
                 Game.world.resourceCapacity.add(capacityIncrease);
                 for(Vector2i v : occupiedTiles)
@@ -302,6 +307,8 @@ public class Structure {
         }
 
         public void remove(){
+                Game.sound.playSingle(Game.sound.demolish);
+
                 if(type == StructureType.Cpu_t1)
                         Game.world.cpu = null;
 

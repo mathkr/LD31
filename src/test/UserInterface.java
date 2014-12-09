@@ -122,6 +122,22 @@ public class UserInterface {
                                                 if (guiState == InterfaceState.REMOVING) {
                                                         if (Game.world.structureGrid[worldX][worldY] != null) {
                                                                 Game.world.structureGrid[worldX][worldY].remove();
+
+                                                                Structure remStruct = Game.world.structureGrid[worldX][worldY];
+                                                                int particleX = Game.renderer.stagePosition.x + remStruct.position.x * Game.PIXELS_PER_TILE * Game.PIXEL_SCALE;
+                                                                int particleW = remStruct.dimensions.x * Game.PIXELS_PER_TILE * Game.PIXEL_SCALE;
+                                                                int particleY = Game.renderer.stagePosition.y + remStruct.position.y * Game.PIXELS_PER_TILE * Game.PIXEL_SCALE;
+                                                                int particleH = remStruct.dimensions.y * Game.PIXELS_PER_TILE * Game.PIXEL_SCALE;
+                                                                Game.renderer.spawnParticlesInArea(
+                                                                        particleX, particleY,
+                                                                        particleW, particleH,
+                                                                        40, 1, 20,
+                                                                        Color.darkGray, 1f);
+                                                                Game.renderer.spawnParticlesInArea(
+                                                                        particleX, particleY,
+                                                                        particleW, particleH,
+                                                                        40, 1, 20,
+                                                                        Color.lightGray, 1f);
                                                         }
                                                 } else if (structureToPlace != null) {
                                                         // can it be placed? roads get handled in mouse dragged callback
@@ -155,6 +171,8 @@ public class UserInterface {
                                                                         structureToPlace = StructureLoader.getInstance(structureToPlace.type, structureToPlace.position.x,
                                                                                 structureToPlace.position.y);
                                                                 }
+                                                        } else {
+                                                                Game.sound.play(Game.sound.cantPlace);
                                                         }
                                                 } else {
                                                         // See if we clicked on a structure
@@ -178,8 +196,13 @@ public class UserInterface {
                                                                 selectedStructure = clickedStructure;
                                                                 guiState = InterfaceState.SELECTING;
                                                                 selectionColorTime = 0f;
+
+                                                                Game.sound.play(Game.sound.select);
                                                         } else {
                                                                 // We clicked on nothing
+                                                                if (guiState == InterfaceState.SELECTING) {
+                                                                        Game.sound.play(Game.sound.deselect);
+                                                                }
                                                                 selectedStructure = null;
                                                                 guiState = InterfaceState.OFF;
                                                         }
@@ -658,8 +681,10 @@ public class UserInterface {
                                                 if (guiState == InterfaceState.SELECTING && !selectedStructure.isRoad() && selectedStructure.type != StructureType.Cpu_t1) {
                                                         if (selectedStructure.state != StructureState.Standby) {
                                                                 selectedStructure.setState(StructureState.Standby);
+                                                                Game.sound.play(Game.sound.standbyOn);
                                                         } else {
                                                                 selectedStructure.setState(StructureState.Active);
+                                                                Game.sound.play(Game.sound.standbyOff);
                                                         }
                                                 }
                                         });
