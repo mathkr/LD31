@@ -357,8 +357,8 @@ public class Structure {
                 switch(road){
                         case NONE : roadFactor = 0.0f; break;
                         case COPPER : roadFactor = 1.0f; break;
-                        case SILVER : roadFactor = 1.25f; break;
-                        case GLASS : roadFactor = 1.75f; break;
+                        case SILVER : roadFactor = 1.10f; break;
+                        case GLASS : roadFactor = 1.25f; break;
                 }
                 return false;
         }
