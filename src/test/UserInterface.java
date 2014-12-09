@@ -805,6 +805,8 @@ public class UserInterface {
                         Properties props = StructureLoader.getProperties(structure.type);
 
                         int thumbSize = 50;
+                        leftX = Game.WIN_WIDTH - (thumbSize + margin);
+                        lineY = margin;
                         Image image = structure.image;
                         if (image != null) {
                                 g.setColor(Game.renderer.TERRAIN_DEFAULT_COLOR);
@@ -823,11 +825,13 @@ public class UserInterface {
 
                                 g.drawRect(leftX, lineY, thumbSize, thumbSize);
                         }
-                        lineY += thumbSize + margin;
+//                        lineY += thumbSize + margin;
+                        leftX = menuPos.x + margin;
+                        lineY = menuPos.y;
 
-                        String name = addLineBreaks(props.getProperty("name"), lineWidth);
+                        String name = addLineBreaks(props.getProperty("name"), lineWidth - (thumbSize + 10));
                         g.drawString(name, leftX, lineY);
-                        lineY += lineHeight;
+                        lineY += Game.renderer.font.getHeight(name) + 5;
 
                         String description = addLineBreaks(props.getProperty("desc"), lineWidth);
                         g.drawString(description, leftX, lineY);
