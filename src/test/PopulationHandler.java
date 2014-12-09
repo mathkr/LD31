@@ -24,7 +24,7 @@ public class PopulationHandler {
         isGrowing = new HashMap<Resource, Boolean>(5);
         couldNotPayLastUpdate = new HashMap<Resource, Boolean>(5);
         for(Resource res : new Resource[]{Resource.ELECTRON, Resource.PHOTON, Resource.QUANTUM}) {
-            isGrowing.put(res, true);
+            isGrowing.put(res, false);
             couldNotPayLastUpdate.put(res, false);
         }
         populationChangeDelta = new ResourceTable();
@@ -64,6 +64,16 @@ public class PopulationHandler {
     }
 
     private void update(float d, Resource popType){
+
+        if(Game.world.resources.get(popType) == 0.0f){
+            for(Resource resource : Resource.values())
+                if(Game.world.resources.get(resource) == 0.0f && sustainCost.get(popType).get(resource) > 0.0f) {
+//                    System.out.println("doesn't need to pay : standby");
+                    return;
+                }
+            isGrowing.put(popType, true);
+        }
+
         if(!needsToPay(popType)) {
             couldNotPayLastUpdate.put(popType, false);
             incrementSustainCostDelta(d, popType);
