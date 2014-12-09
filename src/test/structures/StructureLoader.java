@@ -5,11 +5,13 @@ import test.Game;
 import test.Vector2i;
 import test.resources.Resource;
 
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.nio.charset.Charset;
+import java.nio.file.*;
 import java.util.*;
 
 public class StructureLoader {
@@ -25,8 +27,16 @@ public class StructureLoader {
 
         static {
                 try {
-                        List<String> propertyLines = Files.readAllLines(Paths.get("resources/data/properties_list.txt"));
                         validPropertyKeys = new HashMap<>();
+
+                        URI uri = StructureLoader.class.getClassLoader().getResource("resources/data/properties_list.txt").toURI();
+
+                        Map<String, String> env = new HashMap<>();
+                        env.put("create", "true");
+                        FileSystem zipfs = FileSystems.newFileSystem(uri, env);
+
+                        Path path = Paths.get(uri);
+                        List<String> propertyLines = Files.readAllLines(path, Charset.defaultCharset());
 
                         for (String propertyLine : propertyLines) {
                                 if (propertyLine.contains("RESOURCE")) {
@@ -40,38 +50,49 @@ public class StructureLoader {
                         }
                 } catch (IOException e) {
                         e.printStackTrace();
+                } catch (URISyntaxException e) {
+                        e.printStackTrace();
                 }
 
                 // Updaters:
-                float spawnFrequency = 0.01f;
-                float spawnVelocity = 10f;
-                float spawnVariance = 0.4f;
-                int spawnNum = 1;
-                float spawnLifeTime = 0.8f;
+                final float spawnFrequency = 0.01f;
+                final float spawnVelocity = 10f;
+                final float spawnVariance = 0.4f;
+                final int spawnNum = 1;
+                final float spawnLifeTime = 0.8f;
 
-                updaterMap.put(StructureType.CopperRoad, (structure) -> {
-                        if (Math.random() < spawnFrequency) {
-                                if (structure.state == StructureState.Active) {
-                                        Game.renderer.spawnParticlesAtWorldPosition(structure.position.x, structure.position.y,
-                                                spawnVelocity, spawnVariance, spawnNum, Game.renderer.TERRAIN_COPPER_COLOR, spawnLifeTime);
+                updaterMap.put(StructureType.CopperRoad, new Updater() {
+                        @Override
+                        public void update(Structure structure) {
+                                if (Math.random() < spawnFrequency) {
+                                        if (structure.state == StructureState.Active) {
+                                                Game.renderer.spawnParticlesAtWorldPosition(structure.position.x, structure.position.y,
+                                                        spawnVelocity, spawnVariance, spawnNum, Game.renderer.TERRAIN_COPPER_COLOR, spawnLifeTime);
+                                        }
                                 }
                         }
                 });
 
-                updaterMap.put(StructureType.SilverRoad, (structure) -> {
-                        if (Math.random() < spawnFrequency) {
-                                if (structure.state == StructureState.Active) {
-                                        Game.renderer.spawnParticlesAtWorldPosition(structure.position.x, structure.position.y,
-                                                spawnVelocity, spawnVariance, spawnNum, Game.renderer.TERRAIN_SILVER_COLOR, spawnLifeTime);
+                updaterMap.put(StructureType.SilverRoad, new Updater() {
+                        @Override
+                        public void update(Structure structure) {
+                                if (Math.random() < spawnFrequency) {
+                                        if (structure.state == StructureState.Active) {
+                                                Game.renderer.spawnParticlesAtWorldPosition(structure.position.x, structure.position.y,
+                                                        spawnVelocity, spawnVariance, spawnNum, Game.renderer.TERRAIN_SILVER_COLOR, spawnLifeTime);
+                                        }
                                 }
                         }
                 });
 
-                updaterMap.put(StructureType.GlassRoad, (structure) -> {
-                        if (Math.random() < spawnFrequency) {
-                                if (structure.state == StructureState.Active) {
-                                        Game.renderer.spawnParticlesAtWorldPosition(structure.position.x, structure.position.y,
-                                                spawnVelocity, spawnVariance, spawnNum, Game.renderer.TERRAIN_GLASS_COLOR, spawnLifeTime);
+                updaterMap.put(StructureType.GlassRoad, new Updater() {
+                        @Override
+                        public void update(Structure structure) {
+                                if (Math.random() < spawnFrequency) {
+                                        if (structure.state == StructureState.Active) {
+                                                Game.renderer.spawnParticlesAtWorldPosition(structure.position.x, structure.position.y,
+                                                        spawnVelocity, spawnVariance, spawnNum, Game.renderer.TERRAIN_GLASS_COLOR, spawnLifeTime);
+                                        }
                                 }
                         }
                 });
@@ -83,7 +104,10 @@ public class StructureLoader {
                 } else {
                         try {
                                 ArrayList<Vector2i> res = new ArrayList<>();
-                                List<String> lines = Files.readAllLines(Paths.get("resources/data/" + type.toString() + ".occupied"));
+
+                                URL url = StructureLoader.class.getClassLoader().getResource("resources/data/" + type.toString() + ".occupied");
+                                Path path = Paths.get(url.toURI());
+                                List<String> lines = Files.readAllLines(path, Charset.defaultCharset());
 
                                 for (int y = 0; y < lines.size(); ++y) {
                                         for (int x = 0; x < lines.get(y).length(); ++x) {
@@ -97,6 +121,8 @@ public class StructureLoader {
                                 return res;
                         } catch (IOException e) {
                                 e.printStackTrace();
+                        } catch (URISyntaxException e) {
+                                e.printStackTrace();
                         }
 
                         return null;
@@ -107,7 +133,7 @@ public class StructureLoader {
                 if (propertiesMap.containsKey(type)) {
                         return propertiesMap.get(type);
                 } else {
-                        Properties res = readPropertiesFile("resources/data/" + type.toString() + ".properties");
+                        Properties res = readPropertiesFile("/resources/data/" + type.toString() + ".properties");
                         propertiesMap.put(type, res);
                         return res;
                 }
@@ -115,7 +141,8 @@ public class StructureLoader {
 
         private static Properties readPropertiesFile(String file) {
                 Properties res = new Properties();
-                try (InputStream is = new FileInputStream(file)) {
+
+                try (InputStream is = Properties.class.getResourceAsStream(file)) {
                         res.load(is);
 
                         if (System.getProperties().getProperty("os.name").equals("Linux")) {

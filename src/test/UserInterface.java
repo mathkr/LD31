@@ -5,6 +5,7 @@ import org.newdawn.slick.Color;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.geom.Rectangle;
+import org.newdawn.slick.gui.AbstractComponent;
 import org.newdawn.slick.gui.ComponentListener;
 import org.newdawn.slick.gui.GUIContext;
 import org.newdawn.slick.util.FastTrig;
@@ -52,7 +53,7 @@ public class UserInterface {
 
                 // Add a button per StructureType
                 Vector2i buttonPos = new Vector2i(buttonMargins / 2, buttonMargins / 2);
-                for (StructureType structureType : StructureType.values()) {
+                for (final StructureType structureType : StructureType.values()) {
                         String name = StructureLoader.getProperties(structureType).getProperty("name", "no name");
                         String desc = StructureLoader.getProperties(structureType).getProperty("desc", "no description");
                         String imgPath = StructureLoader.getProperties(structureType).getProperty("image");
@@ -85,13 +86,16 @@ public class UserInterface {
 
                         MyButton button = new MyButton(name + ": " + desc, gc, image, shape);
 
-                        button.addListener((component) -> {
+                        button.addListener(new ComponentListener() {
+                                @Override
+                                public void componentActivated(AbstractComponent component) {
                                         structureToPlace = StructureLoader.getInstance(structureType,
                                                 0,
                                                 0
                                         );
                                         guiState = InterfaceState.PLACING;
-                                });
+                                }
+                        });
 
                         buttons.add(button);
 
@@ -653,13 +657,16 @@ public class UserInterface {
                                         demolitionRect);
 
                                 demolitionButton.addListener(
-                                        (comp) -> {
-                                                if (guiState == InterfaceState.REMOVING) {
-                                                        guiState = InterfaceState.OFF;
-                                                } else {
-                                                        guiState = InterfaceState.REMOVING;
-                                                        selectedStructure = null;
-                                                        structureToPlace = null;
+                                        new ComponentListener() {
+                                                @Override
+                                                public void componentActivated(AbstractComponent comp) {
+                                                        if (guiState == InterfaceState.REMOVING) {
+                                                                guiState = InterfaceState.OFF;
+                                                        } else {
+                                                                guiState = InterfaceState.REMOVING;
+                                                                selectedStructure = null;
+                                                                structureToPlace = null;
+                                                        }
                                                 }
                                         });
 
@@ -677,14 +684,17 @@ public class UserInterface {
                                         standbyRect);
 
                                 standbyButton.addListener(
-                                        (comp) -> {
-                                                if (guiState == InterfaceState.SELECTING && !selectedStructure.isRoad() && selectedStructure.type != StructureType.Cpu_t1) {
-                                                        if (selectedStructure.state != StructureState.Standby) {
-                                                                selectedStructure.setState(StructureState.Standby);
-                                                                Game.sound.play(Game.sound.standbyOn);
-                                                        } else {
-                                                                selectedStructure.setState(StructureState.Active);
-                                                                Game.sound.play(Game.sound.standbyOff);
+                                        new ComponentListener() {
+                                                @Override
+                                                public void componentActivated(AbstractComponent comp) {
+                                                        if (guiState == InterfaceState.SELECTING && !selectedStructure.isRoad() && selectedStructure.type != StructureType.Cpu_t1) {
+                                                                if (selectedStructure.state != StructureState.Standby) {
+                                                                        selectedStructure.setState(StructureState.Standby);
+                                                                        Game.sound.play(Game.sound.standbyOn);
+                                                                } else {
+                                                                        selectedStructure.setState(StructureState.Active);
+                                                                        Game.sound.play(Game.sound.standbyOff);
+                                                                }
                                                         }
                                                 }
                                         });
@@ -703,28 +713,31 @@ public class UserInterface {
                                         removeRect);
 
                                 removeButton.addListener(
-                                        (comp) -> {
-                                                if (guiState == InterfaceState.SELECTING) {
-                                                        int particleX = Game.renderer.stagePosition.x + selectedStructure.position.x * Game.PIXELS_PER_TILE * Game.PIXEL_SCALE;
-                                                        int particleW = selectedStructure.dimensions.x * Game.PIXELS_PER_TILE * Game.PIXEL_SCALE;
-                                                        int particleY = Game.renderer.stagePosition.y + selectedStructure.position.y * Game.PIXELS_PER_TILE * Game.PIXEL_SCALE;
-                                                        int particleH = selectedStructure.dimensions.y * Game.PIXELS_PER_TILE * Game.PIXEL_SCALE;
+                                        new ComponentListener() {
+                                                @Override
+                                                public void componentActivated(AbstractComponent comp) {
+                                                        if (guiState == InterfaceState.SELECTING) {
+                                                                int particleX = Game.renderer.stagePosition.x + selectedStructure.position.x * Game.PIXELS_PER_TILE * Game.PIXEL_SCALE;
+                                                                int particleW = selectedStructure.dimensions.x * Game.PIXELS_PER_TILE * Game.PIXEL_SCALE;
+                                                                int particleY = Game.renderer.stagePosition.y + selectedStructure.position.y * Game.PIXELS_PER_TILE * Game.PIXEL_SCALE;
+                                                                int particleH = selectedStructure.dimensions.y * Game.PIXELS_PER_TILE * Game.PIXEL_SCALE;
 
-                                                        selectedStructure.remove();
-                                                        selectedStructure = null;
-                                                        guiState = InterfaceState.OFF;
+                                                                selectedStructure.remove();
+                                                                selectedStructure = null;
+                                                                guiState = InterfaceState.OFF;
 
-                                                        Game.renderer.spawnParticlesInArea(
-                                                                particleX, particleY,
-                                                                particleW, particleH,
-                                                                40, 1, 20,
-                                                                Color.darkGray, 1f);
+                                                                Game.renderer.spawnParticlesInArea(
+                                                                        particleX, particleY,
+                                                                        particleW, particleH,
+                                                                        40, 1, 20,
+                                                                        Color.darkGray, 1f);
 
-                                                        Game.renderer.spawnParticlesInArea(
-                                                                particleX, particleY,
-                                                                particleW, particleH,
-                                                                40, 1, 20,
-                                                                Color.lightGray, 1f);
+                                                                Game.renderer.spawnParticlesInArea(
+                                                                        particleX, particleY,
+                                                                        particleW, particleH,
+                                                                        40, 1, 20,
+                                                                        Color.lightGray, 1f);
+                                                        }
                                                 }
                                         });
                         } catch (SlickException e) {

@@ -2,12 +2,9 @@ package test;
 
 import org.newdawn.slick.*;
 import org.newdawn.slick.Color;
-import org.newdawn.slick.geom.Polygon;
-import org.newdawn.slick.geom.Shape;
 import org.newdawn.slick.geom.Vector2f;
 import org.newdawn.slick.util.FastTrig;
 import test.structures.Structure;
-import test.structures.StructureState;
 import test.structures.StructureType;
 
 import java.util.ArrayList;
@@ -45,6 +42,7 @@ public class Renderer {
         public Map<String, Image> loadedImages;
 
         public List<Particle> particles;
+        public List<Particle> removeParticles;
 
         public Image terrainImage;
 
@@ -53,6 +51,7 @@ public class Renderer {
         public Renderer() {
                 loadedImages = new HashMap<>();
                 particles = new ArrayList<>();
+                removeParticles = new ArrayList<>();
 
                 wireImages = new WireImages();
 
@@ -387,11 +386,15 @@ public class Renderer {
         }
 
         public void update(float delta) {
+                removeParticles.clear();
                 for (Particle particle : particles) {
                         particle.update(delta);
+                        if (particle.dead) {
+                                removeParticles.add(particle);
+                        }
                 }
-                particles.removeIf((p) -> p.dead);
 
+                particles.removeAll(removeParticles);
 
                 inactiveUpdateTime += 3 * delta;
                 inactiveAlpha = Math.abs((float)FastTrig.cos(inactiveUpdateTime));

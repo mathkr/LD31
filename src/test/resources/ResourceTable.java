@@ -8,7 +8,7 @@ public class ResourceTable {
     public Map<Resource, Float> resources;
 
     public ResourceTable(){
-        resources = new HashMap<Resource,Float>();
+        resources = new HashMap<>();
     }
 
     public boolean greaterOrEqual(ResourceTable other){
@@ -19,11 +19,19 @@ public class ResourceTable {
     }
 
     public void add(ResourceTable other){
-        other.resources.forEach(this::change);
+        for (Map.Entry<Resource, Float> entry : other.resources.entrySet()) {
+            Resource res = entry.getKey();
+            float val = entry.getValue();
+            this.change(res, val);
+        }
     }
 
     public void subtract(ResourceTable other){
-        other.resources.forEach((res, val) -> this.change(res, -val));
+        for (Map.Entry<Resource, Float> entry : other.resources.entrySet()) {
+            Resource res = entry.getKey();
+            float val = entry.getValue();
+            this.change(res, -val);
+        }
     }
 
     public void put(Resource r, float f){
@@ -55,7 +63,8 @@ public class ResourceTable {
     }
 
     public Float get(Resource r){
-        return resources.getOrDefault(r, 0.0f);
+        Float res = resources.get(r);
+        return res == null ? 0.0f : res;
     }
 
     public boolean canSubtract(Resource r, float f) { return get(r) >= f; }
@@ -63,7 +72,11 @@ public class ResourceTable {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        resources.forEach((res, val) -> sb.append(res + ": " + val + ", "));
+        for (Map.Entry<Resource, Float> entry : resources.entrySet()) {
+            Resource res = entry.getKey();
+            float val = entry.getValue();
+            sb.append(res + ": " + val + ", ");
+        }
         return sb.toString();
     }
 }

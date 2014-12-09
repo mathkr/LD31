@@ -90,7 +90,7 @@ public class Structure {
                 state = setState;
         }
 
-        public void update(float d){
+        public void update(final float d){
                 if (updater != null) {
                         updater.update(this);
                 }
@@ -120,8 +120,8 @@ public class Structure {
                         setState(StructureState.Active);
                 }
 
-                ResourceTable resources = Game.world.resources;
-                ResourceTable cap = Game.world.resourceCapacity;
+                final ResourceTable resources = Game.world.resources;
+                final ResourceTable cap = Game.world.resourceCapacity;
 
                 //pruefe, ob eingagsressourcen vorhanden
                 if(isConsumer) {
@@ -149,34 +149,46 @@ public class Structure {
                         }
                 }
 
-                float f = getProductionFactor();
+                final float f = getProductionFactor();
 
-                productionInPerSec.resources.forEach((res, val) ->
-                        productionInDelta.change(res, productionInPerSec.get(res) * d * (isProducer ? f : 1.0f))
-                );
-                productionOutPerSec.resources.forEach((res, val) ->
-                        productionOutDelta.change(res, productionOutPerSec.get(res) * d * f)
-                );
+                for (Map.Entry<Resource, Float> entry : productionInPerSec.resources.entrySet()) {
+                        Resource res = entry.getKey();
+                        float val = entry.getValue();
+                        productionInDelta.change(res, productionInPerSec.get(res) * d * (isProducer ? f : 1.0f));
+                }
+
+                for (Map.Entry<Resource, Float> entry : productionOutPerSec.resources.entrySet()) {
+                        Resource res = entry.getKey();
+                        float val = entry.getValue();
+                        productionOutDelta.change(res, productionOutPerSec.get(res) * d * f);
+                }
 
                 setState(StructureState.Active);
 
                 //ziehe eingangsressourcen ab
                 //UNSAFE fuer input von mehr als 1.0 unit resource pro frame
-                productionInDelta.resources.forEach((res, val) -> {
+                for (Map.Entry<Resource, Float> entry : productionInPerSec.resources.entrySet()) {
+                        Resource res = entry.getKey();
+                        Float val = entry.getValue();
+
                         float rDelta = val.intValue();
                         if (rDelta > 0.0f) {
                                 productionInDelta.change(res, -rDelta);
                                 resources.change(res, -rDelta);
                         }
-                });
+                }
+
                 //addiere ausgangsressourcen (soweit moeglich)
-                productionOutDelta.resources.forEach((res, val) -> {
+                for (Map.Entry<Resource, Float> entry : productionOutPerSec.resources.entrySet()) {
+                        Resource res = entry.getKey();
+                        Float val = entry.getValue();
+
                         float rDelta = val.intValue();
-                        if(rDelta > 0.0f){
+                        if (rDelta > 0.0f) {
                                 productionOutDelta.change(res, -rDelta);
                                 resources.change(res, Math.min(rDelta, cap.get(res) - resources.get(res)));
                         }
-                });
+                }
         }
 
         public boolean canBePlaced(){
