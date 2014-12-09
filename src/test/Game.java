@@ -106,7 +106,7 @@ public class Game extends BasicGame {
                         WIN_HEIGHT = (World.WORLD_DIMENSIONS.y * PIXELS_PER_TILE * PIXEL_SCALE)
                                 + Renderer.HEADER_HEIGHT + Renderer.FOOTER_HEIGHT;
 
-                        appgc = new AppGameContainer(new Game("Simple Slick Game"));
+                        appgc = new AppGameContainer(new Game("Simtech"));
                         appgc.setDisplayMode(WIN_WIDTH, WIN_HEIGHT, false);
                         appgc.setTargetFrameRate(60);
                         appgc.setShowFPS(false);
