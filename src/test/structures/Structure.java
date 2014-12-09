@@ -14,7 +14,7 @@ import java.util.Map;
 
 public class Structure {
 
-        static final float freezeTime = 2.5f;
+        static final float freezeTime = 1.7f;
 
         public Vector2i position;
         public Vector2i dimensions;
