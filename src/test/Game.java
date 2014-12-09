@@ -18,6 +18,11 @@ public class Game extends BasicGame {
         public static SoundLib sound;
         public static UserInterface gui;
 
+        private final float startTime = 3;
+        private float startElapsed = 0;
+        private boolean gameHasStarted = false;
+        private Image title;
+
         public Game(String gamename) {
                 super(gamename);
         }
@@ -28,22 +33,35 @@ public class Game extends BasicGame {
                 renderer = new Renderer();
                 sound = new SoundLib();
                 gui = new UserInterface(gc);
+
+                title = new Image("resources/title.png", false, Image.FILTER_NEAREST).getScaledCopy(Game.PIXEL_SCALE);
         }
 
         @Override
         public void update(GameContainer gc, int i) throws SlickException {
                 float delta = i / 1000.0f;
-                world.update(delta);
-                renderer.update(delta);
-                gui.update(gc, delta);
+                if (gameHasStarted) {
+                        world.update(delta);
+                        renderer.update(delta);
+                        gui.update(gc, delta);
+                } else {
+                        startElapsed += delta;
+                        if (startElapsed >= startTime) {
+                                gameHasStarted = true;
+                        }
+                }
         }
 
         @Override
         public void render(GameContainer gc, Graphics g) throws SlickException {
-                g.setFont(renderer.font);
-                g.setLineWidth(2f);
-                renderer.render(gc, g);
-                gui.render(gc, g);
+                if (gameHasStarted) {
+                        g.setFont(renderer.font);
+                        g.setLineWidth(2f);
+                        renderer.render(gc, g);
+                        gui.render(gc, g);
+                } else {
+                        title.drawCentered(WIN_WIDTH / 2, WIN_HEIGHT / 2);
+                }
         }
 
         public static int getWorldMouseX() {
